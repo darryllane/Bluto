@@ -3,4 +3,5 @@ include *.md
 recursive-include Bluto *.txt *.py
 recursive-include Bluto/doc *.txt *.py
 recursive-include Bluto/doc/modules *.txt *.py
+recursive-include Bluto/log *.log
 recursive-exclude *.DS_store

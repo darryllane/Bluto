@@ -17,6 +17,7 @@ Bluto/doc/sub_interest.txt
 Bluto/doc/subdomains-top1mil-20000.txt
 Bluto/doc/subdomains-top1mil.txt
 Bluto/doc/user_agents.txt
+Bluto/log/bluto-warn.log
 Bluto/modules/__init__.py
 Bluto/modules/bluto_logging.py
 Bluto/modules/general.py
