@@ -6,7 +6,15 @@ import pythonwhois
 import traceback
 import requests
 import datetime
+import sys
+import dns.resolver
+import dns.query
+import dns.zone
+import traceback
 from bluto_logging import warning
+
+myResolver = dns.resolver.Resolver()
+myResolver.nameservers = ['8.8.8.8']
 
 default_s = False
 
@@ -137,3 +145,19 @@ def action_bluto_use(countryID):
     except Exception:
         warning(traceback.print_exc())
         pass
+
+
+def check_dom(domain):
+    try:
+        myAnswers = myResolver.query(domain, "NS")
+        dom = str(myAnswers.canonical_name).strip('.')
+        if dom:
+            pass
+    except dns.resolver.NXDOMAIN:
+        print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        sys.exit()
+    except Exception:
+        print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
+        warning(traceback.print_exc())
+
+

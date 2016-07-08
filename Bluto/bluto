@@ -15,12 +15,12 @@ from termcolor import colored
 from modules.get_dns import action_brute_start, action_wild_cards, action_zone_transfer, get_dns_details, action_brute_wild
 from modules.search import action_bing_true, action_google, action_linkedin, action_netcraft, action_emailHunter
 from modules.get_file import get_subs, get_sub_interest, get_line_count
-from modules.general import action_country_id, action_whois, action_bluto_use
+from modules.general import action_country_id, action_whois, action_bluto_use, check_dom
 from modules.output import action_output_vuln_zone, action_output_wild_false, action_output_wild_false_hunter, action_output_vuln_zone_hunter
 from modules.bluto_logging import warning
 
 
-version = "1.1.23"
+version = "1.99"
 sites = site.getsitepackages()
 myResolver = dns.resolver.Resolver()
 myResolver.nameservers = ['8.8.8.8']
@@ -40,47 +40,51 @@ countries_file = path + "/Bluto/doc/countries.txt"
 
 
 print """
-BBBBBBBBBBBBBBBBB  lllllll                       tttt
-B::::::::::::::::B l:::::l                     ttt:::t
-B::::::BBBBBB:::::Bl:::::l                     t:::::t
-BB:::::B     B:::::l:::::l{6}              t:::::t
-  B::::B     B:::::Bl::::luuuuuu    uuuuuttttttt:::::ttttttt      ooooooooooo
-  B::::B     B:::::Bl::::lu::::u    u::::t:::::::::::::::::t    oo:::::::::::oo
-  B::::BBBBBB:::::B l::::lu::::u    u::::t:::::::::::::::::t   o:::::::::::::::o
-  B:::::::::::::BB  l::::lu::::u    u::::tttttt:::::::tttttt   o:::::ooooo:::::o
-  B::::BBBBBB:::::B l::::lu::::u    u::::u     t:::::t         o::::o     o::::o
-  B::::B     B:::::Bl::::lu::::u    u::::u     t:::::t         o::::o     o::::o
-  B::::B     B:::::Bl::::lu::::u    u::::u     t:::::t         o::::o     o::::o
-  B::::B     B:::::Bl::::lu:::::uuuu:::::u     t:::::t    ttttto::::o     o::::o
-BB:::::BBBBBB::::::l::::::u:::::::::::::::uu   t::::::tttt:::::o:::::ooooo:::::o
-B:::::::::::::::::Bl::::::lu:::::::::::::::u   tt::::::::::::::o:::::::::::::::o
-B::::::::::::::::B l::::::l uu::::::::uu:::u     tt:::::::::::ttoo:::::::::::oo
-BBBBBBBBBBBBBBBBB  llllllll   uuuuuuuu  uuuu       ttttttttttt    ooooooooooo
+ BBBBBBBBBBBBBBBBB  lllllll                       tttt
+ B::::::::::::::::B l:::::l                     ttt:::t
+ B::::::BBBBBB:::::Bl:::::l                     t:::::t
+ BB:::::B     B:::::l:::::l{6}                t:::::t
+   B::::B     B:::::Bl::::luuuuuu    uuuuuttttttt:::::ttttttt      ooooooooooo
+   B::::B     B:::::Bl::::lu::::u    u::::t:::::::::::::::::t    oo:::::::::::oo
+   B::::BBBBBB:::::B l::::lu::::u    u::::t:::::::::::::::::t   o:::::::::::::::o
+   B:::::::::::::BB  l::::lu::::u    u::::tttttt:::::::tttttt   o:::::ooooo:::::o
+   B::::BBBBBB:::::B l::::lu::::u    u::::u     t:::::t         o::::o     o::::o
+   B::::B     B:::::Bl::::lu::::u    u::::u     t:::::t         o::::o     o::::o
+   B::::B     B:::::Bl::::lu::::u    u::::u     t:::::t         o::::o     o::::o
+   B::::B     B:::::Bl::::lu:::::uuuu:::::u     t:::::t    ttttto::::o     o::::o
+ BB:::::BBBBBB::::::l::::::u:::::::::::::::uu   t::::::tttt:::::o:::::ooooo:::::o
+ B:::::::::::::::::Bl::::::lu:::::::::::::::u   tt::::::::::::::o:::::::::::::::o
+ B::::::::::::::::B l::::::l uu::::::::uu:::u     tt:::::::::::ttoo:::::::::::oo
+ BBBBBBBBBBBBBBBBB  llllllll   uuuuuuuu  uuuu       ttttttttttt    ooooooooooo
 
-     {2} | {3} | {4} | {7}
-                             {8}
-            {0}  |  {1}
-                 {5}
-""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/RandomStorm/Bluto", 'green'), colored("v" + version, 'red'), colored("Email Enumeration", 'green'), colored("User Enumeration", 'green'))
+  {2} | {3} | {4} | {9}
+        {8} | {7} | {10}
+                       {11}
+
+              {0}  |  {1}
+                  {5}
+""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + version, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'))
 
 if __name__ == "__main__":
     try:
-        parser = argparse.ArgumentParser(description='Use: -E for lots of spinach | Use: -API for emailhunter_support')
-        parser.add_argument('-E', help='Used for a very large list for SubDomain brute forcing', required=False)
-        parser.add_argument('-API', help='Supply your free API key to gather more email addresses', required=False)
+        parser = argparse.ArgumentParser(description='Use: -E for lots of spinach | Use: -api for emailhunter_support')
+        parser.add_argument('-E', help='Used for brute forcing with a very large list of SubDomains', required=False)
+        parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['E']:
             warning('\n-E Argument Used')
             filename1 = path + "/Bluto/doc/lots-of-spinach.txt"
-        if args['API']:
-            api = args['API']
-            warning('-API Argument Used with api: ' + str(api))
+        if args['api']:
+            api = args['api']
+            warning('-api Argument Used with api: ' + str(api))
         else:
             api = False
-        domain = raw_input("\nTarget Domain: ")
+        domain = raw_input("Target Domain: ")
         warning('Domain Identified: ' + str(domain))
         domain_r = domain.split('.')
         report_location = os.path.expanduser('~/Desktop/Bluto-Evidence-{}.html'.format(domain_r[0]))
+    #Check if domain valid
+        check_dom(domain)
     #WhoisGet
         company = action_whois(domain)
     #Detail Call
