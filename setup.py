@@ -6,7 +6,8 @@ setup(
     author='Darryl lane',
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
-    packages=find_packages() + ['Bluto'],
+    packages=['Bluto'],
+    py_modules = ['modules'],
     include_package_data=True,
     license='LICENSE.txt',
     description='''

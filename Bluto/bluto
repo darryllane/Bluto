@@ -2,10 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import time
-import os
-import threading
 import site
+import os
+
+sites = site.getsitepackages()
+for item in sites:
+    if os.path.exists(item + "/Bluto/modules/__init__.py"):
+        path = item
+        sys.path.append(path + '/Bluto/')
+
+import time
+import threading
 import Queue
 import argparse
 import dns.resolver
@@ -21,7 +28,6 @@ from modules.bluto_logging import warning
 
 
 version = "1.99"
-sites = site.getsitepackages()
 myResolver = dns.resolver.Resolver()
 myResolver.nameservers = ['8.8.8.8']
 prox = False
@@ -29,7 +35,7 @@ prox = False
 for item in sites:
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
         path = item
-        warning('Application Path Identified' + path)
+        warning('Application Path Identified: ' + path)
     else:
         pass
 
