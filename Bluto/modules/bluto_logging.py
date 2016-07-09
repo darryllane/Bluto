@@ -5,15 +5,13 @@ import sys
 import site
 import os
 
-sites = site.getsitepackages()
+working_dir = os.path.expanduser('~')
+if not os.path.exists(working_dir + '/Bluto/log'):
+    os.makedirs(working_dir + '/Bluto/log')
+    open(working_dir + '/Bluto/log/bluto-warn.log','a').close()
 
-for item in sites:
-    if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
-        path = item
-    else:
-        pass
 
-WARNING_LOG_FILENAME = path + '/Bluto/log/bluto-warn.log'
+WARNING_LOG_FILENAME = working_dir + '/Bluto/log/bluto-warn.log'
 
 # set up formatting
 formatter = logging.Formatter('[%(asctime)s] %(module)s: %(message)s')
