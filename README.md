@@ -11,7 +11,7 @@ Bluto has gone through a large code base change and various feature additions ha
 
 The target domain is queried for MX and NS records. Sub-domains are passively gathered via NetCraft. The target domain NS records are each queried for potential Zone Transfers. If none of them gives up their spinach, Bluto will attempt to identify if SubDomain Wild Cards are being used. If they are not Bluto will brute force subdomains using parallel sub processing on the top 20000 of the 'The Alexa Top 1 Million subdomains' If Wild Cards are in place, Bluto will still Brute Force SubDomains but using a different technique which takes roughly 4 x longer. NetCraft results are then presented individually and are then compared to the brute force results, any duplications are removed and particularly interesting results are highlighted. 
 
-Bluto now does email address enumeration based on the target domain, currently using Bing and Google search engines plus gathering data from the Email Hunter service and LinkedIn. https://haveibeenpwned.com/ is then used to identify if any email addresses have been compromised.
+Bluto now does email address enumeration based on the target domain, currently using Bing and Google search engines plus gathering data from the Email Hunter service and LinkedIn. https://haveibeenpwned.com/ is then used to identify if any email addresses have been compromised. Previously Bluto produced a 'Evidence Report' on the screen, this has now been moved off screen and into an HTML report.
 
 Search engine queries are configured in such a way to use a random `User Agent:` on each request and does a country look up to select the fastest Google server in relation to your egress address. Each request closes the connection in an attempt to further avoid captchas, however exsesive lookups will result in captchas (Bluto will warn you if any are identified). 
          
@@ -22,11 +22,11 @@ Bluto now takes command line arguments at launch, the new options are as follows
 -E  		This uses a very large subdomain list for bruting.
 -api		You can supply your email hunter api key here to gather a considerably larger amount of email addresses.
 
-Examples: 
+**Examples:** (feel free to use this api until it is removed (DEV))
 
 	Bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669
 	Bluto -E
-	Bluto - api 2b0ab19df982a783877a6b59b982fdba4b6c3669 -E
+	Bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669 -E
 
 
 
