@@ -23,6 +23,7 @@ setup(
         "requests",
         "pythonwhois",
         "lxml",
+        "dill",
     ],
 )
 
