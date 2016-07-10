@@ -62,5 +62,6 @@ Changelog
   * Email Hunter API Support Added.
   * Haveibeenpwned API Support Added.
   * HTML Evidence Report Added.
-  * Module Based Code Change
+  * Modulated Code Base.
+  * Local Error Logging.
 
