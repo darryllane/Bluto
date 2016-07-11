@@ -88,7 +88,7 @@ if __name__ == "__main__":
         domain = raw_input("Target Domain: ")
         warning('Domain Identified: ' + str(domain))
         domain_r = domain.split('.')
-        report_location = os.path.expanduser('~/Desktop/Bluto-Evidence-{}.html'.format(domain_r[0]))
+        report_location = os.path.expanduser('~/Bluto-Evidence-{}.html'.format(domain_r[0]))
     #Check if domain valid
         check_dom(domain)
     #WhoisGet
