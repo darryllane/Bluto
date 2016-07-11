@@ -14,6 +14,8 @@ import traceback
 from bluto_logging import warning
 
 myResolver = dns.resolver.Resolver()
+myResolver.timeout = 5
+myResolver.lifetime = 5
 myResolver.nameservers = ['8.8.8.8']
 
 default_s = False

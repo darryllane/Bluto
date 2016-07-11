@@ -13,6 +13,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
 myResolver = dns.resolver.Resolver()
+myResolver.timeout = 5
+myResolver.lifetime = 5
 myResolver.nameservers = ['8.8.8.8']
 
 targets = []
@@ -73,7 +75,6 @@ def action_wild_cards(domain, myResolver):
         myAnswers = myResolver.query(str(one) + '.' + str(domain))
 
     except dns.resolver.NoNameservers:
-        print '\n\tNo Name Servers'
         pass
 
     except dns.resolver.NoAnswer:
@@ -98,6 +99,8 @@ def action_brute(subdomain):
     except dns.resolver.NoAnswer:
         pass
     except dns.exception.SyntaxError:
+        pass
+    except dns.exception.Timeout:
         pass
     except Exception:
         print 'An Unhandled Exception Has Occured, Please Check The Log For Details'

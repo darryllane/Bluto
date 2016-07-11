@@ -6,9 +6,11 @@ import site
 import os
 
 working_dir = os.path.expanduser('~')
+log_file = '/Bluto/log/bluto-warn.log'
+
 if not os.path.exists(working_dir + '/Bluto/log'):
     os.makedirs(working_dir + '/Bluto/log')
-    open(working_dir + '/Bluto/log/bluto-warn.log','a').close()
+    open(working_dir + log_file,'a').close()
 
 
 WARNING_LOG_FILENAME = working_dir + '/Bluto/log/bluto-warn.log'
