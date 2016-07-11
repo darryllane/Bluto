@@ -8,9 +8,7 @@ import socket
 import dns.resolver
 import random
 import string
-import dill
 from bluto_logging import warning
-from pathos.multiprocessing import ProcessingPool
 from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
