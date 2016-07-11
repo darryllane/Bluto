@@ -56,3 +56,12 @@ Note: To test if pip is already installed execute.
 
 `sudo pip install git+git://github.com/darryllane/Bluto --upgrade`
 
+Changelog
+====
+* Version __1.99__ (__09/07/2016__):
+  * Email Hunter API Support Added.
+  * Haveibeenpwned API Support Added.
+  * HTML Evidence Report Added.
+  * Modulated Code Base.
+  * Local Error Logging.
+
