@@ -209,7 +209,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     time_spent_email_f = str(datetime.timedelta(seconds=(time_spent_email))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
 
-    print '\nHosts Identified: {}' .format(str(bruted_count)))
+    print '\nHosts Identified: {}' .format(str(bruted_count))
     print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
@@ -427,7 +427,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     time_spent_brute_f = str(datetime.timedelta(seconds=(time_spent_brute))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
 
-    print '\nHosts Identified: {}' .format(str(bruted_count)))
+    print '\nHosts Identified: {}' .format(str(bruted_count))
     print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
@@ -547,7 +547,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     time_spent_brute_f = str(datetime.timedelta(seconds=(time_spent_brute))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
 
-    print '\nHosts Identified: {}' .format(str(bruted_count)))
+    print '\nHosts Identified: {}' .format(str(bruted_count))
     print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
