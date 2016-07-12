@@ -6,8 +6,8 @@ import traceback
 import collections
 import datetime
 import webbrowser
-from modules.search import action_pwned
-from modules.bluto_logging import warning
+from search import action_pwned
+from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
 
 def action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location):
@@ -81,6 +81,8 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     target_dict = dict((x.split(' ') for x in clean_dump))
     clean_target = collections.OrderedDict(sorted(target_dict.items()))
     print "\nProcessed Dump\n"
+
+    bruted_count = len(clean_target)
     for item in clean_target:
         if item in sub_intrest:
             print colored(item, 'red'), colored("\t" + clean_target[item], 'red')
@@ -89,11 +91,21 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
 
     time_spent_email_f = str(datetime.timedelta(seconds=(time_spent_email))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
-    print '\nPotential Emails Found: {}' .format(str(email_count))
+
+    print '\nHosts Identified: {}' .format(str(bruted_count))
+    print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
     print "Email Enumeration:", time_spent_email_f
     print "Total Time:", time_spent_total_f
+
+    info('Hosts Identified: {}' .format(str(bruted_count)))
+    info("Total Time:" .format(str(time_spent_total_f)))
+    info("Email Enumeration: {}" .format(str(time_spent_email_f)))
+    info('Compromised Accounts: {}' .format(str(c_accounts)))
+    info('Potential Staff Members Found: {}' .format(str(staff_count)))
+    info('Potential Emails Found: {}' .format(str(email_count)))
+    info('DNS Vuln Run completed')
 
     print "\nAn evidence report has been written to {}\n".format(report_location)
 
@@ -187,6 +199,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     clean_target = collections.OrderedDict(sorted(target_dict.items()))
 
     print "\nProcessed Dump\n"
+    bruted_count = len(clean_target)
     for item in clean_target:
         if item in sub_intrest:
             print colored(item, 'red'), colored("\t" + clean_target[item], 'red')
@@ -196,11 +209,20 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     time_spent_email_f = str(datetime.timedelta(seconds=(time_spent_email))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
 
-    print '\nPotential Emails Found: {}' .format(str(email_count))
+    print '\nHosts Identified: {}' .format(str(bruted_count)))
+    print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
     print "Email Enumeration:", time_spent_email_f
     print "Total Time:", time_spent_total_f
+
+    info('Hosts Identified: {}' .format(str(bruted_count)))
+    info("Total Time:" .format(str(time_spent_total_f)))
+    info("Email Enumeration: {}" .format(str(time_spent_email_f)))
+    info('Compromised Accounts: {}' .format(str(c_accounts)))
+    info('Potential Staff Members Found: {}' .format(str(staff_count)))
+    info('Potential Emails Found: {}' .format(str(email_count)))
+    info('DNS Vuln Run completed')
 
     print "\nAn evidence report has been written to {}\n".format(report_location)
 
@@ -299,6 +321,14 @@ def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_r
     print 'Compromised Accounts: {}' .format(str(c_accounts))
     print "Email Enumeration:", time_spent_email_f
     print "Total Time:", time_spent_total_f
+
+    info("Email Enumeration: {}" .format(str(time_spent_email_f)))
+    info('Compromised Accounts: {}' .format(str(c_accounts)))
+    info('Potential Staff Members Found: {}' .format(str(staff_count)))
+    info('Potential Emails Found: {}' .format(str(email_count)))
+    info("Total Time:" .format(str(time_spent_total_f)))
+    info('DNS Wild Card + Email Hunter Run completed')
+
     while True:
         answer = raw_input("Would you like to open this report now? ").lower()
         if answer in answers:
@@ -384,6 +414,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
 
 
     sorted_dict = collections.OrderedDict(sorted(brute_results_dict.items()))
+    bruted_count = len(sorted_dict)
     print "\nBluto Results: \n"
     for item in sorted_dict:
         if item in sub_intrest:
@@ -395,12 +426,23 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     time_spent_email_f = str(datetime.timedelta(seconds=(time_spent_email))).split('.')[0]
     time_spent_brute_f = str(datetime.timedelta(seconds=(time_spent_brute))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
-    print '\nPotential Emails Found: {}' .format(str(email_count))
+
+    print '\nHosts Identified: {}' .format(str(bruted_count)))
+    print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
     print "Email Enumeration:", time_spent_email_f
     print "Requests executed:", str(check_count) + " in ", time_spent_brute_f
     print "Total Time:", time_spent_total_f
+
+    info('Hosts Identified: {}' .format(str(bruted_count)))
+    info("Email Enumeration: {}" .format(str(time_spent_email_f)))
+    info('Compromised Accounts: {}' .format(str(c_accounts)))
+    info('Potential Staff Members Found: {}' .format(str(staff_count)))
+    info('Potential Emails Found: {}' .format(str(email_count)))
+    info("Total Time:" .format(str(time_spent_total_f)))
+    info('DNS No Wild Cards + Email Hunter Run completed')
+
     print "\nAn evidence report has been written to {}\n".format(report_location)
     answers = ['no','n','y','yes']
     while True:
@@ -491,6 +533,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
 
 
     sorted_dict = collections.OrderedDict(sorted(brute_results_dict.items()))
+    bruted_count = len(sorted_dict)
     print "\nBluto Results: \n"
     for item in sorted_dict:
         if item is not '*.' + domain:
@@ -503,28 +546,42 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     time_spent_email_f = str(datetime.timedelta(seconds=(time_spent_email))).split('.')[0]
     time_spent_brute_f = str(datetime.timedelta(seconds=(time_spent_brute))).split('.')[0]
     time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
-    print '\nPotential Emails Found: {}' .format(str(email_count))
+
+    print '\nHosts Identified: {}' .format(str(bruted_count)))
+    print 'Potential Emails Found: {}' .format(str(email_count))
     print 'Potential Staff Members Found: {}' .format(str(staff_count))
     print 'Compromised Accounts: {}' .format(str(c_accounts))
     print "Email Enumeration:", time_spent_email_f
     print "Requests executed:", str(check_count) + " in ", time_spent_brute_f
     print "Total Time:", time_spent_total_f
+
+    info('Hosts Identified: {}' .format(str(bruted_count)))
+    info("Email Enumeration: {}" .format(str(time_spent_email_f)))
+    info('Compromised Accounts: {}' .format(str(c_accounts)))
+    info('Potential Staff Members Found: {}' .format(str(staff_count)))
+    info('Potential Emails Found: {}' .format(str(email_count)))
+    info("Total Time:" .format(str(time_spent_total_f)))
+    info('DNS No Wild Cards + Email Hunter Run completed')
+
     print "\nAn evidence report has been written to {}\n".format(report_location)
     answers = ['no','n','y','yes']
     while True:
         answer = raw_input("Would you like to open this report now? ").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
+                info('Read HTML Report In Browser')
                 print '\nOpening {}' .format(report_location)
                 webbrowser.open('file://' + str(report_location))
                 break
             else:
+                info('Did Not Read HTML Report In Browser')
                 break
         else:
             print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
 def write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location):
+    info('Started HTML Report')
     header = '''
     <!DOCTYPE html>
     <html>
@@ -668,7 +725,8 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
             myFile.write('</body>')
             myFile.write('</html>')
             myFile.close()
+            info('Completed HTML Report\n')
     except IOError,e:
-        warning(traceback.print_exc())
+        error('\nIOError', exc_info=True)
     except Exception:
-        warning(traceback.print_exc())
+        error('\nAn Unhandled Exception Occured\n', exc_info=True)

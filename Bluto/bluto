@@ -5,11 +5,18 @@ import sys
 import site
 import os
 
-sites = site.getsitepackages()
-for item in sites:
+SITES = site.getsitepackages()
+for item in SITES:
     if os.path.exists(item + "/Bluto/modules/__init__.py"):
         path = item
         sys.path.append(path + '/Bluto/')
+
+FILENAME_1 = path + "/Bluto/doc/subdomains-top1mil-20000.txt"
+FILENAME_2 = path + "/Bluto/doc/sub_interest.txt"
+USERAGENT_F = path + "/Bluto/doc/user_agents.txt"
+COUNTRIES_FILE = path + "/Bluto/doc/countries.txt"
+INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
+ERROR_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-error.log')
 
 import time
 import threading
@@ -24,26 +31,22 @@ from modules.search import action_bing_true, action_google, action_linkedin, act
 from modules.get_file import get_subs, get_sub_interest, get_line_count
 from modules.general import action_country_id, action_whois, action_bluto_use, check_dom
 from modules.output import action_output_vuln_zone, action_output_wild_false, action_output_wild_false_hunter, action_output_vuln_zone_hunter
-from modules.bluto_logging import warning
+from modules.bluto_logging import info, error
 
 
-version = "1.99"
+VERSION = "1.99"
 myResolver = dns.resolver.Resolver()
+myResolver.timeout = 5
+myResolver.lifetime = 5
 myResolver.nameservers = ['8.8.8.8']
 prox = False
 
-for item in sites:
+for item in SITES:
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
         path = item
-        warning('Application Path Identified: ' + path)
+        info('Application Path Identified: ' + path)
     else:
         pass
-
-filename1 = path + "/Bluto/doc/subdomains-top1mil-20000.txt"
-filename2 = path + "/Bluto/doc/sub_interest.txt"
-useragent_f = path + "/Bluto/doc/user_agents.txt"
-countries_file = path + "/Bluto/doc/countries.txt"
-
 
 print """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
@@ -69,24 +72,25 @@ print """
 
               {0}  |  {1}
                   {5}
-""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + version, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'))
+""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + VERSION, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'))
 
 if __name__ == "__main__":
+    info('Bluto Started')
     try:
         parser = argparse.ArgumentParser(description='Use: -E for lots of spinach | Use: -api for emailhunter_support')
         parser.add_argument('-E', help='Used for brute forcing with a very large list of SubDomains', required=False)
         parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['E']:
-            warning('\n-E Argument Used')
-            filename1 = path + "/Bluto/doc/lots-of-spinach.txt"
+            info('\n-E Argument Used')
+            FILENAME_1 = path + "/Bluto/doc/lots-of-spinach.txt"
         if args['api']:
             api = args['api']
-            warning('-api Argument Used with api: ' + str(api))
+            info('-api Argument Used with api: ' + str(api))
         else:
             api = False
         domain = raw_input("Target Domain: ")
-        warning('Domain Identified: ' + str(domain))
+        info('Domain Identified: ' + str(domain))
         domain_r = domain.split('.')
         report_location = os.path.expanduser('~/Bluto-Evidence-{}.html'.format(domain_r[0]))
     #Check if domain valid
@@ -94,7 +98,7 @@ if __name__ == "__main__":
     #WhoisGet
         company = action_whois(domain)
     #Detail Call
-        sub_intrest = get_sub_interest(filename2, domain)
+        sub_intrest = get_sub_interest(FILENAME_2, domain)
         zn_list = get_dns_details(domain, myResolver)
     #NetCraft Call
         netcraft_list = action_netcraft(domain, myResolver)
@@ -109,24 +113,24 @@ if __name__ == "__main__":
                 print colored('\n\tWild Cards Are In Place', 'green')
                 print colored("\n\tOh no! You ain't eatin' no spinach in this picture", 'blue')
                 print colored("\n\nThis Will Take A While Longer, On Average +- 20min", 'grey')
-                check_count = get_line_count(filename1)
-                subs = get_subs(filename1, domain)
+                check_count = get_line_count(FILENAME_1)
+                subs = get_subs(FILENAME_1, domain)
                 print '\nBrute Forcing Sub-Domains\n\n\tWhile you are waiting we will gather email addresses\n\tand LinkedIn users'
                 print '\nGathering Data From Google, Bing And LinkedIn'
-                userCountry, userServer = action_country_id(countries_file, prox)
+                userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
                 start_time_total = time.time()
                 start_time_email = time.time()
                 if api:
                     q4 = Queue.Queue()
-                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, useragent_f, q4, prox)) #Takes domain[str], api[list], useragent_f[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                     t4.start()
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
-                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, useragent_f, prox))
-                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, useragent_f, prox))
-                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, useragent_f, prox))
+                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
+                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
+                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
                 t1.start()
                 t2.start()
                 t3.start()
@@ -158,11 +162,11 @@ if __name__ == "__main__":
                     action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location)
             else:
                 print colored('\n\tWild Cards Are Not In Place', 'red')
-                check_count = get_line_count(filename1)
-                subs = get_subs(filename1, domain)
+                check_count = get_line_count(FILENAME_1)
+                subs = get_subs(FILENAME_1, domain)
                 print '\nBrute Forcing Sub-Domains\n\n\tWhile you are waiting we will gather email addresses\n\tand LinkedIn users'
                 print '\nGathering Data From Google, Bing And LinkedIn'
-                userCountry, userServer = action_country_id(countries_file, prox)
+                userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
                 start_time_total = time.time()
                 start_time_email = time.time()
@@ -171,11 +175,11 @@ if __name__ == "__main__":
                 q3 = Queue.Queue()
                 if api:
                     q4 = Queue.Queue()
-                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, useragent_f, q4, prox)) #Takes domain[str], api[list], useragent_f[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                     t4.start()
-                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, useragent_f, prox))
-                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, useragent_f, prox))
-                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, useragent_f, prox))
+                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
+                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
+                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
                 t1.start()
                 t2.start()
                 t3.start()
@@ -210,7 +214,7 @@ if __name__ == "__main__":
             vulnerable_list = vulnerable_results[0]
             clean_dump = vulnerable_results[1]
             print '\nGathering Data From Google, Bing And LinkedIn'
-            userCountry, userServer = action_country_id(countries_file, prox)
+            userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
             action_bluto_use(userCountry)
             start_time_total = time.time()
             start_time_email = time.time()
@@ -219,11 +223,11 @@ if __name__ == "__main__":
             q3 = Queue.Queue()
             if api:
                 q4 = Queue.Queue()
-                t4 = threading.Thread(target=action_emailHunter, args=(domain, api, useragent_f, q4, prox)) #Takes domain[str], api[list], useragent_f[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                 t4.start()
-            t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, useragent_f, prox))
-            t2 = threading.Thread(target=action_bing_true, args=(domain, q2, useragent_f, prox))
-            t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, useragent_f, prox))
+            t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
+            t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
+            t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
             t1.start()
             t2.start()
             t3.start()
@@ -244,6 +248,8 @@ if __name__ == "__main__":
             else:
                 action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location)
 
+        info('Bluto Finished')
     except KeyboardInterrupt:
         print '\n\nExiting..'
+        error('Keyboard Interrupt From User\n')
         sys.exit()

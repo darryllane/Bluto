@@ -8,7 +8,7 @@ import socket
 import dns.resolver
 import random
 import string
-from bluto_logging import warning
+from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
@@ -20,6 +20,7 @@ myResolver.nameservers = ['8.8.8.8']
 targets = []
 
 def get_dns_details(domain, myResolver):
+    info('Gathering DNS Details\n')
     ns_list = []
     zn_list =[]
     mx_list = []
@@ -45,8 +46,7 @@ def get_dns_details(domain, myResolver):
         print '\tTimeouted\nConfirm The Domain Name Is Correct.'
         sys.exit()
     except Exception:
-        print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
     try:
         print "\nMail Server:\n"
@@ -63,13 +63,14 @@ def get_dns_details(domain, myResolver):
     except dns.resolver.NoAnswer:
         print "\tNo Mail Servers"
     except Exception:
-        print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
+    info('Completed Gathering DNS Details\n')
     return zn_list
 
 
 def action_wild_cards(domain, myResolver):
+    info('Checking Wild Cards\n')
     try:
         one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
         myAnswers = myResolver.query(str(one) + '.' + str(domain))
@@ -81,8 +82,10 @@ def action_wild_cards(domain, myResolver):
         pass
 
     except dns.resolver.NXDOMAIN:
+        info('Wild Cards False\n')
         return False
     else:
+        info('Wild Cards True\n')
         return True
 
 
@@ -103,19 +106,21 @@ def action_brute(subdomain):
     except dns.exception.Timeout:
         pass
     except Exception:
-        print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
 
 def action_brute_start(subs):
+    info('Bruting SubDomains\n')
     pool = ThreadPool(12)
     pool.map(action_brute, subs)
     pool.close()
+    info('Completed Bruting SubDomains\n')
 
     return targets
 
 
 def action_brute_wild(sub_list, domain):
+    info('Bruting Wild Card SubDomains\n')
     target_results = []
     one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
     myAnswers = myResolver.query(str(one) + '.' + str(domain))
@@ -138,10 +143,12 @@ def action_brute_wild(sub_list, domain):
             pass
         except Exception:
             continue
+    info('Completed Bruting Wild Card SubDomains\n')
     return target_results
 
 
 def action_zone_transfer(zn_list, domain):
+    info('Attempting Zone Transfers\n')
     global clean_dump
     print "\nAttempting Zone Transfers"
     zn_list.sort()
@@ -165,8 +172,7 @@ def action_zone_transfer(zn_list, domain):
                 vuln = False
                 vulnerable_listF.append(ns)
             else:
-                print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-                warning(traceback.print_exc())
+                error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
 
     if vulnerable_listF:
@@ -197,9 +203,10 @@ def action_zone_transfer(zn_list, domain):
                 if error == 'Errno -2] Name or service not known':
                     pass
                 else:
-                    print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-                    warning(traceback.print_exc())
+                    error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+
             print z[n].to_text(n)
 
+    info('Completed Attempting Zone Transfers\n')
     clean_dump = sorted(set(dump_list))
     return ((vulnerable_listT, clean_dump))

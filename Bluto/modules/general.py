@@ -11,7 +11,7 @@ import dns.resolver
 import dns.query
 import dns.zone
 import traceback
-from bluto_logging import warning
+from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 5
@@ -33,7 +33,7 @@ def action_whois(domain):
         else:
             company = temp_company
     except Exception:
-        traceback.print_exc()
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
     return company
 
@@ -145,7 +145,7 @@ def action_bluto_use(countryID):
         payload = {'country': countryID, 'Date': now}
         requests.post(link, data=payload)
     except Exception:
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
         pass
 
 
@@ -159,7 +159,6 @@ def check_dom(domain):
         print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
         sys.exit()
     except Exception:
-        print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
 

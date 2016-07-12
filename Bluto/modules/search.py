@@ -11,9 +11,10 @@ import time
 from get_file import get_user_agents
 from termcolor import colored
 from bs4 import BeautifulSoup
-from bluto_logging import warning
+from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
 def action_google(domain, userCountry, userServer, q, useragent_f, prox):
+    info('Google Search Started\n')
     uas = get_user_agents(useragent_f)
     searchfor = '@' + '"' + domain + '"'
     entries_tuples = []
@@ -71,18 +72,18 @@ def action_google(domain, userCountry, userServer, q, useragent_f, prox):
                 print colored('Google is responding with a Captcha, other searches will continue\n', 'red')
                 break
         except AttributeError as f:
-            #traceback.print_exc()
             pass
         except Exception:
-            print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-            warning(traceback.print_exc())
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
+    info('Google Search Completed\n')
     q.put(sorted(results))
 
 
 #Takes [list[tuples]]email~url #Returns [list[tuples]]email_address, url_found, breach_domain, breach_data, breach_date, /
 #breach_added, breach_description
 def action_pwned(emails):
+    info('Compromised Account Enumeration Search Started\n')
     pwend_data = []
     seen = set()
     for email in emails:
@@ -113,14 +114,15 @@ def action_pwned(emails):
         except ValueError:
             pass
         except Exception:
-            print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-            warning(traceback.print_exc())
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
+    info('Compromised Account Enumeration Search Completed\n')
     return pwend_data
 
 
 #Takes domain[str], api[list], useragent_f[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
 def action_emailHunter(domain, api, useragent_f, q, prox):
+    info('Email Hunter Search Started\n')
     emails = []
     uas = get_user_agents(useragent_f)
     ua = random.choice(uas)
@@ -150,13 +152,14 @@ def action_emailHunter(domain, api, useragent_f, q, prox):
     except ValueError:
         pass
     except Exception:
-        print 'An Unhandled Exception Has Occured, Please Check The Log For Details'
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
+    info('Email Hunter Search Completed\n')
     q.put(sorted(emails))
 
 
 def action_bing_true(domain, q, useragent_f, prox):
+    info('Bing Search Started\n')
     emails = []
     uas = get_user_agents(useragent_f)
     searchfor = '@' + '"' + domain + '"'
@@ -185,12 +188,14 @@ def action_bing_true(domain, q, useragent_f, prox):
                 clean = item.replace("<strong>", "")
                 email.append(clean + domain)
 
-        except Exception as e:
+        except Exception:
             continue
+    info('Bing Search Completed\n')
     q.put(sorted(emails))
 
 
 def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
+    info('LinkedIn Search Started\n')
     uas = get_user_agents(useragent_f)
     entries_tuples = []
     seen = set()
@@ -235,10 +240,12 @@ def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
             results.append(urls)
             seen.add(urls[1])
 
+    info('LinkedIn Search Completed\n')
     q.put(sorted(results))
 
 
 def action_netcraft(domain, myResolver):
+    info('NetCradt Search Started\n')
     netcraft_list = []
     print "\nPassive Gatherings From NetCraft\n"
     try:
@@ -249,8 +256,7 @@ def action_netcraft(domain, myResolver):
         sub_results = re.findall(pattern, response.content)
 
     except Exception:
-        print 'An Unhandled Exception Has Occured, Please Check The Log For Details\n'
-        warning(traceback.print_exc())
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
     if sub_results:
         for item in sub_results:
@@ -261,4 +267,5 @@ def action_netcraft(domain, myResolver):
     else:
         print '\tNo Results Found'
 
+    info('NetCradtCompleted\n')
     return netcraft_list
