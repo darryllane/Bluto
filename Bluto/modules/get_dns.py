@@ -37,13 +37,16 @@ def get_dns_details(domain, myResolver):
             ns_list.sort()
         for i in ns_list:
             print colored(i, 'green')
+    except dns.resolver.NoNameservers:
+        error('\tNo Name Servers\nConfirm The Domain Name Is Correct.' + ERROR_LOG_FILE, exc_info=True)
+        sys.exit()
     except dns.resolver.NoAnswer:
         print "\tNo DNS Servers"
     except dns.resolver.NXDOMAIN:
-        print "\tDomain Does Not Exist"
-        e = str(sys.exc_info()[0])
+        error("\tDomain Does Not Exist" + ERROR_LOG_FILE, exc_info=True)
+        sys.exit()
     except dns.resolver.Timeout:
-        print '\tTimeouted\nConfirm The Domain Name Is Correct.'
+        error('\tTimeouted\nConfirm The Domain Name Is Correct.' + ERROR_LOG_FILE, exc_info=True)
         sys.exit()
     except Exception:
         error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
