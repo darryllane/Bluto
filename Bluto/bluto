@@ -75,14 +75,14 @@ print """
 """ . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + VERSION, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'))
 
 if __name__ == "__main__":
-    info('Bluto Started')
+    info('\nBluto Started')
     try:
         parser = argparse.ArgumentParser(description='Use: -E for lots of spinach | Use: -api for emailhunter_support')
         parser.add_argument('-E', help='Used for brute forcing with a very large list of SubDomains', required=False)
         parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['E']:
-            info('\n-E Argument Used')
+            info('-E Argument Used')
             FILENAME_1 = path + "/Bluto/doc/lots-of-spinach.txt"
         if args['api']:
             api = args['api']
