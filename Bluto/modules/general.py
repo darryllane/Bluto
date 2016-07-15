@@ -33,7 +33,7 @@ def action_whois(domain):
         else:
             company = temp_company
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
     return company
 
@@ -145,7 +145,7 @@ def action_bluto_use(countryID):
         payload = {'country': countryID, 'Date': now}
         requests.post(link, data=payload)
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
         pass
 
 
@@ -159,6 +159,6 @@ def check_dom(domain):
         print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
         sys.exit()
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
 

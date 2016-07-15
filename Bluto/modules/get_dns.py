@@ -20,7 +20,7 @@ myResolver.nameservers = ['8.8.8.8']
 targets = []
 
 def get_dns_details(domain, myResolver):
-    info('Gathering DNS Details\n')
+    info('Gathering DNS Details')
     ns_list = []
     zn_list =[]
     mx_list = []
@@ -66,14 +66,14 @@ def get_dns_details(domain, myResolver):
     except dns.resolver.NoAnswer:
         print "\tNo Mail Servers"
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
-    info('Completed Gathering DNS Details\n')
+    info('Completed Gathering DNS Details')
     return zn_list
 
 
 def action_wild_cards(domain, myResolver):
-    info('Checking Wild Cards\n')
+    info('Checking Wild Cards')
     try:
         one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
         myAnswers = myResolver.query(str(one) + '.' + str(domain))
@@ -85,10 +85,10 @@ def action_wild_cards(domain, myResolver):
         pass
 
     except dns.resolver.NXDOMAIN:
-        info('Wild Cards False\n')
+        info('Wild Cards False')
         return False
     else:
-        info('Wild Cards True\n')
+        info('Wild Cards True')
         return True
 
 
@@ -109,21 +109,21 @@ def action_brute(subdomain):
     except dns.exception.Timeout:
         pass
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
 
 def action_brute_start(subs):
-    info('Bruting SubDomains\n')
+    info('Bruting SubDomains')
     pool = ThreadPool(12)
     pool.map(action_brute, subs)
     pool.close()
-    info('Completed Bruting SubDomains\n')
+    info('Completed Bruting SubDomains')
 
     return targets
 
 
 def action_brute_wild(sub_list, domain):
-    info('Bruting Wild Card SubDomains\n')
+    info('Bruting Wild Card SubDomains')
     target_results = []
     one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
     myAnswers = myResolver.query(str(one) + '.' + str(domain))
@@ -146,14 +146,14 @@ def action_brute_wild(sub_list, domain):
             pass
         except Exception:
             continue
-    info('Completed Bruting Wild Card SubDomains\n')
+    info('Completed Bruting Wild Card SubDomains')
     return target_results
 
 
 def action_zone_transfer(zn_list, domain):
-    info('Attempting Zone Transfers\n')
+    info('Attempting Zone Transfers')
     global clean_dump
-    print "\nAttempting Zone Transfers"
+    print "Attempting Zone Transfers"
     zn_list.sort()
     vuln = True
     vulnerable_listT = []
@@ -210,6 +210,6 @@ def action_zone_transfer(zn_list, domain):
 
             print z[n].to_text(n)
 
-    info('Completed Attempting Zone Transfers\n')
+    info('Completed Attempting Zone Transfers')
     clean_dump = sorted(set(dump_list))
     return ((vulnerable_listT, clean_dump))

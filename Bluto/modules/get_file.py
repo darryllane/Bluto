@@ -15,7 +15,7 @@ def get_user_agents(useragent_f):
             if ua:
                 uas.append(ua.strip()[1:-1-1])
     random.shuffle(uas)
-    info('Completed Gathering UserAgents\n')
+    info('Completed Gathering UserAgents')
     return uas
 
 
@@ -27,10 +27,10 @@ def get_subs(filename, domain):
         for sub in subs:
             full_list.append(str(sub.lower() + "." + domain))
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
         sys.exit()
 
-    info('Completed Gathering SubDomains\n')
+    info('Completed Gathering SubDomains')
     return full_list
 
 def get_sub_interest(filename, domain):
@@ -42,10 +42,10 @@ def get_sub_interest(filename, domain):
             full_list.append(str(sub.lower() + "." + domain))
 
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
         sys.exit()
 
-    info('Completed Gathering SubDomains Of Interest\n')
+    info('Completed Gathering SubDomains Of Interest')
     return full_list
 
 
@@ -55,5 +55,5 @@ def get_line_count(filename):
     for line in open(filename):
         lines += 1
 
-    info('Completed Gathering SubDomains Count\n')
+    info('Completed Gathering SubDomains Count')
     return lines

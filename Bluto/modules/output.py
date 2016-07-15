@@ -725,8 +725,8 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
             myFile.write('</body>')
             myFile.write('</html>')
             myFile.close()
-            info('Completed HTML Report\n')
+            info('Completed HTML Report')
     except IOError,e:
-        error('\nIOError', exc_info=True)
+        error('IOError', exc_info=True)
     except Exception:
-        error('\nAn Unhandled Exception Occured\n', exc_info=True)
+        error('An Unhandled Exception Occured', exc_info=True)
