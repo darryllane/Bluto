@@ -38,7 +38,7 @@ VERSION = "1.99"
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 5
 myResolver.lifetime = 5
-myResolver.nameservers = ['8.8.8.8']
+myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 prox = False
 
 for item in SITES:
@@ -157,9 +157,9 @@ if __name__ == "__main__":
     #Outputing data
                 if api:
                     emailHunter_results = q4.get()
-                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location)
+                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company)
                 else:
-                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location)
+                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company)
             else:
                 print colored('\n\tWild Cards Are Not In Place', 'red')
                 check_count = get_line_count(FILENAME_1)
@@ -205,10 +205,10 @@ if __name__ == "__main__":
                 brute_results_dict = dict((x.split(' ') for x in domains))
                 if api:
                     emailHunter_results = q4.get()
-                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location)
+                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company)
     #Outputing data
                 else:
-                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location)
+                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company)
         else:
     #Vuln Zone Trans
             vulnerable_list = vulnerable_results[0]
@@ -244,9 +244,9 @@ if __name__ == "__main__":
     #Outputing data
             if api:
                 emailHunter_results = q4.get()
-                action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location)
+                action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location, company)
             else:
-                action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location)
+                action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location, company)
 
         info('Bluto Finished')
     except KeyboardInterrupt:

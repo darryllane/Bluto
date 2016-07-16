@@ -15,7 +15,7 @@ from termcolor import colored
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 5
 myResolver.lifetime = 5
-myResolver.nameservers = ['8.8.8.8']
+myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 targets = []
 
@@ -153,7 +153,7 @@ def action_brute_wild(sub_list, domain):
 def action_zone_transfer(zn_list, domain):
     info('Attempting Zone Transfers')
     global clean_dump
-    print "Attempting Zone Transfers"
+    print "\nAttempting Zone Transfers"
     zn_list.sort()
     vuln = True
     vulnerable_listT = []

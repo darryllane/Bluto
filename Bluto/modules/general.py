@@ -6,7 +6,9 @@ import pythonwhois
 import traceback
 import requests
 import datetime
+import re
 import sys
+import socket
 import dns.resolver
 import dns.query
 import dns.zone
@@ -16,26 +18,46 @@ from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 5
 myResolver.lifetime = 5
-myResolver.nameservers = ['8.8.8.8']
+myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 default_s = False
 
 def action_whois(domain):
-
-    try:
-        whois_things = pythonwhois.get_whois(domain)
-        company = whois_things['contacts']['registrant']['name']
-    except KeyError, pythonwhois.net.socket.errno.ETIMEDOUT:
-        print colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red')
-        temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
-        if temp_company == '':
-            company = domain
-        else:
-            company = temp_company
-    except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
-
-    return company
+        while True:
+                try:
+                        whois_things = pythonwhois.get_whois(domain)
+                        company = whois_things['contacts']['registrant']['name']
+                        splitup = company.lower().split()
+                        patern = re.compile('|'.join(splitup))
+                        if patern.search(domain):
+                                info('Whois Results Are Good ' + company)
+                                print '\n\tThe Whois Results Look Promising: ' + colored('{}','green').format(company)
+                        else:
+                                info('Whois Results Not Good ' + company)
+                                print colored("\n\tThe Whois Results Don't Look Very Promissing: '{}'","red") .format(company)
+                                print'\nPlease Supply The Company Name\n\n\tThis Will Be Used To Query LinkedIn'
+                                temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+                                if temp_company == '':
+                                        info('User Supplied Blank Company')
+                                        company = domain
+                                else:
+                                        info('User Supplied Company ' + company)
+                                        company = temp_company
+                        break
+                except pythonwhois.shared.WhoisException:
+                        traceback.print_exc()
+                except socket.error:
+                        pass
+                except KeyError, pythonwhois.net.socket.errno.ETIMEDOUT:
+                        print colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red')
+                        temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+                        if temp_company == '':
+                                company = domain
+                        else:
+                                company = temp_company
+                except Exception:
+                        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        return company
 
 def action_country_id(countries_file, prox):
     userCountry = ''

@@ -10,7 +10,7 @@ from search import action_pwned
 from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
 
-def action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location):
+def action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location, company):
     linkedin_evidence_results = []
     email_evidence_results = []
     email_results = []
@@ -61,7 +61,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     c_accounts = len(pwned_results)
 
     print '\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
         for email in f_emails:
 
@@ -123,7 +123,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
             print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
-def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location):
+def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location, company):
 
     linkedin_evidence_results = []
     email_evidence_results = []
@@ -179,7 +179,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     c_accounts = len(pwned_results)
 
     print '\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
         for email in f_emails:
             print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
@@ -240,7 +240,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
             print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
-def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_results, domain, time_spent_email, time_spent_total, emailHunter_results):
+def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_results, domain, time_spent_email, time_spent_total, emailHunter_results, company):
 
     linkedin_evidence_results = []
     email_evidence_results = []
@@ -298,7 +298,7 @@ def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_r
     c_accounts = len(pwned_results)
 
     print '\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
         for email in f_emails:
             print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
@@ -342,7 +342,7 @@ def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_r
             print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
-def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location):
+def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company):
 
     linkedin_evidence_results = []
     email_evidence_results = []
@@ -394,7 +394,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     c_accounts = len(pwned_results)
 
     print '\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
 
         for email in f_emails:
@@ -458,7 +458,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
             print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
-def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location):
+def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company):
     linkedin_evidence_results = []
     email_evidence_results = []
     email_results = []
@@ -513,7 +513,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     c_accounts = len(pwned_results)
 
     print '\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
 
         for email in f_emails:
@@ -580,45 +580,46 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
             print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
-def write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location):
+def write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company):
     info('Started HTML Report')
     header = '''
     <!DOCTYPE html>
     <html>
     <head>
     <style>
-    th {
+    th {{
         text-align: left;
-    }
-    header {
+    }}
+    header {{
         background-color:black;
         color:white;
         text-align:center;
         padding:5px;
-    }
-    section {
+    }}
+    section {{
         width:650px;
         float:left;
         padding:10px;
-    }
-    footer {
+    }}
+    footer {{
         background-color:black;
         color:white;
         clear:both;
         text-align:center;
         padding:5px;
-    }
-    div {
+    }}
+    div {{
         width: 150%;
-    }
+    }}
     </style>
     </head>
     <body>
 
     <header>
     <h1>Bluto Evidence Report</h1>
+    <h2>{a}</h2>
     </header>
-    '''
+    '''.format(a=company)
     footer = '''
 
         <footer>
