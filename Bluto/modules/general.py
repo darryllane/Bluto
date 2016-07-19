@@ -177,8 +177,8 @@ def check_dom(domain):
         dom = str(myAnswers.canonical_name).strip('.')
         if dom:
             pass
-        except dns.resolver.NXDOMAIN:
-            print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
-            sys.exit()
-        except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+    except dns.resolver.NXDOMAIN:
+        print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        sys.exit()
+    except Exception:
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
