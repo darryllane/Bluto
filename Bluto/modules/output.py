@@ -69,6 +69,14 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     else:
         print '\tNo Data To Be Found'
 
+    print '\nCompromised Accounts:\n'
+        if pwned_results:
+            sorted_pwned = sorted(pwned_results)
+            for account in sorted_pwned:
+                print account
+        else:
+            print '\tNo Data To Be Found'
+
     print '\nLinkedIn Results:\n'
 
     sorted_person = sorted(person_seen)
@@ -185,6 +193,14 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
             print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
     else:
         print '\tNo Data To Be Found'
+
+    print '\nCompromised Accounts:\n'
+        if pwned_results:
+            sorted_pwned = sorted(pwned_results)
+            for account in sorted_pwned:
+                print account
+        else:
+            print '\tNo Data To Be Found'
 
     print '\nLinkedIn Results:\n'
 
@@ -305,6 +321,14 @@ def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_r
     else:
         print '\tNo Data To Be Found'
 
+    print '\nCompromised Accounts:\n'
+    if pwned_results:
+        sorted_pwned = sorted(pwned_results)
+        for account in sorted_pwned:
+            print account
+    else:
+        print '\tNo Data To Be Found'
+
     print '\nLinkedIn Results:\n'
 
     sorted_person = sorted(person_seen)
@@ -400,6 +424,14 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
         for email in f_emails:
 
             print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
+    else:
+        print '\tNo Data To Be Found'
+
+    print '\nCompromised Accounts:\n'
+    if pwned_results:
+        sorted_pwned = sorted(pwned_results)
+        for account in sorted_pwned:
+            print account
     else:
         print '\tNo Data To Be Found'
 
@@ -519,6 +551,14 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
         for email in f_emails:
 
             print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
+    else:
+        print '\tNo Data To Be Found'
+
+    print '\nCompromised Accounts:\n'
+    if pwned_results:
+        sorted_pwned = sorted(pwned_results)
+        for account in sorted_pwned:
+            print account
     else:
         print '\tNo Data To Be Found'
 
