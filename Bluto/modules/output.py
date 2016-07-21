@@ -70,12 +70,12 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
         print '\tNo Data To Be Found'
 
     print '\nCompromised Accounts:\n'
-        if pwned_results:
-            sorted_pwned = sorted(pwned_results)
-            for account in sorted_pwned:
-                print account
-        else:
-            print '\tNo Data To Be Found'
+    if pwned_results:
+        sorted_pwned = sorted(pwned_results)
+        for account in sorted_pwned:
+            print account
+    else:
+        print '\tNo Data To Be Found'
 
     print '\nLinkedIn Results:\n'
 
@@ -195,12 +195,12 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
         print '\tNo Data To Be Found'
 
     print '\nCompromised Accounts:\n'
-        if pwned_results:
-            sorted_pwned = sorted(pwned_results)
-            for account in sorted_pwned:
-                print account
-        else:
-            print '\tNo Data To Be Found'
+    if pwned_results:
+        sorted_pwned = sorted(pwned_results)
+        for account in sorted_pwned:
+            print account
+    else:
+        print '\tNo Data To Be Found'
 
     print '\nLinkedIn Results:\n'
 
