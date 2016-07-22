@@ -22,12 +22,10 @@ Bluto now takes command line arguments at launch, the new options are as follows
 -E  		This uses a very large subdomain list for bruting.
 -api		You can supply your email hunter api key here to gather a considerably larger amount of email addresses.
 
-**Examples:** (feel free to use this api until it is removed (DEV))
+**Examples:** (feel free to use this EmailHunter API Key until it is removed (DEV))
 
-	Bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669
-	Bluto -E
-	Bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669 -E
-
+	bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669
+	bluto -E
 
 
 **Pip Install Instructions**
@@ -66,8 +64,10 @@ Changelog
 
 * Version __2.01__ (__22/07/2016__):
   * Compromised Account Data Prensented In Terminal And HTML Report
- 
 
+* Version __2.0__ (__19/07/2016__):
+  * Pushed Live 2.0
+ 
 * Version __1.99__ (__09/07/2016__):
   * Email Hunter API Support Added.
   * Haveibeenpwned API Support Added.
