@@ -59,6 +59,7 @@ Note: To test if pip is already installed execute.
 Change/Feature Requests
 ====
 * MetaData Scraping From Document Hunt On Target Domain
+* Target Domain Parsed As Argument
 
 Changelog
 ====
