@@ -74,7 +74,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
         sorted_pwned = sorted(pwned_results)
         for account in sorted_pwned:
             print 'Account: \t{}'.format(account[0])
-            print 'Host: \t{}'.format(account[1])
+            print 'Domain: \t{}'.format(account[1])
             print 'Date: \t{}\n'.format(account[3])
     else:
         print '\tNo Data To Be Found'
@@ -201,7 +201,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
         sorted_pwned = sorted(pwned_results)
         for account in sorted_pwned:
             print 'Account: \t{}'.format(account[0])
-            print 'Host: \t{}'.format(account[1])
+            print 'Domain: \t{}'.format(account[1])
             print 'Date: \t{}\n'.format(account[3])
     else:
         print '\tNo Data To Be Found'
@@ -330,7 +330,7 @@ def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_r
         sorted_pwned = sorted(pwned_results)
         for account in sorted_pwned:
             print 'Account: \t{}'.format(account[0])
-            print 'Host: \t{}'.format(account[1])
+            print 'Domain: \t{}'.format(account[1])
             print 'Date: \t{}\n'.format(account[3])
     else:
         print '\tNo Data To Be Found'
@@ -438,7 +438,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
         sorted_pwned = sorted(pwned_results)
         for account in sorted_pwned:
             print 'Account: \t{}'.format(account[0])
-            print 'Host: \t{}'.format(account[1])
+            print 'Domain: \t{}'.format(account[1])
             print 'Date: \t{}\n'.format(account[3])
     else:
         print '\tNo Data To Be Found'
@@ -567,7 +567,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
         sorted_pwned = sorted(pwned_results)
         for account in sorted_pwned:
             print 'Account: \t{}'.format(account[0])
-            print 'Host: \t{}'.format(account[1])
+            print 'Domain: \t{}'.format(account[1])
             print 'Date: \t{}\n'.format(account[3])
     else:
         print '\tNo Data To Be Found'
