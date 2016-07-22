@@ -20,7 +20,7 @@ def action_google(domain, userCountry, userServer, q, useragent_f, prox):
     entries_tuples = []
     seen = set()
     results = []
-    for start in range(1,20,1):
+    for start in range(1,30,1):
         ua = random.choice(uas)
         try:
             if prox == True:
@@ -163,7 +163,7 @@ def action_bing_true(domain, q, useragent_f, prox):
     emails = []
     uas = get_user_agents(useragent_f)
     searchfor = '@' + '"' + domain + '"'
-    for start in range(0,50):
+    for start in range(0,30):
         ua = random.choice(uas)
         if prox == True:
             proxy = {'http' : 'http://127.0.0.1:8080'}
@@ -203,7 +203,7 @@ def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
     who_error = False
     searchfor = 'site:linkedin.com/in ' + '"' + company + '"'
     ua = random.choice(uas)
-    for start in range(1,50,1):
+    for start in range(1,70,1):
         if prox == True:
             proxy = {'http' : 'http://127.0.0.1:8080'}
         else:
@@ -215,7 +215,7 @@ def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
                        'Accept-Language': 'en-US,en;q=0.5',
                        'Accept-Encoding': 'gzip, deflate'}
             payload = { 'q': searchfor, 'first': start}
-            link = 'https://www.bing.com/search'
+            link = 'http://www.bing.com/search'
             if prox == True:
                 response = requests.get(link, headers=headers, params=payload, proxies=proxy)
             else:
@@ -245,7 +245,7 @@ def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
 
 
 def action_netcraft(domain, myResolver):
-    info('NetCradt Search Started')
+    info('NetCraft Search Started')
     netcraft_list = []
     print "\nPassive Gatherings From NetCraft\n"
     try:

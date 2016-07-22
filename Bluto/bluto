@@ -34,10 +34,10 @@ from modules.output import action_output_vuln_zone, action_output_wild_false, ac
 from modules.bluto_logging import info, error
 
 
-VERSION = "2.00"
+VERSION = "2.01"
 myResolver = dns.resolver.Resolver()
-myResolver.timeout = 5
-myResolver.lifetime = 5
+myResolver.timeout = 6
+myResolver.lifetime = 6
 myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 prox = False
 
