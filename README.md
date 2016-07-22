@@ -56,7 +56,7 @@ Note: To test if pip is already installed execute.
 
 `sudo pip install git+git://github.com/darryllane/Bluto --upgrade`
 
-Change/Feature Requets
+Change/Feature Requests
 ====
 * MetaData Scraping From Document Hunt On Target Domain
 
