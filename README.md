@@ -19,13 +19,13 @@ Bluto requires various other dependencies. So to make things as easy as possible
 
 Bluto now takes command line arguments at launch, the new options are as follows;
 
--E  		This uses a very large subdomain list for bruting.
+-e  		This uses a very large subdomain list for bruting.
 -api		You can supply your email hunter api key here to gather a considerably larger amount of email addresses.
 
 **Examples:** (feel free to use this EmailHunter API Key until it is removed (DEV))
 
 	bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669
-	bluto -E
+	bluto -e
 
 
 **Pip Install Instructions**
