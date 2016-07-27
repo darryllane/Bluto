@@ -58,6 +58,7 @@ Change/Feature Requests
 ====
 * MetaData Scraping From Document Hunt On Target Domain
 * Target Domain Parsed As Argument
+* Identification Of Web Portals
 
 Changelog
 ====
