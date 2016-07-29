@@ -79,7 +79,7 @@ if __name__ == "__main__":
     info('\nBluto Started')
     try:
         parser = argparse.ArgumentParser(description='Use: -E for lots of spinach | Use: -api for emailhunter_support')
-        parser.add_argument('-E', help='Used for brute forcing with a very large list of SubDomains', required=False)
+        parser.add_argument('-E', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
         parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['E']:
