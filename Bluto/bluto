@@ -31,10 +31,11 @@ from modules.search import action_bing_true, action_google, action_linkedin, act
 from modules.get_file import get_subs, get_sub_interest, get_line_count
 from modules.general import action_country_id, action_whois, action_bluto_use, check_dom
 from modules.output import action_output_vuln_zone, action_output_wild_false, action_output_wild_false_hunter, action_output_vuln_zone_hunter
+from modules.data_mine import doc_start
 from modules.bluto_logging import info, error
 
 
-VERSION = "2.01"
+VERSION = "2.2.0"
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 6
 myResolver.lifetime = 6
@@ -52,7 +53,7 @@ print """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
  B::::::::::::::::B l:::::l                     ttt:::t
  B::::::BBBBBB:::::Bl:::::l                     t:::::t
- BB:::::B     B:::::l:::::l{6}                t:::::t
+ BB:::::B     B:::::l:::::l{6}               t:::::t
    B::::B     B:::::Bl::::luuuuuu    uuuuuttttttt:::::ttttttt      ooooooooooo
    B::::B     B:::::Bl::::lu::::u    u::::t:::::::::::::::::t    oo:::::::::::oo
    B::::BBBBBB:::::B l::::lu::::u    u::::t:::::::::::::::::t   o:::::::::::::::o
@@ -68,11 +69,11 @@ print """
 
   {2} | {3} | {4} | {9}
         {8} | {7} | {10}
-                       {11}
+               {11}  |  {12}
 
-              {0}  |  {1}
-                  {5}
-""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + VERSION, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'))
+                 {0}  |  {1}
+                     {5}
+""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + VERSION, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'), colored("MetaData Mining", 'green'))
 
 if __name__ == "__main__":
     info('\nBluto Started')
@@ -128,21 +129,26 @@ if __name__ == "__main__":
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
+                q5 = Queue.Queue()
                 t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
                 t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
                 t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
+                t5 = threading.Thread(target=doc_start, args=(domain, USERAGENT_F, prox, q5))
                 t1.start()
                 t2.start()
                 t3.start()
+                t5.start()
                 if api:
                     t4.join()
                 t1.join()
                 t2.join()
                 t3.join()
+                t5.join()
                 time_spent_email = time.time() - start_time_email
                 google_true_results = q1.get()
                 bing_true_results = q2.get()
                 linkedin_results = q3.get()
+                data_mine = q5.get()
                 start_time_brute = time.time()
                 targets_t = action_brute_start(subs)
                 targets = action_brute_wild(targets_t, domain)
@@ -157,9 +163,9 @@ if __name__ == "__main__":
     #Outputing data
                 if api:
                     emailHunter_results = q4.get()
-                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company)
+                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company, data_mine)
                 else:
-                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company)
+                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company, data_mine)
             else:
                 print colored('\n\tWild Cards Are Not In Place', 'red')
                 check_count = get_line_count(FILENAME_1)
@@ -173,6 +179,7 @@ if __name__ == "__main__":
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
+                q5 = Queue.Queue()
                 if api:
                     q4 = Queue.Queue()
                     t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
@@ -180,18 +187,22 @@ if __name__ == "__main__":
                 t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
                 t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
                 t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
+                t5 = threading.Thread(target=doc_start, args=(domain, USERAGENT_F, prox, q5))
                 t1.start()
                 t2.start()
                 t3.start()
+                t5.start()
                 if api:
                     t4.join()
                 t1.join()
                 t2.join()
                 t3.join()
+                t5.join()
                 time_spent_email = time.time() - start_time_email
                 google_true_results = q1.get()
                 bing_true_results = q2.get()
                 linkedin_results = q3.get()
+                data_mine = q5.get()
                 start_time_brute = time.time()
                 targets = action_brute_start(subs)
                 time_spent_brute = time.time() - start_time_brute
@@ -205,10 +216,10 @@ if __name__ == "__main__":
                 brute_results_dict = dict((x.split(' ') for x in domains))
                 if api:
                     emailHunter_results = q4.get()
-                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company)
+                    action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company, data_mine)
     #Outputing data
                 else:
-                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company)
+                    action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company, data_mine)
         else:
     #Vuln Zone Trans
             vulnerable_list = vulnerable_results[0]
@@ -221,6 +232,7 @@ if __name__ == "__main__":
             q1 = Queue.Queue()
             q2 = Queue.Queue()
             q3 = Queue.Queue()
+            q5 = Queue.Queue()
             if api:
                 q4 = Queue.Queue()
                 t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
@@ -228,25 +240,29 @@ if __name__ == "__main__":
             t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
             t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
             t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
+            t5 = threading.Thread(target=doc_start, args=(domain, USERAGENT_F, prox, q5))
             t1.start()
             t2.start()
             t3.start()
+            t5.start()
             t1.join()
             t2.join()
             t3.join()
+            t5.join()
             if api:
                 t4.join()
             time_spent_email = time.time() - start_time_email
             google_results = q1.get()
             bing_results = q2.get()
             linkedin_results = q3.get()
+            data_mine = q5.get()
             time_spent_total = time.time() - start_time_total
     #Outputing data
             if api:
                 emailHunter_results = q4.get()
-                action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location, company)
+                action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location, company, data_mine)
             else:
-                action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location, company)
+                action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location, company, data_mine)
 
         info('Bluto Finished')
     except KeyboardInterrupt:

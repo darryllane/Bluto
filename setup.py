@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Bluto',
-    version='2.01',
+    version='2.2.0',
     author='Darryl lane',
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
@@ -23,6 +23,8 @@ setup(
         "requests",
         "pythonwhois",
         "lxml",
+        "oletools",
+        "pdfminer",
     ],
 )
 
