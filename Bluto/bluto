@@ -78,19 +78,24 @@ print """
 if __name__ == "__main__":
     info('\nBluto Started')
     try:
-        parser = argparse.ArgumentParser(description='Use: -E for lots of spinach | Use: -api for emailhunter_support')
-        parser.add_argument('-E', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
+        parser = argparse.ArgumentParser(description='Use: -e for lots of spinach | Use: -api for emailhunter_support')
+        parser.add_argument('-e', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
+        parser.add_argument('-d', help='Used for setting the target domain', required=False)
         parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
-        if args['E']:
-            info('-E Argument Used')
+        if args['e']:
+            info('-e Argument Used')
             FILENAME_1 = path + "/Bluto/doc/lots-of-spinach.txt"
         if args['api']:
             api = args['api']
             info('-api Argument Used with api: ' + str(api))
         else:
             api = False
-        domain = raw_input("Target Domain: ")
+
+        if args['d']:
+            domain = args['d']
+        else:
+            domain = raw_input("Target Domain: ")
         info('Domain Identified: ' + str(domain))
         domain_r = domain.split('.')
         report_location = os.path.expanduser('~/Bluto/Bluto-Evidence-{}.html'.format(domain_r[0]))

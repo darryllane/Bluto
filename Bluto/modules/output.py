@@ -9,7 +9,7 @@ import webbrowser
 import shutil
 import os
 from search import action_pwned
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
+from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE, LOG_DIR
 
 
 def action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location, company, data_mine):
@@ -82,22 +82,6 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     else:
         print '\tNo Data To Be Found'
 
-    if data_mine:
-        user_names = data_mine[0]
-        software_list = data_mine[1]
-        download_count = data_mine[2]
-        username_count = len(user_names)
-        software_count = len(software_list)
-
-        print '\nData Found In Document MetaData'
-        print '\nPotential Usernames:\n'
-        for user in user_names:
-            print '\t' + colored(user, 'red')
-
-        print '\nSoftware And Versions Found:\n'
-        for software in software_list:
-            print '\t' + colored(software, 'red')
-
     print '\nLinkedIn Results:\n'
 
     sorted_person = sorted(person_seen)
@@ -106,6 +90,34 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
             print person
     else:
         print '\tNo Data To Be Found'
+
+    if data_mine is not None:
+        user_names = data_mine[0]
+        software_list = data_mine[1]
+        download_count = data_mine[2]
+        username_count = len(user_names)
+        software_count = len(software_list)
+
+        print '\nData Found In Document MetaData'
+        print '\nPotential Usernames:\n'
+        if user_names:
+            for user in user_names:
+                print '\t' + colored(user, 'red')
+        else:
+            print '\tNo Data To Be Found'
+
+        print '\nSoftware And Versions Found:\n'
+        if software_list:
+            for software in software_list:
+                print '\t' + colored(software, 'red')
+        else:
+            print '\tNo Data To Be Found'
+    else:
+        user_names = []
+        software_list = []
+        download_count = 0
+        username_count = len(user_names)
+        software_count = len(software_list)
 
     target_dict = dict((x.split(' ') for x in clean_dump))
     clean_target = collections.OrderedDict(sorted(target_dict.items()))
@@ -143,34 +155,36 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     info('DNS Vuln Run completed')
     info('Output action_output_vuln_zone: Complete')
 
-    print "\nAn evidence report has been written to {}\n".format(report_location)
-
     domain_r = domain.split('.')
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep the downloaded documents? ").lower()
+        answer = raw_input("\nWould you like to keep all local data? (Local Logs, Downloded Documents, HTML Evidence Report)").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
                 print '\nThe documents are located here: {}'.format(docs)
+                print 'The logs are located here: {}.'.format(LOG_DIR)
+                print "\nAn evidence report has been written to {}\n".format(report_location)
+                while True:
+                    answer = raw_input("Would you like to open this report now? ").lower()
+                    if answer in answers:
+                        if answer == 'y' or answer == 'yes':
+                            print '\nOpening {}' .format(report_location)
+                            webbrowser.open('file://' + str(report_location))
+                            break
+                        else:
+                            break
+                    else:
+                        print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
                 break
             else:
                 shutil.rmtree(docs)
+                shutil.rmtree(LOG_DIR)
+                shutil.rmtree(report_location)
                 break
         else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
-    while True:
-        answer = raw_input("Would you like to open this report now? ").lower()
-        if answer in answers:
-            if answer == 'y' or answer == 'yes':
-                print '\nOpening {}' .format(report_location)
-                webbrowser.open('file://' + str(report_location))
-                break
-            else:
-                break
-        else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
+            print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
 def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, emailHunter_results, args, report_location, company, data_mine):
@@ -246,22 +260,6 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     else:
         print '\tNo Data To Be Found'
 
-    if data_mine:
-        user_names = data_mine[0]
-        software_list = data_mine[1]
-        download_count = data_mine[2]
-        username_count = len(user_names)
-        software_count = len(software_list)
-
-        print '\nData Found In Document MetaData'
-        print '\nPotential Usernames:\n'
-        for user in user_names:
-            print '\t' + colored(user, 'red')
-
-        print '\nSoftware And Versions Found:\n'
-        for software in software_list:
-            print '\t' + colored(software, 'red')
-
     print '\nLinkedIn Results:\n'
 
     sorted_person = sorted(person_seen)
@@ -270,6 +268,34 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
             print person
     else:
         print '\tNo Data To Be Found'
+
+    if data_mine is not None:
+        user_names = data_mine[0]
+        software_list = data_mine[1]
+        download_count = data_mine[2]
+        username_count = len(user_names)
+        software_count = len(software_list)
+
+        print '\nData Found In Document MetaData'
+        print '\nPotential Usernames:\n'
+        if user_names:
+            for user in user_names:
+                print '\t' + colored(user, 'red')
+        else:
+            print '\tNo Data To Be Found'
+
+        print '\nSoftware And Versions Found:\n'
+        if software_list:
+            for software in software_list:
+                print '\t' + colored(software, 'red')
+        else:
+            print '\tNo Data To Be Found'
+    else:
+        user_names = []
+        software_list = []
+        download_count = 0
+        username_count = len(user_names)
+        software_count = len(software_list)
 
     target_dict = dict((x.split(' ') for x in clean_dump))
     clean_target = collections.OrderedDict(sorted(target_dict.items()))
@@ -307,186 +333,36 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     info('DNS Vuln Run completed')
     info('Output action_output_vuln_zone_hunter: Completed')
 
-    print "\nAn evidence report has been written to {}\n".format(report_location)
-
     domain_r = domain.split('.')
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep the downloaded documents? ").lower()
+        answer = raw_input("\nWould you like to keep all local data? (Local Logs, Downloded Documents, HTML Evidence Report)").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
                 print '\nThe documents are located here: {}'.format(docs)
+                print 'The logs are located here: {}.'.format(LOG_DIR)
+                print "\nAn evidence report has been written to {}\n".format(report_location)
+                while True:
+                    answer = raw_input("Would you like to open this report now? ").lower()
+                    if answer in answers:
+                        if answer == 'y' or answer == 'yes':
+                            print '\nOpening {}' .format(report_location)
+                            webbrowser.open('file://' + str(report_location))
+                            break
+                        else:
+                            break
+                    else:
+                        print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
                 break
             else:
                 shutil.rmtree(docs)
+                shutil.rmtree(LOG_DIR)
+                shutil.rmtree(report_location)
                 break
         else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
-    while True:
-        answer = raw_input("Would you like to open this report now? ").lower()
-        if answer in answers:
-            if answer == 'y' or answer == 'yes':
-                print '\nOpening {}' .format(report_location)
-                webbrowser.open('file://' + str(report_location))
-                break
-            else:
-                break
-        else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
-
-
-def action_output_wild_true_hunter(google_results, bing_true_results, linkedin_results, domain, time_spent_email, time_spent_total, emailHunter_results, company, data_mine):
-    info('Output action_output_wild_true_hunter: Start')
-    linkedin_evidence_results = []
-    email_evidence_results = []
-    email_results = []
-
-    email_seen = []
-    url_seen = []
-    person_seen = []
-    final_emails = []
-
-    for email in emailHunter_results:
-        email_results.append(email[0])
-        email_evidence_results.append((email[0],email[1]))
-
-    for email, url in google_results:
-        try:
-            e1, e2 = email.split(',')
-            if url not in email_seen:
-                email_seen.append(url)
-                email_evidence_results.append((str(e2).replace(' ',''),url))
-                email_evidence_results.append((str(e1).replace(' ',''),url))
-                email_results.append((str(e2).replace(' ','')))
-                email_results.append((str(e1).replace(' ','')))
-
-        except ValueError:
-            if url not in email_seen:
-                email_seen.append(url)
-                email_evidence_results.append((str(email).replace(' ',''),url))
-                email_results.append(str(email).replace(' ',''))
-
-    for e, u in bing_true_results:
-        email_results.append(e)
-        if u not in url_seen:
-            email_evidence_results.append((e, u))
-
-    for url, person, description in linkedin_results:
-        if person not in person_seen:
-            person_seen.append(person)
-            linkedin_evidence_results.append((url, person, description))
-
-    linkedin_evidence_results.sort(key=lambda tup: tup[1])
-    sorted_email = set(sorted(email_results))
-    for email in sorted_email:
-        if email == '[]':
-            pass
-        elif email[0] == '@' + domain:
-            pass
-        else:
-            final_emails.append(email)
-
-    email_count = len(final_emails)
-    staff_count = len(person_seen)
-    f_emails = sorted(final_emails)
-    pwned_results = action_pwned(f_emails)
-    c_accounts = len(pwned_results)
-
-    print '\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
-    if f_emails:
-        for email in f_emails:
-            print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
-    else:
-        print '\tNo Data To Be Found'
-
-    print '\nCompromised Accounts:\n'
-    if pwned_results:
-        sorted_pwned = sorted(pwned_results)
-        for account in sorted_pwned:
-            print 'Account: \t{}'.format(account[0])
-            print 'Domain: \t{}'.format(account[1])
-            print 'Date: \t{}\n'.format(account[3])
-    else:
-        print '\tNo Data To Be Found'
-
-    if data_mine:
-        user_names = data_mine[0]
-        software_list = data_mine[1]
-        download_count = data_mine[2]
-        username_count = len(user_names)
-        software_count = len(software_list)
-
-        print '\nData Found In Document MetaData'
-        print '\nPotential Usernames:\n'
-        for user in user_names:
-            print '\t' + colored(user, 'red')
-
-        print '\nSoftware And Versions Found:\n'
-        for software in software_list:
-            print '\t' + colored(software, 'red')
-
-    print '\nLinkedIn Results:\n'
-
-    sorted_person = sorted(person_seen)
-    if sorted_person:
-        for person in sorted_person:
-            print person
-    else:
-        print '\tNo Data To Be Found'
-
-    time_spent_email_f = str(datetime.timedelta(seconds=(time_spent_email))).split('.')[0]
-    time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
-    print '\nPotential Emails Found: {}' .format(str(email_count))
-    print 'Potential Staff Members Found: {}' .format(str(staff_count))
-    print 'Compromised Accounts: {}' .format(str(c_accounts))
-    print 'Potential Usernames Found: {}'.format(username_count)
-    print 'Potential Software Found: {}'.format(software_count)
-    print 'Documents Downloaded: {}'.format(download_count)
-    print "Email Enumeration:", time_spent_email_f
-    print "Total Time:", time_spent_total_f
-
-    info("Email Enumeration: {}" .format(str(time_spent_email_f)))
-    info('Compromised Accounts: {}' .format(str(c_accounts)))
-    info('Potential Usernames Found: {}'.format(username_count))
-    info('Potential Software Found: {}'.format(software_count))
-    info('Documents Downloaded: {}'.format(download_count))
-    info('Potential Staff Members Found: {}' .format(str(staff_count)))
-    info('Potential Emails Found: {}' .format(str(email_count)))
-    info("Total Time:" .format(str(time_spent_total_f)))
-    info('DNS Wild Card + Email Hunter Run completed')
-    info('Output action_output_wild_true_hunter: Completed')
-
-    print "\nAn evidence report has been written to {}\n".format(report_location)
-
-    domain_r = domain.split('.')
-    docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
-    answers = ['no','n','y','yes']
-    while True:
-        answer = raw_input("\nWould you like to keep the downloaded documents? ").lower()
-        if answer in answers:
-            if answer == 'y' or answer == 'yes':
-                domain
-                print '\nThe documents are located here: {}'.format(docs)
-                break
-            else:
-                shutil.rmtree(docs)
-                break
-        else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
-    while True:
-        answer = raw_input("Would you like to open this report now? ").lower()
-        if answer in answers:
-            if answer == 'y' or answer == 'yes':
-                print '\nOpening {}' .format(report_location)
-                webbrowser.open('file://' + str(report_location))
-                break
-            else:
-                break
-        else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
+            print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
 def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company, data_mine):
@@ -569,7 +445,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     else:
         print '\tNo Data To Be Found'
 
-    if data_mine:
+    if data_mine is not None:
         user_names = data_mine[0]
         software_list = data_mine[1]
         download_count = data_mine[2]
@@ -578,12 +454,24 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
 
         print '\nData Found In Document MetaData'
         print '\nPotential Usernames:\n'
-        for user in user_names:
-            print '\t' + colored(user, 'red')
+        if user_names:
+            for user in user_names:
+                print '\t' + colored(user, 'red')
+        else:
+            print '\tNo Data To Be Found'
 
         print '\nSoftware And Versions Found:\n'
-        for software in software_list:
-            print '\t' + colored(software, 'red')
+        if software_list:
+            for software in software_list:
+                print '\t' + colored(software, 'red')
+        else:
+            print '\tNo Data To Be Found'
+    else:
+        user_names = []
+        software_list = []
+        download_count = 0
+        username_count = len(user_names)
+        software_count = len(software_list)
 
     sorted_dict = collections.OrderedDict(sorted(brute_results_dict.items()))
     bruted_count = len(sorted_dict)
@@ -622,33 +510,36 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     info('DNS No Wild Cards + Email Hunter Run completed')
     info('Output action_output_wild_false: Completed')
 
-    print "\nAn evidence report has been written to {}\n".format(report_location)
     domain_r = domain.split('.')
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep the downloaded documents? ").lower()
+        answer = raw_input("\nWould you like to keep all local data? (Local Logs, Downloded Documents, HTML Evidence Report)").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
                 print '\nThe documents are located here: {}'.format(docs)
+                print 'The logs are located here: {}.'.format(LOG_DIR)
+                print "\nAn evidence report has been written to {}\n".format(report_location)
+                while True:
+                    answer = raw_input("Would you like to open this report now? ").lower()
+                    if answer in answers:
+                        if answer == 'y' or answer == 'yes':
+                            print '\nOpening {}' .format(report_location)
+                            webbrowser.open('file://' + str(report_location))
+                            break
+                        else:
+                            break
+                    else:
+                        print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
                 break
             else:
                 shutil.rmtree(docs)
+                shutil.rmtree(LOG_DIR)
+                shutil.rmtree(report_location)
                 break
         else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
-    while True:
-        answer = raw_input("Would you like to open this report now? ").lower()
-        if answer in answers:
-            if answer == 'y' or answer == 'yes':
-                print '\nOpening {}' .format(report_location)
-                webbrowser.open('file://' + str(report_location))
-                break
-            else:
-                break
-        else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
+            print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
 def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company, data_mine):
@@ -735,20 +626,33 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     else:
         print '\tNo Data To Be Found'
 
-    if data_mine:
+    if data_mine is not None:
         user_names = data_mine[0]
         software_list = data_mine[1]
         download_count = data_mine[2]
         username_count = len(user_names)
         software_count = len(software_list)
+
         print '\nData Found In Document MetaData'
         print '\nPotential Usernames:\n'
-        for user in user_names:
-            print '\t' + colored(user, 'red')
+        if user_names:
+            for user in user_names:
+                print '\t' + colored(user, 'red')
+        else:
+            print '\tNo Data To Be Found'
 
         print '\nSoftware And Versions Found:\n'
-        for software in software_list:
-            print '\t' + colored(software, 'red')
+        if software_list:
+            for software in software_list:
+                print '\t' + colored(software, 'red')
+        else:
+            print '\tNo Data To Be Found'
+    else:
+        user_names = []
+        software_list = []
+        download_count = 0
+        username_count = len(user_names)
+        software_count = len(software_list)
 
     sorted_dict = collections.OrderedDict(sorted(brute_results_dict.items()))
     bruted_count = len(sorted_dict)
@@ -786,33 +690,36 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     info('DNS No Wild Cards + Email Hunter Run completed')
     info('Output action_output_wild_false_hunter: Completed')
 
-    print "\nAn evidence report has been written to {}\n".format(report_location)
     domain_r = domain.split('.')
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("Would you like to keep the downloaded documents? ").lower()
+        answer = raw_input("\nWould you like to keep all local data?\n(Local Logs, Downloded Documents, HTML Evidence Report)\n:").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
                 print '\nThe documents are located here: {}'.format(docs)
+                print 'The logs are located here: {}.'.format(LOG_DIR)
+                print "\nAn evidence report has been written to {}\n".format(report_location)
+                while True:
+                    answer = raw_input("Would you like to open this report now? ").lower()
+                    if answer in answers:
+                        if answer == 'y' or answer == 'yes':
+                            print '\nOpening {}' .format(report_location)
+                            webbrowser.open('file://' + str(report_location))
+                            break
+                        else:
+                            break
+                    else:
+                        print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
                 break
             else:
                 shutil.rmtree(docs)
+                shutil.rmtree(LOG_DIR)
+                os.remove(report_location)
                 break
         else:
             print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
-    while True:
-        answer = raw_input("Would you like to open this report now? ").lower()
-        if answer in answers:
-            if answer == 'y' or answer == 'yes':
-                print '\nOpening {}' .format(report_location)
-                webbrowser.open('file://' + str(report_location))
-                break
-            else:
-                break
-        else:
-            print 'Your answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
 def write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company):

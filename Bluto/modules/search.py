@@ -203,7 +203,7 @@ def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
     who_error = False
     searchfor = 'site:linkedin.com/in ' + '"' + company + '"'
     ua = random.choice(uas)
-    for start in range(1,70,1):
+    for start in range(1,50,1):
         if prox == True:
             proxy = {'http' : 'http://127.0.0.1:8080'}
         else:

@@ -69,7 +69,6 @@ def action_download(doc_list, docs):
 def action_documents(domain, USERAGENT_F, prox):
 	document_list = []
 	uas = get_user_agents(USERAGENT_F)
-	print 'Gathering Potentialy Useful Documents'
 	info('Document Search Started')
 	for start in range(0,80,10):
 		ua = random.choice(uas)
@@ -90,7 +89,7 @@ def action_documents(domain, USERAGENT_F, prox):
 				response = requests.get(link, headers=headers)
 			soup = BeautifulSoup(response.text, "lxml")
 			if soup.find('label', {'class': 'control-label', 'for': 'id_captcha'}):
-				print colored("\n\tSo you don't like spinach?", "blue")
+				print colored("\tSo you don't like spinach?", "blue")
 				print "\n\tCaptchas are preventing any more potential document searches."
 				break
 			for div in soup.findAll('li', {'class': 'media'}):
@@ -103,6 +102,7 @@ def action_documents(domain, USERAGENT_F, prox):
 			continue
 	potential_docs = len(document_list)
 	info('Document Search Finished')
+	print '\nGathered Potentialy Useful Documents'
 	info('Potential Documents Found: {}'.format(potential_docs))
 	print colored('\n\tPotential Document Count: {}', 'red').format(potential_docs)
 	return document_list
@@ -125,6 +125,8 @@ def pdf_read(pdf_file_list):
 				user_names.append(str(person).title())
 			if software:
 				software_list.append(software)
+		except PDFSyntaxError:
+			error('This doesnt seem to be a PDF' + filename, exc_info=True)
 		except KeyError:
 			continue
 		except TypeError:
@@ -164,23 +166,25 @@ def ms_doc(ms_file_list):
 
 #Modules takes in DOMAIN, PROX, USERAGENTS outputs user_names, software_list
 def doc_start(domain, USERAGENT_F, prox, q):
+	ms_list_ext = ('.docx', '.pptx', '.xlsx', '.doc', '.xls', '.ppt')
+	ms_file_list = []
+	pdf_file_list = []
 	info('Let The Hunt Begin')
 	domain_r = domain.split('.')
 	if not os.path.exists(os.path.expanduser('~/Bluto/doc/{}'.format(domain_r[0]))):
 		os.makedirs(os.path.expanduser('~/Bluto/doc/{}'.format(domain_r[0])))
 
 	location = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
+	info('Data Folder Created ' + location)
 	docs = os.path.expanduser(location)
 	doc_list = action_documents(domain, USERAGENT_F, prox)
 
 	if doc_list == []:
-		sys.exit()
+		q.put(None)
+		return
 	download_list = action_download(doc_list, docs)
 	download_count = len(download_list)
 
-	ms_list_ext = ('.docx', '.pptx', '.xlsx', '.doc', '.xls', '.ppt')
-	ms_file_list = []
-	pdf_file_list = []
 	for root, dirs, files in os.walk(docs):
 		for filename in files:
 			if str(filename).endswith(ms_list_ext):

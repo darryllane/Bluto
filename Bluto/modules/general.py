@@ -32,8 +32,8 @@ def action_whois(domain):
         while True:
             if patern.search(domain):
                 info('Whois Results Are Good ' + company)
-                print '\n\tThe Whois Results Look Promising: ' + colored('{}','green').format(company)
-                accept = raw_input(colored('\n\tAre the Whois Results Acceptable?: ','green')).lower()
+                print '\nThe Whois Results Look Promising: ' + colored('{}','green').format(company)
+                accept = raw_input(colored('\nAre the Whois Results Acceptable?: ','green')).lower()
                 if accept in ('y', 'yes'):
                     company = accept
                     break
