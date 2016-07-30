@@ -159,7 +159,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep all local data? (Local Logs, Downloded Documents, HTML Evidence Report)").lower()
+        answer = raw_input("\nWould you like to keep all local data?\n(Local Logs, Downloded Documents, HTML Evidence Report)\n:").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
@@ -337,7 +337,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep all local data? (Local Logs, Downloded Documents, HTML Evidence Report)").lower()
+        answer = raw_input("\nWould you like to keep all local data?\n(Local Logs, Downloded Documents, HTML Evidence Report)\n:").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
@@ -514,7 +514,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep all local data? (Local Logs, Downloded Documents, HTML Evidence Report)").lower()
+        answer = raw_input("\nWould you like to keep all local data?\n(Local Logs, Downloded Documents, HTML Evidence Report)\n:").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
