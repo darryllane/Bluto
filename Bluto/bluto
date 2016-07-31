@@ -41,7 +41,7 @@ myResolver = dns.resolver.Resolver()
 myResolver.timeout = 6
 myResolver.lifetime = 6
 myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
-prox = True
+prox = False
 
 for item in SITES:
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
