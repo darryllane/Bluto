@@ -28,11 +28,12 @@ import dns.zone
 from termcolor import colored
 from modules.get_dns import action_brute_start, action_wild_cards, action_zone_transfer, get_dns_details, action_brute_wild
 from modules.search import action_bing_true, action_google, action_linkedin, action_netcraft, action_emailHunter
-from modules.get_file import get_subs, get_sub_interest, get_line_count
+from modules.get_file import get_subs, get_sub_interest, get_line_count, get_user_agents
 from modules.general import action_country_id, action_whois, action_bluto_use, check_dom
 from modules.output import action_output_vuln_zone, action_output_wild_false, action_output_wild_false_hunter, action_output_vuln_zone_hunter
 from modules.data_mine import doc_start
 from modules.bluto_logging import info, error
+
 
 
 VERSION = "2.2.0"
@@ -40,7 +41,7 @@ myResolver = dns.resolver.Resolver()
 myResolver.timeout = 6
 myResolver.lifetime = 6
 myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
-prox = False
+prox = True
 
 for item in SITES:
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
@@ -96,6 +97,7 @@ if __name__ == "__main__":
             domain = args['d']
         else:
             domain = raw_input("Target Domain: ")
+        user_agents = get_user_agents(USERAGENT_F)
         info('Domain Identified: ' + str(domain))
         domain_r = domain.split('.')
         report_location = os.path.expanduser('~/Bluto/Bluto-Evidence-{}.html'.format(domain_r[0]))
@@ -129,16 +131,16 @@ if __name__ == "__main__":
                 start_time_email = time.time()
                 if api:
                     q4 = Queue.Queue()
-                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                     t4.start()
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
                 q5 = Queue.Queue()
-                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
-                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
-                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
-                t5 = threading.Thread(target=doc_start, args=(domain, USERAGENT_F, prox, q5))
+                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, user_agents, prox))
+                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, user_agents, prox))
+                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, user_agents, prox))
+                t5 = threading.Thread(target=doc_start, args=(domain, user_agents, prox, q5))
                 t1.start()
                 t2.start()
                 t3.start()
@@ -187,12 +189,12 @@ if __name__ == "__main__":
                 q5 = Queue.Queue()
                 if api:
                     q4 = Queue.Queue()
-                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                     t4.start()
-                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
-                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
-                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
-                t5 = threading.Thread(target=doc_start, args=(domain, USERAGENT_F, prox, q5))
+                t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, user_agents, prox))
+                t2 = threading.Thread(target=action_bing_true, args=(domain, q2, user_agents, prox))
+                t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, user_agents, prox))
+                t5 = threading.Thread(target=doc_start, args=(domain, user_agents, prox, q5))
                 t1.start()
                 t2.start()
                 t3.start()
@@ -240,12 +242,12 @@ if __name__ == "__main__":
             q5 = Queue.Queue()
             if api:
                 q4 = Queue.Queue()
-                t4 = threading.Thread(target=action_emailHunter, args=(domain, api, USERAGENT_F, q4, prox)) #Takes domain[str], api[list], USERAGENT_F[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                 t4.start()
-            t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, USERAGENT_F, prox))
-            t2 = threading.Thread(target=action_bing_true, args=(domain, q2, USERAGENT_F, prox))
-            t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, USERAGENT_F, prox))
-            t5 = threading.Thread(target=doc_start, args=(domain, USERAGENT_F, prox, q5))
+            t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, user_agents, prox))
+            t2 = threading.Thread(target=action_bing_true, args=(domain, q2, user_agents, prox))
+            t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, user_agents, prox))
+            t5 = threading.Thread(target=doc_start, args=(domain, user_agents, prox, q5))
             t1.start()
             t2.start()
             t3.start()

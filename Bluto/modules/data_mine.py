@@ -1,4 +1,4 @@
-
+import pdfminer
 import requests
 import urllib2
 import oletools.thirdparty.olefile as olefile
@@ -8,12 +8,16 @@ import time
 import re
 import random
 import sys
+import Queue
+import threading
 from termcolor import colored
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from bs4 import BeautifulSoup
 from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 from get_file import get_user_agents
+from search import doc_bing, doc_exalead
+
 
 
 def action_download(doc_list, docs):
@@ -66,46 +70,19 @@ def action_download(doc_list, docs):
 	return download_list
 
 
-def action_documents(domain, USERAGENT_F, prox):
-	document_list = []
-	uas = get_user_agents(USERAGENT_F)
-	info('Document Search Started')
-	for start in range(0,80,10):
-		ua = random.choice(uas)
-		link = 'http://www.exalead.com/search/web/results/?search_language=&q=(filetype:xls+OR+filetype:doc+OR++filetype:pdf+OR+filetype:ppt)+site:{}&search_language=&elements_per_page=10&start_index={}'.format(domain, start)
-		if prox == True:
-			proxy = {'http' : 'http://127.0.0.1:8080'}
-		else:
-			pass
-		try:
-			headers = {"Connection" : "close",
-			           "User-Agent" : ua,
-			           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-			           'Accept-Language': 'en-US,en;q=0.5',
-			           'Accept-Encoding': 'gzip, deflate'}
-			if prox == True:
-				response = requests.get(link, headers=headers, proxies=proxy)
-			else:
-				response = requests.get(link, headers=headers)
-			soup = BeautifulSoup(response.text, "lxml")
-			if soup.find('label', {'class': 'control-label', 'for': 'id_captcha'}):
-				print colored("\tSo you don't like spinach?", "blue")
-				print "\n\tCaptchas are preventing any more potential document searches."
-				break
-			for div in soup.findAll('li', {'class': 'media'}):
-				document = div.find('a', href=True)['href']
-				document = urllib2.unquote(document)
-				document_list.append(document)
-			time.sleep(10)
-		except Exception:
-			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
-			continue
-	potential_docs = len(document_list)
-	info('Document Search Finished')
-	print '\nGathered Potentialy Useful Documents'
-	info('Potential Documents Found: {}'.format(potential_docs))
-	print colored('\n\tPotential Document Count: {}', 'red').format(potential_docs)
-	return document_list
+def doc_search(domain, USERAGENT_F, prox):
+	q1 = Queue.Queue()
+	q2 = Queue.Queue()
+	t1 = threading.Thread(target=doc_bing, args=(domain, USERAGENT_F, prox, q1))
+	t2 = threading.Thread(target=doc_exalead, args=(domain, USERAGENT_F, prox, q2))
+	t1.start()
+	t2.start()
+	t1.join()
+	t2.join()
+	bing = q1.get()
+	exalead = q2.get()
+	list_d = bing + exalead
+	return list_d
 
 
 #Extract Author PDF
@@ -125,8 +102,8 @@ def pdf_read(pdf_file_list):
 				user_names.append(str(person).title())
 			if software:
 				software_list.append(software)
-		except PDFSyntaxError:
-			error('This doesnt seem to be a PDF' + filename, exc_info=True)
+		except pdfminer.pdfparser.PDFSyntaxError:
+			pass
 		except KeyError:
 			continue
 		except TypeError:
@@ -158,9 +135,8 @@ def ms_doc(ms_file_list):
 				software_list.append(software)
 			if save_by:
 				user_names.append(str(save_by).title())
-
 		except Exception:
-			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+			pass
 	info('Finished Extracting MSDOC MetaData')
 	return (user_names, software_list)
 
@@ -177,7 +153,7 @@ def doc_start(domain, USERAGENT_F, prox, q):
 	location = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
 	info('Data Folder Created ' + location)
 	docs = os.path.expanduser(location)
-	doc_list = action_documents(domain, USERAGENT_F, prox)
+	doc_list = doc_search(domain, USERAGENT_F, prox)
 
 	if doc_list == []:
 		q.put(None)
