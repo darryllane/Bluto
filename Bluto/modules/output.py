@@ -63,7 +63,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     pwned_results = action_pwned(f_emails)
     c_accounts = len(pwned_results)
 
-    print '\nEmail Addresses:\n'
+    print '\n\nEmail Addresses:\n'
     write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
         for email in f_emails:
@@ -242,7 +242,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     pwned_results = action_pwned(f_emails)
     c_accounts = len(pwned_results)
 
-    print '\nEmail Addresses:\n'
+    print '\n\nEmail Addresses:\n'
     write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
         for email in f_emails:
@@ -416,7 +416,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     pwned_results = action_pwned(f_emails)
     c_accounts = len(pwned_results)
 
-    print '\nEmail Addresses:\n'
+    print '\n\nEmail Addresses:\n'
     write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
 
@@ -597,7 +597,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     pwned_results = action_pwned(f_emails)
     c_accounts = len(pwned_results)
 
-    print '\nEmail Addresses:\n'
+    print '\n\nEmail Addresses:\n'
     write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
     if f_emails:
 

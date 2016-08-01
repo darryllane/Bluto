@@ -217,7 +217,7 @@ def doc_exalead(domain, user_agents, prox, q):
             soup = BeautifulSoup(response.text, "lxml")
             if soup.find('label', {'class': 'control-label', 'for': 'id_captcha'}):
                 print colored("\tSo you don't like spinach?", "blue")
-                print "\n\tCaptchas are preventing any more potential document searches."
+                print "\n\tCaptchas are preventing some document searches."
                 break
             for div in soup.findAll('li', {'class': 'media'}):
                 document = div.find('a', href=True)['href']
@@ -265,7 +265,8 @@ def doc_bing(domain, user_agents, prox, q):
                 document = h2.find('a', href=True)['href']
                 document = urllib2.unquote(document)
                 document_list.append(document)
-
+        except requests.models.ChunkedEncodingError:
+            continue
         except Exception:
             traceback.print_exc()
             continue

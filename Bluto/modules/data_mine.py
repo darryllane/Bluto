@@ -24,38 +24,52 @@ def action_download(doc_list, docs):
 	info('Document Download Started')
 	i = 0
 	download_list = []
-	print '\nGathering Live Documents For Metadata Mining\n'
+	initial_count = 0
+	print 'Gathering Live Documents For Metadata Mining\n'
 	for doc in doc_list:
+		initial_count += 1
 		try:
 			r = requests.get(doc)
 			if r.status_code == 404:
 				r.raise_for_status()
-			filename = re.search('filename="(.*)"', r.headers['content-disposition']).group(1)
+			if re.search('filename="(.*)"', r.headers['content-disposition']):
+				filename_t = re.search('filename="(.*)"', r.headers['content-disposition'])
+				filename = filename_t.group(1)
+			else:
+				continue
 			with open(docs + filename, "w") as code:
 				i += 1
 				code.write(r.content)
 				code.close()
-				print '\t' + doc
+				print('\tDownload Count: {}\r'.format(str(initial_count))),
 				download_list.append(doc)
 				info(doc)
+
+		except IOError:
+			pass
 		except requests.exceptions.HTTPError:
 			error('Error: File Not Found Server Side')
 			error(doc)
 		except requests.exceptions.ConnectionError:
 			error('Error: File Not Found Server Side')
 			error(doc)
+			continue
 		except KeyError:
 			temp = str(doc).rsplit('.', 1)[1]
 			ext = re.sub(r'\?.*', r'', temp)
 			filename = "file{}.{}".format(i, ext.replace('?T', ''))
+		try:
 			with open(docs + filename, "w") as code:
 				i += 1
 				code.write(r.content)
 				code.close()
-				print '\t' + doc
+				print('\tDownload Count: {}\r'.format(str(initial_count))),
 				info(doc)
 				download_list.append(doc)
+
 			continue
+		except IOError:
+			pass
 		except Exception:
 			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 			error(doc)
@@ -64,9 +78,7 @@ def action_download(doc_list, docs):
 	if i < 1:
 		sys.exit()
 
-	download_count = len(download_list)
-	info('Documents Downloaded: {}'.format(download_count))
-	print colored('\n\tDocuments Downloaded: {}', 'red').format(download_count)
+	info('Documents Downloaded: {}'.format(initial_count))
 	return download_list
 
 
@@ -99,9 +111,19 @@ def pdf_read(pdf_file_list):
 			software = re.sub('[^0-9a-zA-Z]+', ' ', doc.info[0]['Creator'])
 			person = re.sub('[^0-9a-zA-Z]+', ' ', doc.info[0]['Author'])
 			if person:
-				user_names.append(str(person).title())
+				oddity = re.match('(\s\w\s+(\w\s+)+\w)', person)
+				if oddity:
+					oddity = str(oddity.group(1)).replace(' ', '')
+					user_names.append(str(oddity).title())
+				else:
+					user_names.append(str(person).title())
 			if software:
-				software_list.append(software)
+				oddity2 = re.match('(\s\w\s+(\w\s+)+\w)', software)
+				if oddity2:
+					oddity2 = str(oddity2.group(1)).replace(' ', '')
+					software_list.append(oddity2)
+				else:
+					software_list.append(software)
 		except pdfminer.pdfparser.PDFSyntaxError:
 			pass
 		except KeyError:
@@ -130,11 +152,28 @@ def ms_doc(ms_file_list):
 			software  = re.sub('[^0-9a-zA-Z]+', ' ', meta.creating_application)
 			save_by = re.sub('[^0-9a-zA-Z]+', ' ', meta.last_saved_by)
 			if author:
-				user_names.append(str(author).title())
+				oddity = re.match('(\s\w\s+(\w\s+)+\w)', author)
+				if oddity:
+					oddity = str(oddity.group(1)).replace(' ', '')
+					user_names.append(str(oddity).title())
+				else:
+					user_names.append(str(author).title())
 			if software:
-				software_list.append(software)
+				oddity2 = re.match('(\s\w\s+(\w\s+)+\w)', software)
+				if oddity2:
+					oddity2 = str(oddity2.group(1)).replace(' ', '')
+					software_list.append(oddity2)
+				else:
+					software_list.append(software)
+
 			if save_by:
-				user_names.append(str(save_by).title())
+				oddity3 = re.match('(\s\w\s+(\w\s+)+\w)', save_by)
+				if oddity3:
+					oddity3 = str(oddity3.group(1)).replace(' ', '')
+					user_names.append(str(oddity3).title())
+				else:
+					user_names.append(str(save_by).title())
+
 		except Exception:
 			pass
 	info('Finished Extracting MSDOC MetaData')

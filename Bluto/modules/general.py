@@ -26,14 +26,19 @@ def action_whois(domain):
 
     try:
         whois_things = pythonwhois.get_whois(domain)
-        company = whois_things['contacts']['registrant']['name']
+        try:
+            company = whois_things['contacts']['registrant']['name']
+        except Exception:
+            print '\nThere seems to be no Registrar for this domain.'
+            company = domain
+            pass
         splitup = company.lower().split()
         patern = re.compile('|'.join(splitup))
         while True:
             if patern.search(domain):
                 info('Whois Results Are Good ' + company)
                 print '\nThe Whois Results Look Promising: ' + colored('{}','green').format(company)
-                accept = raw_input(colored('\nAre the Whois Results Acceptable?: ','green')).lower()
+                accept = raw_input(colored('\nIs The Search Term sufficient?: ','green')).lower()
                 if accept in ('y', 'yes'):
                     company = accept
                     break
