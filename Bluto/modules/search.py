@@ -1,6 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
+import dns.resolver
 import unicodedata
 import traceback
 import sys
@@ -334,7 +335,8 @@ def action_netcraft(domain, myResolver):
         soup = BeautifulSoup(response.content, 'lxml')
         pattern = 'rel="nofollow">([a-z\.\-A-Z0-9]+)<FONT COLOR="#ff0000">'
         sub_results = re.findall(pattern, response.content)
-
+    except dns.exception.Timeout:
+        pass
     except Exception:
         error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 

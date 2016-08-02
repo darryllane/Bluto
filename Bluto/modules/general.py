@@ -82,10 +82,12 @@ def action_whois(domain):
 
 
     except pythonwhois.shared.WhoisException:
-        traceback.print_exc()
+        pass
     except socket.error:
         pass
-    except KeyError, pythonwhois.net.socket.errno.ETIMEDOUT:
+    except KeyError:
+        pass
+    except pythonwhois.net.socket.errno.ETIMEDOUT:
         print colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red')
         temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
         if temp_company == '':
@@ -94,6 +96,19 @@ def action_whois(domain):
             company = temp_company
     except Exception:
         error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+    if 'company' not in locals():
+        print 'There is no Whois data for this domain.\n\nPlease supply a company name.'
+        while True:
+            temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+            if temp_company == '':
+                info('User Supplied Blank Company')
+                company = domain
+                break
+            else:
+                info('User Supplied Company ' + company)
+                company = temp_company
+                break
+
     return company
 
 def action_country_id(countries_file, prox):

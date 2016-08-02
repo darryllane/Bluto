@@ -36,10 +36,10 @@ from modules.bluto_logging import info, error
 
 
 
-VERSION = "2.3.2"
+VERSION = "2.3.3"
 myResolver = dns.resolver.Resolver()
-myResolver.timeout = 6
-myResolver.lifetime = 6
+myResolver.timeout = 10
+myResolver.lifetime = 10
 myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 prox = False
 
