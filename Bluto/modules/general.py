@@ -22,7 +22,8 @@ myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 default_s = False
 
-def get_size(start_path = dir_location):
+def get_size(dir_location):
+    start_path = dir_location
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
         for f in filenames:
