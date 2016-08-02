@@ -342,10 +342,15 @@ def action_netcraft(domain, myResolver):
 
     if sub_results:
         for item in sub_results:
-            netcheck = myResolver.query(item + '.' + domain)
-            for data in netcheck:
-                netcraft_list.append(item + '.' + domain + ' ' + str(data))
-                print colored(item + '.' + domain, 'red')
+            try:
+                netcheck = myResolver.query(item + '.' + domain)
+                for data in netcheck:
+                    netcraft_list.append(item + '.' + domain + ' ' + str(data))
+                    print colored(item + '.' + domain, 'red')
+            except dns.resolver.NXDOMAIN:
+                pass
+            except Exception:
+                error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
     else:
         print '\tNo Results Found'
 
