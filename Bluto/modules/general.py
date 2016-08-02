@@ -105,8 +105,8 @@ def action_whois(domain):
                 company = domain
                 break
             else:
-                info('User Supplied Company ' + company)
                 company = temp_company
+                info('User Supplied Company ' + company)
                 break
 
     return company
