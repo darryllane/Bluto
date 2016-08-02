@@ -21,11 +21,14 @@ Bluto now takes command line arguments at launch, the new options are as follows
 
 -e  		This uses a very large subdomain list for bruting.
 -api		You can supply your email hunter api key here to gather a considerably larger amount of email addresses.
+-d  		Used to specify the target domain on the commandline.
 
-**Examples:** (feel free to use this EmailHunter API Key until it is removed (DEV))
+**Examples:** (feel free to use this EmailHunter API Key until it is removed)
 
 	bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669
 	bluto -e
+	bluto -api 2b0ab19df982a783877a6b59b982fdba4b6c3669 -e
+	bluto -d example.com -api 2b0ab19df982a783877a6b59b982fdba4b6c3669 -e
 
 
 **Pip Install Instructions**
@@ -56,21 +59,24 @@ Note: To test if pip is already installed execute.
 
 Change/Feature Requests
 ====
-* MetaData Scraping From Document Hunt On Target Domain
-* Target Domain Parsed As Argument
+* ~~MetaData Scraping From Document Hunt On Target Domain~~
+* ~~Target Domain Parsed As Argument~~
 * Identification Of Web Portals
 * Active Document Hunting
 
 Changelog
 ====
-
-* Version __2.01__ (__22/07/2016__):
+* Version __2.3.2__ (__02/08/2016__):
+  * MetaData Scraping From Document Hunt On Target Domain
+  * Target Domain Parsed As Argument
+  
+* Version __2.0.1__ (__22/07/2016__):
   * Compromised Account Data Prensented In Terminal And HTML Report
 
-* Version __2.0__ (__19/07/2016__):
+* Version __2.0.0__ (__19/07/2016__):
   * Pushed Live 2.0
  
-* Version __1.99__ (__09/07/2016__):
+* Version __1.9.9__ (__09/07/2016__):
   * Email Hunter API Support Added.
   * Haveibeenpwned API Support Added.
   * HTML Evidence Report Added.
