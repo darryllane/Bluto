@@ -9,6 +9,7 @@ import re
 import random
 import sys
 import Queue
+import time
 import threading
 from termcolor import colored
 from pdfminer.pdfparser import PDFParser
@@ -17,6 +18,7 @@ from bs4 import BeautifulSoup
 from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 from get_file import get_user_agents
 from search import doc_bing, doc_exalead
+from general import get_size
 
 
 
@@ -25,9 +27,8 @@ def action_download(doc_list, docs):
 	i = 0
 	download_list = []
 	initial_count = 0
-	print 'Gathering Live Documents For Metadata Mining\n'
+	print '\nGathering Live Documents For Metadata Mining\n'
 	for doc in doc_list:
-		initial_count += 1
 		try:
 			r = requests.get(doc)
 			if r.status_code == 404:
@@ -41,6 +42,7 @@ def action_download(doc_list, docs):
 				i += 1
 				code.write(r.content)
 				code.close()
+				initial_count += 1
 				print('\tDownload Count: {}\r'.format(str(initial_count))),
 				download_list.append(doc)
 				info(doc)
@@ -58,26 +60,28 @@ def action_download(doc_list, docs):
 			temp = str(doc).rsplit('.', 1)[1]
 			ext = re.sub(r'\?.*', r'', temp)
 			filename = "file{}.{}".format(i, ext.replace('?T', ''))
-		try:
-			with open(docs + filename, "w") as code:
-				i += 1
-				code.write(r.content)
-				code.close()
-				print('\tDownload Count: {}\r'.format(str(initial_count))),
-				info(doc)
-				download_list.append(doc)
+			try:
+				with open(docs + filename, "w") as code:
+					i += 1
+					code.write(r.content)
+					code.close()
+					initial_count += 1
+					print('\tDownload Count: {}\r'.format(str(initial_count))),
+					info(doc)
+					download_list.append(doc)
 
-			continue
-		except IOError:
-			pass
-		except Exception:
-			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
-			error(doc)
-			error(r.headers)
-			continue
+				continue
+			except IOError:
+				pass
+			except Exception:
+				error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+				error(doc)
+				error(r.headers)
+				continue
 	if i < 1:
 		sys.exit()
-
+	data_size = get_size(docs)
+	print '\nData Downloaded: {}'.format(str(data_size))
 	info('Documents Downloaded: {}'.format(initial_count))
 	return download_list
 
@@ -124,12 +128,14 @@ def pdf_read(pdf_file_list):
 					software_list.append(oddity2)
 				else:
 					software_list.append(software)
+		except IndexError:
+			continue
 		except pdfminer.pdfparser.PDFSyntaxError:
-			pass
+			continue
 		except KeyError:
 			continue
 		except TypeError:
-			pass
+			continue
 		except Exception:
 			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 			continue
@@ -230,16 +236,16 @@ def doc_start(domain, USERAGENT_F, prox, q):
 		user_names = sorted(set(user_names_t))
 		software_list = sorted(set(software_list_t))
 		info('The Hunt Ended')
-		q.put((user_names, software_list, download_count))
+		q.put((user_names, software_list, download_count, download_list))
 
 	elif software_list_t:
 		software_list = sorted(set(software_list_t))
 		user_names = []
 		info('The Hunt Ended')
-		q.put((user_names, software_list, download_count))
+		q.put((user_names, software_list, download_count, download_list))
 
 	elif user_names_t:
 		user_names = sorted(set(user_names_t))
 		software_list = []
 		info('The Hunt Ended')
-		q.put((user_names, software_list, download_count))
+		q.put((user_names, software_list, download_count, download_list))

@@ -64,7 +64,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     c_accounts = len(pwned_results)
 
     print '\n\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company, data_mine)
     if f_emails:
         for email in f_emails:
 
@@ -95,6 +95,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
         user_names = data_mine[0]
         software_list = data_mine[1]
         download_count = data_mine[2]
+        download_list = data_mine[3]
         username_count = len(user_names)
         software_count = len(software_list)
 
@@ -243,7 +244,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     c_accounts = len(pwned_results)
 
     print '\n\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company, data_mine)
     if f_emails:
         for email in f_emails:
             print str(email).replace("u'","").replace("'","").replace('[','').replace(']','')
@@ -273,6 +274,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
         user_names = data_mine[0]
         software_list = data_mine[1]
         download_count = data_mine[2]
+        download_list = data_mine[3]
         username_count = len(user_names)
         software_count = len(software_list)
 
@@ -417,7 +419,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
     c_accounts = len(pwned_results)
 
     print '\n\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company, data_mine)
     if f_emails:
 
         for email in f_emails:
@@ -449,6 +451,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
         user_names = data_mine[0]
         software_list = data_mine[1]
         download_count = data_mine[2]
+        download_list = data_mine[3]
         username_count = len(user_names)
         software_count = len(software_list)
 
@@ -598,7 +601,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     c_accounts = len(pwned_results)
 
     print '\n\nEmail Addresses:\n'
-    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company)
+    write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company, data_mine)
     if f_emails:
 
         for email in f_emails:
@@ -630,6 +633,7 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
         user_names = data_mine[0]
         software_list = data_mine[1]
         download_count = data_mine[2]
+        download_list = data_mine[3]
         username_count = len(user_names)
         software_count = len(software_list)
 
@@ -722,13 +726,26 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
             print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
 
 
-def write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company):
+def write_html(email_evidence_results, linkedin_evidence_results, pwned_results, report_location, company, data_mine):
     info('Started HTML Report')
+    if data_mine is not None:
+        user_names = data_mine[0]
+        software_list = data_mine[1]
+        download_count = data_mine[2]
+        download_list = data_mine[3]
+        username_count = len(user_names)
+        software_count = len(software_list)
     header = '''
     <!DOCTYPE html>
     <html>
     <head>
     <style>
+    table {{
+        style="width:75%"
+        border-collapse: separate;
+        border-spacing: 5px;
+        *border-collapse: expression('separate', cellSpacing = '10px');
+    }}
     th {{
         text-align: left;
     }}
@@ -739,7 +756,7 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
         padding:5px;
     }}
     section {{
-        width:650px;
+        width:75%;
         float:left;
         padding:10px;
     }}
@@ -751,7 +768,7 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
         padding:5px;
     }}
     div {{
-        width: 150%;
+        width: 100%;
     }}
     </style>
     </head>
@@ -788,6 +805,23 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
             </div>
         </th>
     '''
+    metaDescription ='''
+
+            <H2>MetaData Evidence:</H2>
+            <th>
+                <div>
+                    <p>
+                     Various techniques were used to gather potentially useful information on the scoped domain. The consultant
+                     identified multiple documents available for download from the scoped domains website/s. These documents could hold potentially
+                     sensitive data such as usernames, email addresses, folder structures, printers, operating system version information and
+                     software version information. This information can prove to be very useful to an attacker when targeting various vectors
+                     such as Social Engineering, password attacks and to expose further attack vectors.
+
+                     It is recommended that all document metadata is sanitised before being published into the public domain.
+                    </p>
+                </div>
+            </th>
+        '''
 
     linkedinDescription ='''
 
@@ -822,7 +856,7 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
             myFile.write('<section>')
             if email_evidence_results:
                 myFile.write(emailDescription)
-                myFile.write('<table style="width:100%">')
+                myFile.write('<table>')
                 myFile.write('<tr>')
                 myFile.write('<th>Email Address</th>')
                 myFile.write('<th>URL Address</th>')
@@ -837,7 +871,7 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
                 myFile.write(linkedinDescription)
             if linkedin_evidence_results:
                 for url, person, clean in linkedin_evidence_results:
-                    myFile.write('<table style="width:100%">')
+                    myFile.write('<table style="width:60%">')
                     myFile.write('<p><tr><td><b>Person:</b> {}</td>'.format(person))
                     myFile.write('</tr>')
                     myFile.write('<tr><td><b>Role</b>: {}</td>'.format(clean))
@@ -847,7 +881,7 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
                     myFile.write('</table>')
             if pwned_results:
                 myFile.write(compromisedDescription)
-                myFile.write('<table style="width:70%">')
+                myFile.write('<table>')
             if pwned_results:
                 for result in pwned_results:
                     myFile.write('<p><tr><td>Email: {}</td>'.format(result[0]))
@@ -862,6 +896,59 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
                     myFile.write('</tr>')
                     myFile.write('<tr><td>Description: <p>{}</p></td>'.format(result[5]))
                     myFile.write('</tr></p>')
+                myFile.write('</table>')
+            if data_mine:
+                myFile.write(metaDescription)
+                myFile.write('<table>')
+                if data_mine:
+                    myFile.write('<tr>')
+                    if software_count:
+                        myFile.write('<th>Software Count</th>')
+                    if username_count:
+                        myFile.write('<th>Username Count</th>')
+                    if download_count:
+                        myFile.write('<th>Download Count</th>')
+                    myFile.write('</tr>')
+                    myFile.write('<tr>')
+                    if software_count:
+                        myFile.write('<td>{}</td>'.format(software_count))
+                    if username_count:
+                        myFile.write('<td>{}</td>'.format(username_count))
+                    if download_count:
+                        myFile.write('<td>{}</td>'.format(download_count))
+                    myFile.write('</tr>')
+                myFile.write('</table>')
+                myFile.write('<table>')
+                myFile.write('<br>')
+            if user_names:
+                myFile.write('<tr>')
+                myFile.write('<th>Usernames</th>')
+                myFile.write('</tr>')
+                for username in user_names:
+                    myFile.write('<tr>')
+                    myFile.write('<td>{}</td>'.format(username))
+                    myFile.write('<tr>')
+                myFile.write('</table>')
+                myFile.write('<table style="width:75">')
+                myFile.write('<br>')
+            if software_list:
+                myFile.write('<tr>')
+                myFile.write('<th>Software</th>')
+                myFile.write('</tr>')
+                for software in software_list:
+                    myFile.write('<tr>')
+                    myFile.write('<td>{}</td>'.format(software))
+                    myFile.write('<tr>')
+                myFile.write('</table>')
+                myFile.write('<table style="width:100%">')
+            if download_list:
+                myFile.write('<tr>')
+                myFile.write('<th>Document</th>')
+                myFile.write('</tr>')
+                for doc in download_list:
+                    myFile.write('<tr>')
+                    myFile.write('<td>{}</td>'.format(doc))
+                    myFile.write('<tr>')
                 myFile.write('</table>')
             myFile.write('</section>')
             myFile.write(footer)

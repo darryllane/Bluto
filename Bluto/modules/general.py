@@ -22,6 +22,15 @@ myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 default_s = False
 
+def get_size(start_path = dir_location):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
+
 def action_whois(domain):
 
     try:
@@ -210,6 +219,9 @@ def check_dom(domain):
         sys.exit()
     except dns.resolver.NXDOMAIN:
         print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        sys.exit()
+    except dns.exception.Timeout:
+        print '\nThe connection hit a timeout. Are you connected to the internet?\n'
         sys.exit()
     except Exception:
         error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
