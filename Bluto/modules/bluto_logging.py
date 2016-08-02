@@ -4,9 +4,9 @@ import logging
 import sys
 import site
 import os
-
-INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
-ERROR_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-error.log')
+LOG_DIR = os.path.expanduser('~/Bluto/log/')
+INFO_LOG_FILE = os.path.expanduser(LOG_DIR + 'bluto-info.log')
+ERROR_LOG_FILE = os.path.expanduser(LOG_DIR + 'bluto-error.log')
 
 if not os.path.exists(os.path.expanduser('~/Bluto/log')):
     os.makedirs(os.path.expanduser('~/Bluto/log'))

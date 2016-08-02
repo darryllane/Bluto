@@ -22,16 +22,48 @@ myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 default_s = False
 
+def get_size(start_path = dir_location):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
+
 def action_whois(domain):
-    while True:
+
+    try:
+        whois_things = pythonwhois.get_whois(domain)
         try:
-            whois_things = pythonwhois.get_whois(domain)
             company = whois_things['contacts']['registrant']['name']
-            splitup = company.lower().split()
-            patern = re.compile('|'.join(splitup))
+        except Exception:
+            print '\nThere seems to be no Registrar for this domain.'
+            company = domain
+            pass
+        splitup = company.lower().split()
+        patern = re.compile('|'.join(splitup))
+        while True:
             if patern.search(domain):
                 info('Whois Results Are Good ' + company)
-                print '\n\tThe Whois Results Look Promising: ' + colored('{}','green').format(company)
+                print '\nThe Whois Results Look Promising: ' + colored('{}','green').format(company)
+                accept = raw_input(colored('\nIs The Search Term sufficient?: ','green')).lower()
+                if accept in ('y', 'yes'):
+                    company = accept
+                    break
+                elif accept in ('n', 'no'):
+                    temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+                    if temp_company == '':
+                        info('User Supplied Blank Company')
+                        company = domain
+                        break
+                    else:
+                        info('User Supplied Company ' + company)
+                        company = temp_company
+                        break
+                else:
+                    print '\nThe Options Are yes|no Or y|no Not {}'.format(accept)
+
             else:
                 info('Whois Results Not Good ' + company)
                 print colored("\n\tThe Whois Results Don't Look Very Promissing: '{}'","red") .format(company)
@@ -40,26 +72,30 @@ def action_whois(domain):
                 if temp_company == '':
                     info('User Supplied Blank Company')
                     company = domain
+                    break
                 else:
                     info('User Supplied Company ' + company)
                     company = temp_company
-            break
-        except pythonwhois.shared.WhoisException:
-            traceback.print_exc()
-        except socket.error:
-            pass
-        except KeyError, pythonwhois.net.socket.errno.ETIMEDOUT:
-            print colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red')
-            temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
-            if temp_company == '':
-                company = domain
-            else:
-                company = temp_company
-        except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+                    break
+
+
+    except pythonwhois.shared.WhoisException:
+        traceback.print_exc()
+    except socket.error:
+        pass
+    except KeyError, pythonwhois.net.socket.errno.ETIMEDOUT:
+        print colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red')
+        temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+        if temp_company == '':
+            company = domain
+        else:
+            company = temp_company
+    except Exception:
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
     return company
 
 def action_country_id(countries_file, prox):
+    info('Identifying Country')
     userCountry = ''
     userServer = ''
     userIP = ''
@@ -85,12 +121,12 @@ def action_country_id(countries_file, prox):
         try:
             if prox == True:
                 proxy = {'http' : 'http://127.0.0.1:8080'}
-                r = requests.get(r'http://freegeoip.net/json/', proxies=proxy)
+                r = requests.get(r'https://freegeoip.net/json/', proxies=proxy)
                 ip = r.json()['ip']
                 originCountry = r.json()['country_name']
 
             else:
-                r = requests.get(r'http://freegeoip.net/json/')
+                r = requests.get(r'https://freegeoip.net/json/')
                 ip = r.json()['ip']
                 originCountry = r.json()['country_name']
 
@@ -152,11 +188,12 @@ def action_country_id(countries_file, prox):
                 userCountry = 'DEAFULT'
                 pass
             else:
-                print 'Bluto currently doesn\'t have your countries google server available.\nPlease navigate to "http://www.telize.com/geoip/" and post an issue to "https://github.com/RandomStorm/Bluto/issues"\nincluding the country value as shown in the json output\nYou have been assigned to http://www.google.com for now.'
+                print 'Bluto currently doesn\'t have your countries google server available.\nPlease navigate to "https://freegeoip.net/json/" and post an issue to "https://github.com/darryllane/Bluto/issues"\nincluding the country value as shown in the json output\nYou have been assigned to http://www.google.co.uk for now.'
                 userServer = 'http://www.google.co.uk'
                 userCountry = 'United Kingdom'
 
     print '\n\tSearching From: {0}\n\tGoogle Server: {1}\n' .format(userCountry.title(), userServer)
+    info('Country Identified: {}'.format(userCountry))
     return (userCountry, userServer)
 
 
@@ -177,8 +214,14 @@ def check_dom(domain):
         dom = str(myAnswers.canonical_name).strip('.')
         if dom:
             pass
+    except dns.resolver.NoNameservers:
+        print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        sys.exit()
     except dns.resolver.NXDOMAIN:
         print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        sys.exit()
+    except dns.exception.Timeout:
+        print '\nThe connection hit a timeout. Are you connected to the internet?\n'
         sys.exit()
     except Exception:
         error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)

@@ -13,8 +13,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
 myResolver = dns.resolver.Resolver()
-myResolver.timeout = 5
-myResolver.lifetime = 5
+myResolver.timeout = 10
+myResolver.lifetime = 10
 myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 targets = []
@@ -107,6 +107,10 @@ def action_brute(subdomain):
     except dns.exception.SyntaxError:
         pass
     except dns.exception.Timeout:
+        error('Timeout')
+        error(subdomain)
+        pass
+    except dns.resolver.Timeout:
         pass
     except Exception:
         error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
@@ -125,14 +129,18 @@ def action_brute_start(subs):
 def action_brute_wild(sub_list, domain):
     info('Bruting Wild Card SubDomains')
     target_results = []
-    one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
-    myAnswers = myResolver.query(str(one) + '.' + str(domain))
-    name = myAnswers.canonical_name
-    random_addr = socket.gethostbyname(str(name))
+    random_addrs = []
+    for i in range(0,10,1):
+        one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
+        myAnswers = myResolver.query(str(one) + '.' + str(domain))
+        name = myAnswers.canonical_name
+        random_addr = socket.gethostbyname(str(name))
+        random_addrs.append(random_addr)
+    random_addrs = sorted(set(random_addrs))
     for host in sub_list:
         try:
             host_host, host_addr = host.split(' ')
-            if random_addr == host_addr:
+            if host_addr in random_addrs:
                 pass
             else:
                 target_results.append(host)

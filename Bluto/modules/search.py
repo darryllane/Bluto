@@ -8,14 +8,14 @@ import re
 import requests
 import random
 import time
-from get_file import get_user_agents
+import urllib2
 from termcolor import colored
 from bs4 import BeautifulSoup
 from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
-def action_google(domain, userCountry, userServer, q, useragent_f, prox):
+def action_google(domain, userCountry, userServer, q, user_agents, prox):
     info('Google Search Started')
-    uas = get_user_agents(useragent_f)
+    uas = user_agents
     searchfor = '@' + '"' + domain + '"'
     entries_tuples = []
     seen = set()
@@ -120,11 +120,11 @@ def action_pwned(emails):
     return pwend_data
 
 
-#Takes domain[str], api[list], useragent_f[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
-def action_emailHunter(domain, api, useragent_f, q, prox):
+#Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+def action_emailHunter(domain, api, user_agents, q, prox):
     info('Email Hunter Search Started')
     emails = []
-    uas = get_user_agents(useragent_f)
+    uas = user_agents
     ua = random.choice(uas)
     link = 'https://api.emailhunter.co/v1/search?domain={0}&api_key={1}'.format(domain,api)
 
@@ -158,10 +158,10 @@ def action_emailHunter(domain, api, useragent_f, q, prox):
     q.put(sorted(emails))
 
 
-def action_bing_true(domain, q, useragent_f, prox):
+def action_bing_true(domain, q, user_agents, prox):
     info('Bing Search Started')
     emails = []
-    uas = get_user_agents(useragent_f)
+    uas = user_agents
     searchfor = '@' + '"' + domain + '"'
     for start in range(0,30):
         ua = random.choice(uas)
@@ -193,17 +193,97 @@ def action_bing_true(domain, q, useragent_f, prox):
     info('Bing Search Completed')
     q.put(sorted(emails))
 
+def doc_exalead(domain, user_agents, prox, q):
+    document_list = []
+    uas = user_agents
+    info('Exalead Document Search Started')
+    for start in range(0,80,10):
+        ua = random.choice(uas)
+        link = 'http://www.exalead.com/search/web/results/?search_language=&q=(filetype:xls+OR+filetype:doc+OR++filetype:pdf+OR+filetype:ppt)+site:{}&search_language=&elements_per_page=10&start_index={}'.format(domain, start)
+        if prox == True:
+            proxy = {'http' : 'http://127.0.0.1:8080'}
+        else:
+            pass
+        try:
+            headers = {"Connection" : "close",
+                       "User-Agent" : ua,
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Language': 'en-US,en;q=0.5',
+                       'Accept-Encoding': 'gzip, deflate'}
+            if prox == True:
+                response = requests.get(link, headers=headers, proxies=proxy)
+            else:
+                response = requests.get(link, headers=headers)
+            soup = BeautifulSoup(response.text, "lxml")
+            if soup.find('label', {'class': 'control-label', 'for': 'id_captcha'}):
+                print colored("\tSo you don't like spinach?", "blue")
+                print "\n\tCaptchas are preventing some document searches."
+                break
+            for div in soup.findAll('li', {'class': 'media'}):
+                document = div.find('a', href=True)['href']
+                document = urllib2.unquote(document)
+                document_list.append(document)
 
-def action_linkedin(domain, userCountry, q, company, useragent_f, prox):
+        except Exception:
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+            continue
+
+        time.sleep(10)
+    potential_docs = len(document_list)
+    info('Exalead Document Search Finished')
+    info('Potential Exalead Documents Found: {}'.format(potential_docs))
+    q.put(document_list)
+
+def doc_bing(domain, user_agents, prox, q):
+    document_list = []
+    uas = user_agents
+    info('Bing Document Search Started')
+    for start in range(1,300,10):
+        ua = random.choice(uas)
+        if prox == True:
+            proxy = {'http' : 'http://127.0.0.1:8080'}
+        else:
+            pass
+        try:
+            headers = {"Connection" : "close",
+                       "User-Agent" : ua,
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Language': 'en-US,en;q=0.5',
+                       'Accept-Encoding': 'gzip, deflate'}
+            payload = { 'q': 'filetype:(doc dot docx docm dotx dotm docb xls xlt xlm xlsx xlsm xltx xltm xlsb xla xlam xll xlw ppt pot pps pptx pptm potx potm ppam ppsx ppsm sldx sldm pub pdf) site:{}'.format(domain), 'first': start}
+            link = 'http://www.bing.com/search'
+            if prox == True:
+                response = requests.get(link, headers=headers, proxies=proxy, params=payload)
+            else:
+                response = requests.get(link, headers=headers, params=payload)
+
+            soup = BeautifulSoup(response.text, "lxml")
+
+            divs = soup.findAll('li', {'class': 'b_algo'})
+            for div in divs:
+                h2 = div.find('h2')
+                document = h2.find('a', href=True)['href']
+                document = urllib2.unquote(document)
+                document_list.append(document)
+        except requests.models.ChunkedEncodingError:
+            continue
+        except Exception:
+            traceback.print_exc()
+            continue
+    potential_docs = len(document_list)
+    info('Bing Document Search Finished')
+    q.put(document_list)
+
+def action_linkedin(domain, userCountry, q, company, user_agents, prox):
     info('LinkedIn Search Started')
-    uas = get_user_agents(useragent_f)
+    uas = user_agents
     entries_tuples = []
     seen = set()
     results = []
     who_error = False
     searchfor = 'site:linkedin.com/in ' + '"' + company + '"'
     ua = random.choice(uas)
-    for start in range(1,70,1):
+    for start in range(1,50,1):
         if prox == True:
             proxy = {'http' : 'http://127.0.0.1:8080'}
         else:
