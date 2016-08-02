@@ -36,7 +36,7 @@ from modules.bluto_logging import info, error
 
 
 
-VERSION = "2.4.0"
+VERSION = "2.3.2"
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 6
 myResolver.lifetime = 6
