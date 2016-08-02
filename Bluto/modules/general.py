@@ -13,6 +13,7 @@ import dns.resolver
 import dns.query
 import dns.zone
 import traceback
+import os
 from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
 myResolver = dns.resolver.Resolver()
