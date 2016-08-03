@@ -36,7 +36,7 @@ from modules.bluto_logging import info, error
 
 
 
-VERSION = "2.3.3"
+VERSION = "2.3.5"
 myResolver = dns.resolver.Resolver()
 myResolver.timeout = 10
 myResolver.lifetime = 10
@@ -105,6 +105,7 @@ if __name__ == "__main__":
         check_dom(domain)
     #WhoisGet
         company = action_whois(domain)
+
     #Detail Call
         sub_intrest = get_sub_interest(FILENAME_2, domain)
         zn_list = get_dns_details(domain, myResolver)
@@ -128,11 +129,7 @@ if __name__ == "__main__":
                 userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
                 start_time_total = time.time()
-                start_time_email = time.time()
-                if api:
-                    q4 = Queue.Queue()
-                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
-                    t4.start()
+
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
@@ -141,17 +138,23 @@ if __name__ == "__main__":
                 t2 = threading.Thread(target=action_bing_true, args=(domain, q2, user_agents, prox))
                 t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, user_agents, prox))
                 t5 = threading.Thread(target=doc_start, args=(domain, user_agents, prox, q5))
-                t1.start()
-                t2.start()
-                t3.start()
-                t5.start()
+                start_time_email = time.time()
                 if api:
+                    q4 = Queue.Queue()
+                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                    t4.start()
                     t4.join()
+                t1.start()
                 t1.join()
+                t2.start()
                 t2.join()
-                t3.join()
-                t5.join()
                 time_spent_email = time.time() - start_time_email
+                t3.start()
+                t3.join()
+                start_download_time = time.time()
+                t5.start()
+                t5.join()
+                time_spent_download = time.time() - start_download_time
                 google_true_results = q1.get()
                 bing_true_results = q2.get()
                 linkedin_results = q3.get()
@@ -182,30 +185,32 @@ if __name__ == "__main__":
                 userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
                 start_time_total = time.time()
-                start_time_email = time.time()
+
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
                 q5 = Queue.Queue()
-                if api:
-                    q4 = Queue.Queue()
-                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
-                    t4.start()
                 t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, user_agents, prox))
                 t2 = threading.Thread(target=action_bing_true, args=(domain, q2, user_agents, prox))
                 t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, user_agents, prox))
                 t5 = threading.Thread(target=doc_start, args=(domain, user_agents, prox, q5))
-                t1.start()
-                t2.start()
-                t3.start()
-                t5.start()
+                start_time_email = time.time()
                 if api:
+                    q4 = Queue.Queue()
+                    t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                    t4.start()
                     t4.join()
+                t1.start()
                 t1.join()
+                t2.start()
                 t2.join()
-                t3.join()
-                t5.join()
                 time_spent_email = time.time() - start_time_email
+                t3.start()
+                t3.join()
+                start_download_time = time.time()
+                t5.start()
+                t5.join()
+                time_spent_download = time.time() - start_download_time
                 google_true_results = q1.get()
                 bing_true_results = q2.get()
                 linkedin_results = q3.get()
@@ -235,30 +240,31 @@ if __name__ == "__main__":
             userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
             action_bluto_use(userCountry)
             start_time_total = time.time()
-            start_time_email = time.time()
             q1 = Queue.Queue()
             q2 = Queue.Queue()
             q3 = Queue.Queue()
             q5 = Queue.Queue()
-            if api:
-                q4 = Queue.Queue()
-                t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
-                t4.start()
             t1 = threading.Thread(target=action_google, args=(domain, userCountry, userServer, q1, user_agents, prox))
             t2 = threading.Thread(target=action_bing_true, args=(domain, q2, user_agents, prox))
             t3 = threading.Thread(target=action_linkedin, args=(domain, userCountry, q3, company, user_agents, prox))
             t5 = threading.Thread(target=doc_start, args=(domain, user_agents, prox, q5))
-            t1.start()
-            t2.start()
-            t3.start()
-            t5.start()
-            t1.join()
-            t2.join()
-            t3.join()
-            t5.join()
+            start_time_email = time.time()
             if api:
+                q4 = Queue.Queue()
+                t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
+                t4.start()
                 t4.join()
+            t1.start()
+            t1.join()
+            t2.start()
+            t2.join()
             time_spent_email = time.time() - start_time_email
+            t3.start()
+            t3.join()
+            start_download_time = time.time()
+            t5.start()
+            t5.join()
+            time_spent_download = time.time() - start_download_time
             google_results = q1.get()
             bing_results = q2.get()
             linkedin_results = q3.get()

@@ -30,6 +30,8 @@ def get_size(dir_location):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             total_size += os.path.getsize(fp)
+    total_size = total_size / 1024.0
+    total_size = total_size / 1024.0
     return total_size
 
 
@@ -51,7 +53,7 @@ def action_whois(domain):
                 print '\nThe Whois Results Look Promising: ' + colored('{}','green').format(company)
                 accept = raw_input(colored('\nIs The Search Term sufficient?: ','green')).lower()
                 if accept in ('y', 'yes'):
-                    company = accept
+                    company = company
                     break
                 elif accept in ('n', 'no'):
                     temp_company = raw_input(colored('\nRegistered Company Name: ','green'))

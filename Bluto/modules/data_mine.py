@@ -7,6 +7,7 @@ import traceback
 import time
 import re
 import random
+import math
 import sys
 import Queue
 import time
@@ -81,7 +82,7 @@ def action_download(doc_list, docs):
 	if i < 1:
 		sys.exit()
 	data_size = get_size(docs)
-	print '\nData Downloaded: {}'.format(str(data_size))
+	print '\n\nData Downloaded: {}MB'.format(str(math.floor(data_size)))
 	info('Documents Downloaded: {}'.format(initial_count))
 	return download_list
 
@@ -203,6 +204,7 @@ def doc_start(domain, USERAGENT_F, prox, q):
 	if doc_list == []:
 		q.put(None)
 		return
+	doc_list = set(sorted(doc_list))
 	download_list = action_download(doc_list, docs)
 	download_count = len(download_list)
 

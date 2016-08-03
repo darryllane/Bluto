@@ -13,8 +13,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
 myResolver = dns.resolver.Resolver()
-myResolver.timeout = 10
-myResolver.lifetime = 10
+myResolver.timeout = 4
 myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 targets = []
@@ -118,7 +117,7 @@ def action_brute(subdomain):
 
 def action_brute_start(subs):
     info('Bruting SubDomains')
-    pool = ThreadPool(12)
+    pool = ThreadPool(8)
     pool.map(action_brute, subs)
     pool.close()
     info('Completed Bruting SubDomains')
@@ -192,6 +191,7 @@ def action_zone_transfer(zn_list, domain):
             print colored(ns, 'green')
 
     if vulnerable_listT:
+        info('Vulnerable To Zone Transfers')
         print "\nVulnerable:\n"
         for ns in vulnerable_listT:
             print colored(ns,'red'), colored("\t" + "TCP/53", 'red')

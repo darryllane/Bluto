@@ -182,7 +182,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
             else:
                 shutil.rmtree(docs)
                 shutil.rmtree(LOG_DIR)
-                shutil.rmtree(report_location)
+                os.remove(report_location)
                 break
         else:
             print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
@@ -361,7 +361,7 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
             else:
                 shutil.rmtree(docs)
                 shutil.rmtree(LOG_DIR)
-                shutil.rmtree(report_location)
+                os.remove(report_location)
                 break
         else:
             print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
@@ -539,7 +539,7 @@ def action_output_wild_false(brute_results_dict, sub_intrest, google_results, bi
             else:
                 shutil.rmtree(docs)
                 shutil.rmtree(LOG_DIR)
-                shutil.rmtree(report_location)
+                os.remove(report_location)
                 break
         else:
             print '\tYour answer needs to be either yes|y|no|n rather than, {}' .format(answer)
