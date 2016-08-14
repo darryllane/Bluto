@@ -19,9 +19,10 @@ Bluto requires various other dependencies. So to make things as easy as possible
 
 Bluto now takes command line arguments at launch, the new options are as follows;
 
--e  		This uses a very large subdomain list for bruting.
--api		You can supply your email hunter api key here to gather a considerably larger amount of email addresses.
--d  		Used to specify the target domain on the commandline.
+	-e		This uses a very large subdomain list for bruting.
+	-api	You can supply your email hunter api key here to gather a considerably larger amount of email addresses.
+	-d		Used to specify the target domain on the commandline.
+	-t		Used to set a timeout value in seconds. Deafult is 10
 
 **Examples:** (feel free to use this EmailHunter API Key until it is removed)
 
@@ -66,6 +67,10 @@ Change/Feature Requests
 
 Changelog
 ====
+* Version __2.3.6__ (__14/08/2016__):
+  * BugFixes
+  * Timeout value can be parsed as argument (-t 5)
+  
 * Version __2.3.2__ (__02/08/2016__):
   * MetaData Scraping From Document Hunt On Target Domain
   * Target Domain Parsed As Argument
