@@ -26,7 +26,7 @@ import dns.resolver
 import dns.query
 import dns.zone
 from termcolor import colored
-from modules.get_dns import action_brute_start, action_wild_cards, action_zone_transfer, get_dns_details, action_brute_wild
+from modules.get_dns import action_brute_start, action_wild_cards, action_zone_transfer, get_dns_details, action_brute_wild, set_resolver
 from modules.search import action_bing_true, action_google, action_linkedin, action_netcraft, action_emailHunter
 from modules.get_file import get_subs, get_sub_interest, get_line_count, get_user_agents
 from modules.general import action_country_id, action_whois, action_bluto_use, check_dom
@@ -36,11 +36,8 @@ from modules.bluto_logging import info, error
 
 
 
-VERSION = "2.3.5"
-myResolver = dns.resolver.Resolver()
-myResolver.timeout = 10
-myResolver.lifetime = 10
-myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
+VERSION = "2.3.6"
+
 prox = False
 
 for item in SITES:
@@ -81,9 +78,19 @@ if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description='Use: -e for lots of spinach | Use: -api for emailhunter_support')
         parser.add_argument('-e', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
+        parser.add_argument('-t', type=int, help='Used to set the timeout, in seconds.', required=False)
         parser.add_argument('-d', help='Used for setting the target domain', required=False)
         parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
+        if args['t']:
+            timeout_value = args['t']
+            myResolver = set_resolver(timeout_value)
+        else:
+            myResolver = dns.resolver.Resolver()
+            myResolver.timeout = 10
+            myResolver.lifetime = 10
+            myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
+
         if args['e']:
             info('-e Argument Used')
             FILENAME_1 = path + "/Bluto/doc/lots-of-spinach.txt"
@@ -102,7 +109,7 @@ if __name__ == "__main__":
         domain_r = domain.split('.')
         report_location = os.path.expanduser('~/Bluto/Bluto-Evidence-{}.html'.format(domain_r[0]))
     #Check if domain valid
-        check_dom(domain)
+        check_dom(domain, myResolver)
     #WhoisGet
         company = action_whois(domain)
 
@@ -160,8 +167,8 @@ if __name__ == "__main__":
                 linkedin_results = q3.get()
                 data_mine = q5.get()
                 start_time_brute = time.time()
-                targets_t = action_brute_start(subs)
-                targets = action_brute_wild(targets_t, domain)
+                targets_t = action_brute_start(subs, myResolver)
+                targets = action_brute_wild(targets_t, domain, myResolver)
                 time_spent_brute = time.time() - start_time_brute
                 time_spent_total = time.time() - start_time_total
                 if targets == []:
@@ -216,7 +223,7 @@ if __name__ == "__main__":
                 linkedin_results = q3.get()
                 data_mine = q5.get()
                 start_time_brute = time.time()
-                targets = action_brute_start(subs)
+                targets = action_brute_start(subs, myResolver)
                 time_spent_brute = time.time() - start_time_brute
                 time_spent_total = time.time() - start_time_total
     #Clean Brute Results

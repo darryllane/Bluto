@@ -16,10 +16,6 @@ import traceback
 import os
 from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 
-myResolver = dns.resolver.Resolver()
-myResolver.timeout = 5
-myResolver.lifetime = 5
-myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
 default_s = False
 
@@ -97,7 +93,7 @@ def action_whois(domain):
         else:
             company = temp_company
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
     if 'company' not in locals():
         print 'There is no Whois data for this domain.\n\nPlease supply a company name.'
         while True:
@@ -223,11 +219,11 @@ def action_bluto_use(countryID):
         payload = {'country': countryID, 'Date': now}
         requests.post(link, data=payload)
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
         pass
 
 
-def check_dom(domain):
+def check_dom(domain, myResolver):
     try:
         myAnswers = myResolver.query(domain, "NS")
         dom = str(myAnswers.canonical_name).strip('.')
@@ -243,4 +239,4 @@ def check_dom(domain):
         print '\nThe connection hit a timeout. Are you connected to the internet?\n'
         sys.exit()
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)

@@ -27,7 +27,7 @@ def get_subs(filename, domain):
         for sub in subs:
             full_list.append(str(sub.lower() + "." + domain))
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
         sys.exit()
 
     info('Completed Gathering SubDomains')
@@ -42,7 +42,7 @@ def get_sub_interest(filename, domain):
             full_list.append(str(sub.lower() + "." + domain))
 
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
         sys.exit()
 
     info('Completed Gathering SubDomains Of Interest')

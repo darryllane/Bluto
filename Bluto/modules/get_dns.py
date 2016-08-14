@@ -12,11 +12,16 @@ from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
 from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
-myResolver = dns.resolver.Resolver()
-myResolver.timeout = 4
-myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
-
 targets = []
+
+def set_resolver(timeout_value):
+    myResolver = dns.resolver.Resolver()
+    myResolver.timeout = timeout_value
+    myResolver.lifetime = timeout_value
+    myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
+
+    return myResolver
+
 
 def get_dns_details(domain, myResolver):
     info('Gathering DNS Details')
@@ -65,7 +70,7 @@ def get_dns_details(domain, myResolver):
     except dns.resolver.NoAnswer:
         print "\tNo Mail Servers"
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
 
     info('Completed Gathering DNS Details')
     return zn_list
@@ -92,8 +97,9 @@ def action_wild_cards(domain, myResolver):
 
 
 def action_brute(subdomain):
+    global myResolverG
     try:
-        myAnswers = myResolver.query(subdomain)
+        myAnswers = myResolverG.query(subdomain)
         for data in myAnswers:
             targets.append(subdomain + ' ' + str(data))
 
@@ -112,10 +118,13 @@ def action_brute(subdomain):
     except dns.resolver.Timeout:
         pass
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+        error(traceback.print_exc())
 
 
-def action_brute_start(subs):
+def action_brute_start(subs, myResolver):
+    global myResolverG
+    myResolverG = myResolver
     info('Bruting SubDomains')
     pool = ThreadPool(8)
     pool.map(action_brute, subs)
@@ -125,7 +134,7 @@ def action_brute_start(subs):
     return targets
 
 
-def action_brute_wild(sub_list, domain):
+def action_brute_wild(sub_list, domain, myResolver):
     info('Bruting Wild Card SubDomains')
     target_results = []
     random_addrs = []

@@ -75,7 +75,7 @@ def action_google(domain, userCountry, userServer, q, user_agents, prox):
         except AttributeError as f:
             pass
         except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
 
     info('Google Search Completed')
     q.put(sorted(results))
@@ -145,6 +145,11 @@ def action_emailHunter(domain, api, user_agents, q, prox):
             response = requests.get(link, headers=headers)
 
         json_data = response.json()
+        if json_data['message'] =='Too many calls for this period.':
+            print colored("\tError:\tIt seems the EmailHunter API key being used has reached\n\t\tit's limit for this month.", 'red')
+            print colored('\tAPI Key: {}\n'.format(api),'red')
+            q.put(None)
+            return None
         for value in json_data['emails']:
             for domain in value['sources']:
                 url = str(domain['uri']).replace("u'","")
@@ -226,7 +231,7 @@ def doc_exalead(domain, user_agents, prox, q):
                 document_list.append(document)
 
         except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
             continue
 
         time.sleep(10)
@@ -347,6 +352,8 @@ def action_netcraft(domain, myResolver):
                 for data in netcheck:
                     netcraft_list.append(item + '.' + domain + ' ' + str(data))
                     print colored(item + '.' + domain, 'red')
+            except dns.exception.Timeout:
+                pass
             except dns.resolver.NXDOMAIN:
                 pass
             except Exception:

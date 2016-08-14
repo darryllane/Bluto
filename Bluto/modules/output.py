@@ -198,9 +198,10 @@ def action_output_vuln_zone_hunter(google_results, bing_results, linkedin_result
     person_seen = []
     final_emails = []
 
-    for email in emailHunter_results:
-        email_results.append(email[0])
-        email_evidence_results.append((email[0],email[1]))
+    if emailHunter_results is not None:
+        for email in emailHunter_results:
+            email_results.append(email[0])
+            email_evidence_results.append((email[0],email[1]))
 
     for email, url in google_results:
         try:
@@ -555,9 +556,10 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     person_seen = []
     final_emails = []
 
-    for email in emailHunter_results:
-        email_results.append(email[0])
-        email_evidence_results.append((email[0],email[1]))
+    if emailHunter_results is not None:
+        for email in emailHunter_results:
+            email_results.append(email[0])
+            email_evidence_results.append((email[0],email[1]))
 
     for email, url in google_results:
         try:
