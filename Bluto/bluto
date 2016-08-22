@@ -80,7 +80,7 @@ if __name__ == "__main__":
         parser.add_argument('-e', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
         parser.add_argument('-t', type=int, help='Used to set the timeout, in seconds.', required=False)
         parser.add_argument('-d', help='Used for setting the target domain', required=False)
-        parser.add_argument('-api', help='Supply your free Emial Hunter API key to gather even more email addresses', required=False)
+        parser.add_argument('-api', help='Supply your free Email Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['t']:
             timeout_value = args['t']
