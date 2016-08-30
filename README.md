@@ -6,6 +6,10 @@
 
 >https://github.com/darryllane/Bluto
 
+Like Bluto?
+====
+Give us a vote: https://n0where.net/dns-analysis-tool-bluto/
+
 Bluto has gone through a large code base change and various feature additions have been added since its first day on the job. Now that RandomStorm has been consumed and no longer exists, I felt it time to move the repo to a new location. So from this git push onwards Bluto will live here. I hope you enjoy the new Bluto.
 
 
