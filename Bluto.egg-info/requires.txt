@@ -1,0 +1,8 @@
+dnspython
+termcolor
+BeautifulSoup4
+requests
+pythonwhois
+lxml
+oletools
+pdfminer
