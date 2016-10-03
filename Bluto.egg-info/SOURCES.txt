@@ -2,7 +2,6 @@ LICENSE.txt
 MANIFEST.in
 README.md
 setup.py
-Bluto/__init__.py
 Bluto/bluto
 Bluto.egg-info/PKG-INFO
 Bluto.egg-info/SOURCES.txt
