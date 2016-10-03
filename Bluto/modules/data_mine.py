@@ -75,7 +75,7 @@ def action_download(doc_list, docs):
 			except IOError:
 				pass
 			except Exception:
-				info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE)
+				info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
 				info(doc)
 				info(r.headers)
 				continue
@@ -138,7 +138,7 @@ def pdf_read(pdf_file_list):
 		except TypeError:
 			continue
 		except Exception:
-			info('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
 			continue
 	info('Finished Extracting PDF MetaData')
 	return (user_names, software_list)
