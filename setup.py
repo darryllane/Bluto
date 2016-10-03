@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='Bluto',
-    version='2.3.7',
+    version='2.3.8',
     author='Darryl lane',
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
     packages=['Bluto'],
-    py_modules = ['modules'],
+    py_modules = ['/Bluto/modules/'],
     include_package_data=True,
     license='LICENSE.txt',
     description='''

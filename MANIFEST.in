@@ -2,4 +2,4 @@ include *.txt
 include *.md
 recursive-include Bluto/doc *.txt
 recursive-include Bluto/modules *.py
-recursive-exclude *.DS_store
+recursive-exclude / *.DS_store
