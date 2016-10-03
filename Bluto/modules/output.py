@@ -9,7 +9,7 @@ import webbrowser
 import shutil
 import os
 from search import action_pwned
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE, LOG_DIR
+from bluto_logging import info, INFO_LOG_FILE, LOG_DIR
 
 
 def action_output_vuln_zone(google_results, bing_results, linkedin_results, time_spent_email, time_spent_total, clean_dump, sub_intrest, domain, report_location, company, data_mine):
@@ -700,7 +700,8 @@ def action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_resu
     docs = os.path.expanduser('~/Bluto/doc/{}/'.format(domain_r[0]))
     answers = ['no','n','y','yes']
     while True:
-        answer = raw_input("\nWould you like to keep all local data?\n(Local Logs, Downloded Documents, HTML Evidence Report)\n\nYes|No:").lower()
+        print colored("\nWould you like to keep all local data?\n(Local Logs, Downloded Documents, HTML Evidence Report)\n\nYes|No:", "red")
+        answer = raw_input("").lower()
         if answer in answers:
             if answer == 'y' or answer == 'yes':
                 domain
@@ -959,6 +960,6 @@ def write_html(email_evidence_results, linkedin_evidence_results, pwned_results,
             myFile.close()
             info('Completed HTML Report')
     except IOError,e:
-        error('IOError', exc_info=True)
+        info('IOError', exc_info=True)
     except Exception:
-        error('An Unhandled Exception Occured', exc_info=True)
+        info('An Unhandled Exception Occured', exc_info=True)

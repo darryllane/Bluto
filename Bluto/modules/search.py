@@ -12,7 +12,7 @@ import time
 import urllib2
 from termcolor import colored
 from bs4 import BeautifulSoup
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
+from bluto_logging import info, INFO_LOG_FILE
 
 def action_google(domain, userCountry, userServer, q, user_agents, prox):
     info('Google Search Started')
@@ -75,7 +75,7 @@ def action_google(domain, userCountry, userServer, q, user_agents, prox):
         except AttributeError as f:
             pass
         except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+            info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
 
     info('Google Search Completed')
     q.put(sorted(results))
@@ -115,7 +115,7 @@ def action_pwned(emails):
         except ValueError:
             pass
         except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+            info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
     info('Compromised Account Enumeration Search Completed')
     return pwend_data
@@ -158,7 +158,7 @@ def action_emailHunter(domain, api, user_agents, q, prox):
     except ValueError:
         pass
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
     info('Email Hunter Search Completed')
     q.put(sorted(emails))
@@ -231,7 +231,7 @@ def doc_exalead(domain, user_agents, prox, q):
                 document_list.append(document)
 
         except Exception:
-            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+            info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
             continue
 
         time.sleep(10)
@@ -343,7 +343,7 @@ def action_netcraft(domain, myResolver):
     except dns.exception.Timeout:
         pass
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
     if sub_results:
         for item in sub_results:
@@ -357,7 +357,7 @@ def action_netcraft(domain, myResolver):
             except dns.resolver.NXDOMAIN:
                 pass
             except Exception:
-                error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+                info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
     else:
         print '\tNo Results Found'
 

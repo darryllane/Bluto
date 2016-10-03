@@ -16,7 +16,6 @@ FILENAME_2 = path + "/Bluto/doc/sub_interest.txt"
 USERAGENT_F = path + "/Bluto/doc/user_agents.txt"
 COUNTRIES_FILE = path + "/Bluto/doc/countries.txt"
 INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
-ERROR_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-error.log')
 
 import time
 import threading
@@ -32,11 +31,9 @@ from modules.get_file import get_subs, get_sub_interest, get_line_count, get_use
 from modules.general import action_country_id, action_whois, action_bluto_use, check_dom
 from modules.output import action_output_vuln_zone, action_output_wild_false, action_output_wild_false_hunter, action_output_vuln_zone_hunter
 from modules.data_mine import doc_start
-from modules.bluto_logging import info, error
+from modules.bluto_logging import info
 
-
-
-VERSION = "2.3.6"
+VERSION = "2.3.7"
 
 prox = False
 
@@ -287,5 +284,5 @@ if __name__ == "__main__":
         info('Bluto Finished')
     except KeyboardInterrupt:
         print '\n\nExiting..'
-        error('Keyboard Interrupt From User\n')
+        info('Keyboard Interrupt From User\n')
         sys.exit()

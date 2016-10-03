@@ -5,7 +5,7 @@ import traceback
 import sys
 import random
 from termcolor import colored
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
+from bluto_logging import info, INFO_LOG_FILE
 
 def get_user_agents(useragent_f):
     info('Gathering UserAgents')
@@ -27,7 +27,7 @@ def get_subs(filename, domain):
         for sub in subs:
             full_list.append(str(sub.lower() + "." + domain))
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
         sys.exit()
 
     info('Completed Gathering SubDomains')
@@ -42,7 +42,7 @@ def get_sub_interest(filename, domain):
             full_list.append(str(sub.lower() + "." + domain))
 
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
         sys.exit()
 
     info('Completed Gathering SubDomains Of Interest')

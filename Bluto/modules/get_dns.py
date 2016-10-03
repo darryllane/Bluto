@@ -42,18 +42,18 @@ def get_dns_details(domain, myResolver):
         for i in ns_list:
             print colored(i, 'green')
     except dns.resolver.NoNameservers:
-        error('\tNo Name Servers\nConfirm The Domain Name Is Correct.' + ERROR_LOG_FILE, exc_info=True)
+        info('\tNo Name Servers\nConfirm The Domain Name Is Correct.' + ERROR_LOG_FILE, exc_info=True)
         sys.exit()
     except dns.resolver.NoAnswer:
         print "\tNo DNS Servers"
     except dns.resolver.NXDOMAIN:
-        error("\tDomain Does Not Exist" + ERROR_LOG_FILE, exc_info=True)
+        info("\tDomain Does Not Exist" + ERROR_LOG_FILE, exc_info=True)
         sys.exit()
     except dns.resolver.Timeout:
-        error('\tTimeouted\nConfirm The Domain Name Is Correct.' + ERROR_LOG_FILE, exc_info=True)
+        info('\tTimeouted\nConfirm The Domain Name Is Correct.' + ERROR_LOG_FILE, exc_info=True)
         sys.exit()
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
     try:
         print "\nMail Server:\n"
@@ -70,7 +70,7 @@ def get_dns_details(domain, myResolver):
     except dns.resolver.NoAnswer:
         print "\tNo Mail Servers"
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
 
     info('Completed Gathering DNS Details')
     return zn_list
@@ -112,14 +112,14 @@ def action_brute(subdomain):
     except dns.exception.SyntaxError:
         pass
     except dns.exception.Timeout:
-        error('Timeout')
-        error(subdomain)
+        info('Timeout')
+        info(subdomain)
         pass
     except dns.resolver.Timeout:
         pass
     except Exception:
-        error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
-        error(traceback.print_exc())
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+        info(traceback.print_exc())
 
 
 def action_brute_start(subs, myResolver):
@@ -191,7 +191,7 @@ def action_zone_transfer(zn_list, domain):
                 vuln = False
                 vulnerable_listF.append(ns)
             else:
-                error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+                info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
 
     if vulnerable_listF:
@@ -223,7 +223,7 @@ def action_zone_transfer(zn_list, domain):
                 if error == 'Errno -2] Name or service not known':
                     pass
                 else:
-                    error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
+                    info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE, exc_info=True)
 
             print z[n].to_text(n)
 

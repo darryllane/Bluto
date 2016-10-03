@@ -51,11 +51,11 @@ def action_download(doc_list, docs):
 		except IOError:
 			pass
 		except requests.exceptions.HTTPError:
-			error('Error: File Not Found Server Side')
-			error(doc)
+			info('Error: File Not Found Server Side')
+			info(doc)
 		except requests.exceptions.ConnectionError:
-			error('Error: File Not Found Server Side')
-			error(doc)
+			info('Error: File Not Found Server Side')
+			info(doc)
 			continue
 		except KeyError:
 			temp = str(doc).rsplit('.', 1)[1]
@@ -75,9 +75,9 @@ def action_download(doc_list, docs):
 			except IOError:
 				pass
 			except Exception:
-				error('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE)
-				error(doc)
-				error(r.headers)
+				info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + ERROR_LOG_FILE)
+				info(doc)
+				info(r.headers)
 				continue
 	if i < 1:
 		sys.exit()
@@ -138,7 +138,7 @@ def pdf_read(pdf_file_list):
 		except TypeError:
 			continue
 		except Exception:
-			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE)
 			continue
 	info('Finished Extracting PDF MetaData')
 	return (user_names, software_list)
