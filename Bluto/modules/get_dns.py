@@ -8,7 +8,7 @@ import socket
 import dns.resolver
 import random
 import string
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
+from bluto_logging import info, INFO_LOG_FILE
 from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
