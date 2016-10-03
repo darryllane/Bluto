@@ -7,7 +7,7 @@ setup(
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
     packages=['Bluto'],
-    py_modules = ['/modules/'],
+    py_modules = ['Bluto/modules/__init__.py'],
     include_package_data=True,
     license='LICENSE.txt',
     description='''
