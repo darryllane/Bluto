@@ -14,7 +14,7 @@ import dns.query
 import dns.zone
 import traceback
 import os
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
+from bluto_logging import info, INFO_LOG_FILE
 
 
 default_s = False

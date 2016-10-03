@@ -16,7 +16,7 @@ from termcolor import colored
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from bs4 import BeautifulSoup
-from bluto_logging import info, error, INFO_LOG_FILE, ERROR_LOG_FILE
+from bluto_logging import info, INFO_LOG_FILE
 from get_file import get_user_agents
 from search import doc_bing, doc_exalead
 from general import get_size
