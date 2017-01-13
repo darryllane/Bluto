@@ -10,6 +10,7 @@ import requests
 import random
 import time
 import urllib2
+import json
 from termcolor import colored
 from bs4 import BeautifulSoup
 from bluto_logging import info, INFO_LOG_FILE
@@ -21,15 +22,14 @@ def action_google(domain, userCountry, userServer, q, user_agents, prox):
     entries_tuples = []
     seen = set()
     results = []
-    for start in range(1,30,1):
+    for start in range(1,10,1):
         ua = random.choice(uas)
         try:
             if prox == True:
                 proxy = {'http' : 'http://127.0.0.1:8080'}
             else:
                 pass
-            headers = {"Connection" : "close",
-                       "User-Agent" : ua,
+            headers = {"User-Agent" : ua,
                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                        'Accept-Language': 'en-US,en;q=0.5',
                        'Accept-Encoding': 'gzip, deflate',
@@ -70,7 +70,7 @@ def action_google(domain, userCountry, userServer, q, user_agents, prox):
                     seen.add(urls[1])
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 503:
-                print colored('Google is responding with a Captcha, other searches will continue\n', 'red')
+                info('Google is responding with a Captcha, other searches will continue')
                 break
         except AttributeError as f:
             pass
@@ -143,21 +143,27 @@ def action_emailHunter(domain, api, user_agents, q, prox):
             response = requests.get(link, headers=headers, proxies=proxy)
         else:
             response = requests.get(link, headers=headers)
+        if response.status_code == 200:
+            json_data = response.json()
+            if json_data['message'] =='Too many calls for this period.':
+                print colored("\tError:\tIt seems the EmailHunter API key being used has reached\n\t\tit's limit for this month.", 'red')
+                print colored('\tAPI Key: {}\n'.format(api),'red')
+                q.put(None)
+                return None
+        else:
+            raise ValueError('No Response From Hunter')
 
-        json_data = response.json()
-        if json_data['message'] =='Too many calls for this period.':
-            print colored("\tError:\tIt seems the EmailHunter API key being used has reached\n\t\tit's limit for this month.", 'red')
-            print colored('\tAPI Key: {}\n'.format(api),'red')
-            q.put(None)
-            return None
+    except KeyError:
         for value in json_data['emails']:
             for domain in value['sources']:
                 url = str(domain['uri']).replace("u'","")
                 email =  str(value['value']).replace("u'","")
                 emails.append((email,url))
     except ValueError:
+        traceback.print_exc()
         pass
     except Exception:
+        traceback.print_exc()
         info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
     info('Email Hunter Search Completed')
@@ -222,8 +228,8 @@ def doc_exalead(domain, user_agents, prox, q):
                 response = requests.get(link, headers=headers)
             soup = BeautifulSoup(response.text, "lxml")
             if soup.find('label', {'class': 'control-label', 'for': 'id_captcha'}):
-                print colored("\tSo you don't like spinach?", "blue")
-                print "\n\tCaptchas are preventing some document searches."
+                info("So you don't like spinach?")
+                info("Captchas are preventing some document searches.")
                 break
             for div in soup.findAll('li', {'class': 'media'}):
                 document = div.find('a', href=True)['href']

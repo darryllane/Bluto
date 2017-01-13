@@ -112,8 +112,7 @@ def action_brute(subdomain):
     except dns.exception.SyntaxError:
         pass
     except dns.exception.Timeout:
-        info('Timeout')
-        info(subdomain)
+        info('Timeout: {}'.format(subdomain))
         pass
     except dns.resolver.Timeout:
         pass
@@ -126,6 +125,7 @@ def action_brute_start(subs, myResolver):
     global myResolverG
     myResolverG = myResolver
     info('Bruting SubDomains')
+    print '\nBrute Forcing Sub-Domains\n'
     pool = ThreadPool(8)
     pool.map(action_brute, subs)
     pool.close()

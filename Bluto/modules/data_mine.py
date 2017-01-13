@@ -12,6 +12,7 @@ import sys
 import Queue
 import time
 import threading
+import cgi
 from termcolor import colored
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
@@ -28,61 +29,76 @@ def action_download(doc_list, docs):
 	i = 0
 	download_list = []
 	initial_count = 0
-	print '\nGathering Live Documents For Metadata Mining\n'
+	print 'Gathering Live Documents For Metadata Mining\n'
+	headers = {
+		'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.0; pl; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB7.1 ( .NET CLR 3.5.30729',
+		'Referer': 'https://www.google.co.uk/',
+		'Accept-Language': 'en-US,en;q=0.5',
+		'Cache-Control': 'no-cache'
+	}
 	for doc in doc_list:
+		doc = doc.replace(' ', '%20')
 		try:
-			r = requests.get(doc)
+			r = requests.get(doc.encode('utf-8'), headers=headers)
 			if r.status_code == 404:
 				r.raise_for_status()
-			if re.search('filename="(.*)"', r.headers['content-disposition']):
-				filename_t = re.search('filename="(.*)"', r.headers['content-disposition'])
-				filename = filename_t.group(1)
-			else:
-				continue
-			with open(docs + filename, "w") as code:
-				i += 1
-				code.write(r.content)
-				code.close()
-				initial_count += 1
-				print('\tDownload Count: {}\r'.format(str(initial_count))),
-				download_list.append(doc)
-				info(doc)
 
+			if r.status_code == 200:
+				params = cgi.parse_header(r.headers.get('Content-Disposition', ''))[-1]
+				if 'filename' not in params:
+					filename = str(doc).replace('%20', ' ').split('/')[-1]
+					with open(docs + filename, "w") as code:
+						i += 1
+						code.write(r.content)
+						code.close()
+						initial_count += 1
+						print('\tDownload Count: {}\r'.format(str(initial_count))),
+						info(str(doc).replace('%20', ' '))
+						download_list.append(str(doc).replace('%20', ' '))
+
+					continue
+				else:
+					filename_t = re.search('filename="(.*)"', r.headers['content-disposition'])
+					filename = filename_t.group(1)
+
+					with open(docs + filename, "w") as code:
+						i += 1
+						code.write(r.content)
+						code.close()
+						initial_count += 1
+						print('\tDownload Count: {}\r'.format(str(initial_count))),
+						download_list.append(str(doc).replace('%20', ' '))
+						info(str(doc).replace('%20', ' '))
+					continue
+
+
+		except ValueError:
+			info('No Filename in header')
+			pass
+		except AttributeError:
+			pass
+		except IOError:
+			info('Not Found: {}'.format(str(doc).replace('%20', ' ')))
+			pass
 		except IOError:
 			pass
 		except requests.exceptions.HTTPError:
-			info('Error: File Not Found Server Side')
-			info(doc)
+			info('Error: File Not Found Server Side: HTTPError')
+			pass
 		except requests.exceptions.ConnectionError:
-			info('Error: File Not Found Server Side')
-			info(doc)
-			continue
+			info('Error: File Not Found Server Side: ConnectionError')
+			pass
 		except KeyError:
-			temp = str(doc).rsplit('.', 1)[1]
-			ext = re.sub(r'\?.*', r'', temp)
-			filename = "file{}.{}".format(i, ext.replace('?T', ''))
-			try:
-				with open(docs + filename, "w") as code:
-					i += 1
-					code.write(r.content)
-					code.close()
-					initial_count += 1
-					print('\tDownload Count: {}\r'.format(str(initial_count))),
-					info(doc)
-					download_list.append(doc)
-
-				continue
-			except IOError:
-				pass
-			except Exception:
-				info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
-				info(doc)
-				info(r.headers)
-				continue
+			pass
+		except Exception:
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
+			info(str(doc).replace('%20', ' '))
+			info(r.headers)
+			pass
 	if i < 1:
 		sys.exit()
 	data_size = get_size(docs)
-	print '\n\nData Downloaded: {}MB'.format(str(math.floor(data_size)))
+	print '\tData Downloaded: {}MB'.format(str(math.floor(data_size)))
 	info('Documents Downloaded: {}'.format(initial_count))
 	return download_list
 
@@ -108,6 +124,7 @@ def pdf_read(pdf_file_list):
 	software_list = []
 	user_names = []
 	for filename in pdf_file_list:
+		info(filename)
 		try:
 
 			fp = open(filename, 'rb')

@@ -33,9 +33,9 @@ from modules.output import action_output_vuln_zone, action_output_wild_false, ac
 from modules.data_mine import doc_start
 from modules.bluto_logging import info
 
-VERSION = "2.3.8"
+VERSION = "2.3.9"
 
-prox = False
+prox = True
 
 for item in SITES:
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
@@ -128,7 +128,6 @@ if __name__ == "__main__":
                 print colored("\n\nThis Will Take A While Longer, On Average +- 20min", 'grey')
                 check_count = get_line_count(FILENAME_1)
                 subs = get_subs(FILENAME_1, domain)
-                print '\nBrute Forcing Sub-Domains\n\n\tWhile you are waiting we will gather email addresses\n\tand LinkedIn users'
                 print '\nGathering Data From Google, Bing And LinkedIn'
                 userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
@@ -184,7 +183,6 @@ if __name__ == "__main__":
                 print colored('\n\tWild Cards Are Not In Place', 'red')
                 check_count = get_line_count(FILENAME_1)
                 subs = get_subs(FILENAME_1, domain)
-                print '\nBrute Forcing Sub-Domains\n\n\tWhile you are waiting we will gather email addresses\n\tand LinkedIn users'
                 print '\nGathering Data From Google, Bing And LinkedIn'
                 userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
