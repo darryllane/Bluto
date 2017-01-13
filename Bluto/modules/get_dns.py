@@ -177,7 +177,7 @@ def action_zone_transfer(zn_list, domain):
     dump_list = []
     for ns in zn_list:
         try:
-            z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=7))
+            z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=3))
             names = z.nodes.keys()
             names.sort()
             if vuln == True:

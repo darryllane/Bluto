@@ -15,6 +15,8 @@ from termcolor import colored
 from bs4 import BeautifulSoup
 from bluto_logging import info, INFO_LOG_FILE
 
+requests.packages.urllib3.disable_warnings()
+
 def action_google(domain, userCountry, userServer, q, user_agents, prox):
     info('Google Search Started')
     uas = user_agents

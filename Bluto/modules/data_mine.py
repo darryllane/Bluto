@@ -80,8 +80,6 @@ def action_download(doc_list, docs):
 		except IOError:
 			info('Not Found: {}'.format(str(doc).replace('%20', ' ')))
 			pass
-		except IOError:
-			pass
 		except requests.exceptions.HTTPError:
 			info('Error: File Not Found Server Side: HTTPError')
 			pass
