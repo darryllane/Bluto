@@ -35,7 +35,7 @@ from modules.bluto_logging import info
 
 VERSION = "2.3.9"
 
-prox = True
+prox = False
 
 for item in SITES:
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
