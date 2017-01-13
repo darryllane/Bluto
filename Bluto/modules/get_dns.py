@@ -177,10 +177,11 @@ def action_zone_transfer(zn_list, domain):
     dump_list = []
     for ns in zn_list:
         try:
-            z = dns.zone.from_xfr(dns.query.xfr(ns, domain))
+            z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=7))
             names = z.nodes.keys()
             names.sort()
             if vuln == True:
+                info('Vuln: {}'.format(ns))
                 vulnerable_listT.append(ns)
 
         except Exception as e:
@@ -188,6 +189,7 @@ def action_zone_transfer(zn_list, domain):
             if error == 'Errno -2] Name or service not known':
                 pass
             if error == "[Errno 54] Connection reset by peer" or "No answer or RRset not for qname":
+                info('Not Vuln: {}'.format(ns))
                 vuln = False
                 vulnerable_listF.append(ns)
             else:
