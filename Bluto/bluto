@@ -33,7 +33,7 @@ from modules.output import action_output_vuln_zone, action_output_wild_false, ac
 from modules.data_mine import doc_start
 from modules.bluto_logging import info
 
-VERSION = "2.3.9"
+VERSION = "2.3.10"
 
 prox = False
 
@@ -73,9 +73,9 @@ print """
 if __name__ == "__main__":
     info('\nBluto Started')
     try:
-        parser = argparse.ArgumentParser(description='Use: -e for lots of spinach | Use: -api for emailhunter_support')
+        parser = argparse.ArgumentParser(description='Use: -e for lots of spinach (much larger sublist) | Use: -api for emailhunter_support')
         parser.add_argument('-e', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
-        parser.add_argument('-t', type=int, help='Used to set the timeout, in seconds.', required=False)
+        parser.add_argument('-t', type=int, help='Used to set the timeout, in seconds', required=False)
         parser.add_argument('-d', help='Used for setting the target domain', required=False)
         parser.add_argument('-api', help='Supply your free Email Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
@@ -147,6 +147,8 @@ if __name__ == "__main__":
                     t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                     t4.start()
                     t4.join()
+                else:
+                    print colored('\nDon\'t forget you can increase your identified email count significantly with a free Hunter API key.\nhttps://hunter.io/api_keys', 'green')
                 t1.start()
                 t1.join()
                 t2.start()
@@ -202,6 +204,8 @@ if __name__ == "__main__":
                     t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                     t4.start()
                     t4.join()
+                else:
+                    print colored('\nDon\'t forget you can increase your identified email count significantly with a free Hunter API key.\nhttps://hunter.io/api_keys', 'green')
                 t1.start()
                 t1.join()
                 t2.start()
@@ -256,6 +260,8 @@ if __name__ == "__main__":
                 t4 = threading.Thread(target=action_emailHunter, args=(domain, api, user_agents, q4, prox)) #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
                 t4.start()
                 t4.join()
+            else:
+                print colored('\nDon\'t forget you can increase your identified email count significantly with a free Hunter API key.\nhttps://hunter.io/api_keys', 'green')
             t1.start()
             t1.join()
             t2.start()

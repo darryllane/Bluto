@@ -146,23 +146,32 @@ def action_emailHunter(domain, api, user_agents, q, prox):
         else:
             response = requests.get(link, headers=headers)
         if response.status_code == 200:
+            for value in json_data['emails']:
+                for domain in value['sources']:
+                    url = str(domain['uri']).replace("u'","")
+                    email =  str(value['value']).replace("u'","")
+                    emails.append((email,url))
+        elif response.status_code == 401:
             json_data = response.json()
             if json_data['message'] =='Too many calls for this period.':
-                print colored("\tError:\tIt seems the EmailHunter API key being used has reached\n\t\tit's limit for this month.", 'red')
+                print colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red')
                 print colored('\tAPI Key: {}\n'.format(api),'red')
+                q.put(None)
+                return None
+            if json_data['message'] == 'Invalid or missing api key.':
+                print colored("\tError:\tIt seems the Hunter API key being used is no longer valid,\nit was probably deleted.", 'red')
+                print colored('\tAPI Key: {}\n'.format(api),'red')
+                print colored('\tWhy don\'t you grab yourself a new one (they are free)','green')
+                print colored('\thttps://hunter.io/api_keys','green')
                 q.put(None)
                 return None
         else:
             raise ValueError('No Response From Hunter')
 
     except KeyError:
-        for value in json_data['emails']:
-            for domain in value['sources']:
-                url = str(domain['uri']).replace("u'","")
-                email =  str(value['value']).replace("u'","")
-                emails.append((email,url))
+        pass
     except ValueError:
-        traceback.print_exc()
+        info(traceback.print_exc())
         pass
     except Exception:
         traceback.print_exc()
