@@ -71,6 +71,9 @@ Change/Feature Requests
 
 Changelog
 ====
+* Version __2.3.10__ (__13/01/2017__):
+  * BugFixes
+  
 * Version __2.3.6__ (__14/08/2016__):
   * BugFixes
   * Timeout value can be parsed as argument (-t 5)
