@@ -136,8 +136,7 @@ def action_emailHunter(domain, api, user_agents, q, prox):
     else:
         pass
     try:
-        headers = {"Connection" : "close",
-                   "User-Agent" : ua,
+        headers = {"User-Agent" : ua,
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                    'Accept-Language': 'en-US,en;q=0.5',
                    'Accept-Encoding': 'gzip, deflate'}
@@ -146,6 +145,7 @@ def action_emailHunter(domain, api, user_agents, q, prox):
         else:
             response = requests.get(link, headers=headers)
         if response.status_code == 200:
+            json_data = response.json()
             for value in json_data['emails']:
                 for domain in value['sources']:
                     url = str(domain['uri']).replace("u'","")
@@ -167,7 +167,8 @@ def action_emailHunter(domain, api, user_agents, q, prox):
                 return None
         else:
             raise ValueError('No Response From Hunter')
-
+    except UnboundLocalError,e:
+        print e
     except KeyError:
         pass
     except ValueError:

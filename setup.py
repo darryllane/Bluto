@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Bluto',
-    version='2.3.10',
+    version='2.3.11',
     author='Darryl lane',
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
@@ -19,7 +19,7 @@ setup(
         "dnspython",
         "termcolor",
         "BeautifulSoup4",
-        "requests",
+        "requests[security]",
         "pythonwhois",
         "lxml",
         "oletools",

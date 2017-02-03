@@ -33,7 +33,7 @@ from modules.output import action_output_vuln_zone, action_output_wild_false, ac
 from modules.data_mine import doc_start
 from modules.bluto_logging import info
 
-VERSION = "2.3.10"
+VERSION = "2.3.11"
 
 prox = False
 
