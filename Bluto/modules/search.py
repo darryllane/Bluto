@@ -40,9 +40,9 @@ def action_google(domain, userCountry, userServer, q, user_agents, prox):
 
             link = '{0}/search?num=200' .format(userServer)
             if prox == True:
-                response = requests.get(link, headers=headers, params=payload, proxies=proxy)
+                response = requests.get(link, headers=headers, params=payload, proxies=proxy, verify=False)
             else:
-                response = requests.get(link, headers=headers, params=payload)
+                response = requests.get(link, headers=headers, params=payload, verify=False)
 
             response.raise_for_status()
             response.text.encode('ascii', 'ignore').decode('ascii')
@@ -98,7 +98,7 @@ def action_pwned(emails):
                        'Accept-Language': 'en-US,en;q=0.5',
                        'Accept-Encoding': 'gzip, deflate'}
 
-            response = requests.get(link, headers=headers)
+            response = requests.get(link, headers=headers, verify=False)
             json_data = response.json()
             if json_data:
                 if email in seen:
@@ -141,9 +141,9 @@ def action_emailHunter(domain, api, user_agents, q, prox):
                    'Accept-Language': 'en-US,en;q=0.5',
                    'Accept-Encoding': 'gzip, deflate'}
         if prox == True:
-            response = requests.get(link, headers=headers, proxies=proxy)
+            response = requests.get(link, headers=headers, proxies=proxy, verify=False)
         else:
-            response = requests.get(link, headers=headers)
+            response = requests.get(link, headers=headers, verify=False)
         if response.status_code == 200:
             json_data = response.json()
             for value in json_data['emails']:
@@ -202,9 +202,9 @@ def action_bing_true(domain, q, user_agents, prox):
             payload = { 'q': searchfor, 'first': start}
             link = 'https://www.bing.com/search'
             if prox == True:
-                response = requests.get(link, headers=headers, params=payload, proxies=proxy)
+                response = requests.get(link, headers=headers, params=payload, proxies=proxy, verify=False)
             else:
-                response = requests.get(link, headers=headers, params=payload)
+                response = requests.get(link, headers=headers, params=payload, verify=False)
             reg_emails = re.compile('[a-zA-Z0-9.-]*' + '@' + '<strong>')
             temp = reg_emails.findall(response.text)
             time.sleep(1)
@@ -235,9 +235,9 @@ def doc_exalead(domain, user_agents, prox, q):
                        'Accept-Language': 'en-US,en;q=0.5',
                        'Accept-Encoding': 'gzip, deflate'}
             if prox == True:
-                response = requests.get(link, headers=headers, proxies=proxy)
+                response = requests.get(link, headers=headers, proxies=proxy, verify=False)
             else:
-                response = requests.get(link, headers=headers)
+                response = requests.get(link, headers=headers, verify=False)
             soup = BeautifulSoup(response.text, "lxml")
             if soup.find('label', {'class': 'control-label', 'for': 'id_captcha'}):
                 info("So you don't like spinach?")
@@ -277,9 +277,9 @@ def doc_bing(domain, user_agents, prox, q):
             payload = { 'q': 'filetype:(doc dot docx docm dotx dotm docb xls xlt xlm xlsx xlsm xltx xltm xlsb xla xlam xll xlw ppt pot pps pptx pptm potx potm ppam ppsx ppsm sldx sldm pub pdf) site:{}'.format(domain), 'first': start}
             link = 'http://www.bing.com/search'
             if prox == True:
-                response = requests.get(link, headers=headers, proxies=proxy, params=payload)
+                response = requests.get(link, headers=headers, proxies=proxy, params=payload, verify=False)
             else:
-                response = requests.get(link, headers=headers, params=payload)
+                response = requests.get(link, headers=headers, params=payload, verify=False)
 
             soup = BeautifulSoup(response.text, "lxml")
 
@@ -321,9 +321,9 @@ def action_linkedin(domain, userCountry, q, company, user_agents, prox):
             payload = { 'q': searchfor, 'first': start}
             link = 'http://www.bing.com/search'
             if prox == True:
-                response = requests.get(link, headers=headers, params=payload, proxies=proxy)
+                response = requests.get(link, headers=headers, params=payload, proxies=proxy, verify=False)
             else:
-                response = requests.get(link, headers=headers, params=payload)
+                response = requests.get(link, headers=headers, params=payload, verify=False)
 
             response.text.encode('utf-8')
             soup = BeautifulSoup(response.text, "lxml")
@@ -354,7 +354,7 @@ def action_netcraft(domain, myResolver):
     print "\nPassive Gatherings From NetCraft\n"
     try:
         link = "http://searchdns.netcraft.com/?restriction=site+contains&host=*.{}&lookup=wait..&position=limited" .format (domain)
-        response = requests.get(link)
+        response = requests.get(link, verify=False)
         soup = BeautifulSoup(response.content, 'lxml')
         pattern = 'rel="nofollow">([a-z\.\-A-Z0-9]+)<FONT COLOR="#ff0000">'
         sub_results = re.findall(pattern, response.content)

@@ -39,7 +39,7 @@ def action_download(doc_list, docs):
 	for doc in doc_list:
 		doc = doc.replace(' ', '%20')
 		try:
-			r = requests.get(doc.encode('utf-8'), headers=headers)
+			r = requests.get(doc.encode('utf-8'), headers=headers, verify=False)
 			if r.status_code == 404:
 				r.raise_for_status()
 
