@@ -62,6 +62,15 @@ Note: To test if pip is already installed execute.
 
 `sudo pip install git+git://github.com/darryllane/Bluto --upgrade`
 
+
+**Install From Dev Branch**
+
+(1) To install from the latest development branch (maybe unstable);
+
+`sudo pip uninstall bluto`
+
+`sudo pip install git+git://github.com/darryllane/Bluto@dev`
+
 Change/Feature Requests
 ====
 * ~~MetaData Scraping From Document Hunt On Target Domain~~
