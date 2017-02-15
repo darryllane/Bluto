@@ -104,3 +104,20 @@ Changelog
   * Modulated Code Base.
   * Local Error Logging.
 
+
+**Help Section**
+
+This section contains helpful snippets.
+
+Check version of openssl being used by python
+
+	python
+	import ssl
+	ssl.OPENSSL_VERSION`
+
+Output
+
+	>>> import ssl
+	>>> ssl.OPENSSL_VERSION
+	'OpenSSL 1.0.2j  26 Sep 2016'
+	>>>
