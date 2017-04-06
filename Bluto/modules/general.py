@@ -141,7 +141,7 @@ def action_country_id(countries_file, prox):
                 originCountry = r.json()['country_name']
 
             else:
-                r = requests.get(r'https://freegeoip.net/json/', verify=False)
+                r = requests.get(r'http://freegeoip.net/json/', verify=False)
                 ip = r.json()['ip']
                 originCountry = r.json()['country_name']
 
