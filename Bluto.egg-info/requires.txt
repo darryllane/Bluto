@@ -1,7 +1,7 @@
 dnspython
 termcolor
 BeautifulSoup4
-requests
+requests[security]
 pythonwhois
 lxml
 oletools
