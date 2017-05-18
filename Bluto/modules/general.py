@@ -14,7 +14,7 @@ import dns.query
 import dns.zone
 import traceback
 import os
-from bluto_logging import info, INFO_LOG_FILE
+from .bluto_logging import info, INFO_LOG_FILE
 
 
 default_s = False
@@ -38,7 +38,7 @@ def action_whois(domain):
         try:
             company = whois_things['contacts']['registrant']['name']
         except Exception:
-            print '\nThere seems to be no Registrar for this domain.'
+            print('\nThere seems to be no Registrar for this domain.')
             company = domain
             pass
         splitup = company.lower().split()
@@ -46,13 +46,13 @@ def action_whois(domain):
         while True:
             if patern.search(domain):
                 info('Whois Results Are Good ' + company)
-                print '\nThe Whois Results Look Promising: ' + colored('{}','green').format(company)
-                accept = raw_input(colored('\nIs The Search Term sufficient?: ','green')).lower()
+                print('\nThe Whois Results Look Promising: ' + colored('{}','green').format(company))
+                accept = input(colored('\nIs The Search Term sufficient?: ','green')).lower()
                 if accept in ('y', 'yes'):
                     company = company
                     break
                 elif accept in ('n', 'no'):
-                    temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+                    temp_company = input(colored('\nRegistered Company Name: ','green'))
                     if temp_company == '':
                         info('User Supplied Blank Company')
                         company = domain
@@ -62,13 +62,13 @@ def action_whois(domain):
                         company = temp_company
                         break
                 else:
-                    print '\nThe Options Are yes|no Or y|no Not {}'.format(accept)
+                    print('\nThe Options Are yes|no Or y|no Not {}'.format(accept))
 
             else:
                 info('Whois Results Not Good ' + company)
-                print colored("\n\tThe Whois Results Don't Look Very Promissing: '{}'","red") .format(company)
-                print'\nPlease Supply The Company Name\n\n\tThis Will Be Used To Query LinkedIn'
-                temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+                print(colored("\n\tThe Whois Results Don't Look Very Promissing: '{}'","red") .format(company))
+                print('\nPlease Supply The Company Name\n\n\tThis Will Be Used To Query LinkedIn')
+                temp_company = input(colored('\nRegistered Company Name: ','green'))
                 if temp_company == '':
                     info('User Supplied Blank Company')
                     company = domain
@@ -86,8 +86,8 @@ def action_whois(domain):
     except KeyError:
         pass
     except pythonwhois.net.socket.errno.ETIMEDOUT:
-        print colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red')
-        temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+        print(colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. Please supply the registered company name, if left blank the domain name ' + '"' + domain + '"' +' will be used for the Linkedin search. The results may not be as accurate.','red'))
+        temp_company = input(colored('\nRegistered Company Name: ','green'))
         if temp_company == '':
             company = domain
         else:
@@ -95,9 +95,9 @@ def action_whois(domain):
     except Exception:
         info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
     if 'company' not in locals():
-        print 'There is no Whois data for this domain.\n\nPlease supply a company name.'
+        print('There is no Whois data for this domain.\n\nPlease supply a company name.')
         while True:
-            temp_company = raw_input(colored('\nRegistered Company Name: ','green'))
+            temp_company = input(colored('\nRegistered Company Name: ','green'))
             if temp_company == '':
                 info('User Supplied Blank Company')
                 company = domain
@@ -124,9 +124,9 @@ def action_country_id(countries_file, prox):
             key, value = line.strip().split(';')
             tcountries_dic.update({key: value})
 
-    countries_dic = dict((k.lower(), v.lower()) for k,v in tcountries_dic.iteritems())
+    countries_dic = dict((k.lower(), v.lower()) for k,v in tcountries_dic.items())
 
-    for country, server in countries_dic.items():
+    for country, server in list(countries_dic.items()):
         country_list.append(country)
 
     country_list = [item.capitalize() for item in country_list]
@@ -147,9 +147,9 @@ def action_country_id(countries_file, prox):
 
         except ValueError as e:
             if o == 0:
-                print colored('\nUnable to connect to the CountryID, we will retry.', 'red')
+                print(colored('\nUnable to connect to the CountryID, we will retry.', 'red'))
             if o > 0:
-                print '\nThis is {} of 3 attempts' .format(o)
+                print('\nThis is {} of 3 attempts' .format(o))
             time.sleep(2)
             o += 1
             if o == 4:
@@ -158,9 +158,9 @@ def action_country_id(countries_file, prox):
         break
 
     if o == 4:
-        print colored('\nWe have been unable to connect to the CountryID service.\n','red')
-        print '\nPlease let Bluto know what country you hale from.\n'
-        print colored('Available Countries:\n', 'green')
+        print(colored('\nWe have been unable to connect to the CountryID service.\n','red'))
+        print('\nPlease let Bluto know what country you hale from.\n')
+        print(colored('Available Countries:\n', 'green'))
 
         if len(country_list) % 2 != 0:
             country_list.append(" ")
@@ -170,22 +170,22 @@ def action_country_id(countries_file, prox):
         l2 = country_list[split:]
 
         for key, value in zip(l1,l2):
-            print "{0:<20s} {1}".format(key, value)
+            print("{0:<20s} {1}".format(key, value))
 
         country_list = [item.lower() for item in country_list]
 
         while True:
-            originCountry = raw_input('\nCountry: ').lower()
+            originCountry = input('\nCountry: ').lower()
             if originCountry in country_list:
                 break
             if originCountry == '':
-                print '\nYou have not selected a country so the default server will be used'
+                print('\nYou have not selected a country so the default server will be used')
                 originCountry = 'United Kingdom'.lower()
                 break
             else:
-                print '\nCheck your spelling and try again'
+                print('\nCheck your spelling and try again')
 
-        for country, server in countries_dic.items():
+        for country, server in list(countries_dic.items()):
             if country == originCountry:
                 userCountry = country
                 userServer = server
@@ -193,7 +193,7 @@ def action_country_id(countries_file, prox):
 
     else:
 
-        for country, server in countries_dic.items():
+        for country, server in list(countries_dic.items()):
             if country == originCountry.lower():
                 userCountry = country
                 userServer = server
@@ -203,11 +203,11 @@ def action_country_id(countries_file, prox):
                 userCountry = 'DEAFULT'
                 pass
             else:
-                print 'Bluto currently doesn\'t have your countries google server available.\nPlease navigate to "https://freegeoip.net/json/" and post an issue to "https://github.com/darryllane/Bluto/issues"\nincluding the country value as shown in the json output\nYou have been assigned to http://www.google.co.uk for now.'
+                print('Bluto currently doesn\'t have your countries google server available.\nPlease navigate to "https://freegeoip.net/json/" and post an issue to "https://github.com/darryllane/Bluto/issues"\nincluding the country value as shown in the json output\nYou have been assigned to http://www.google.co.uk for now.')
                 userServer = 'http://www.google.co.uk'
                 userCountry = 'United Kingdom'
 
-    print '\n\tSearching From: {0}\n\tGoogle Server: {1}\n' .format(userCountry.title(), userServer)
+    print('\n\tSearching From: {0}\n\tGoogle Server: {1}\n' .format(userCountry.title(), userServer))
     info('Country Identified: {}'.format(userCountry))
     return (userCountry, userServer)
 
@@ -230,13 +230,13 @@ def check_dom(domain, myResolver):
         if dom:
             pass
     except dns.resolver.NoNameservers:
-        print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        print('\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n')
         sys.exit()
     except dns.resolver.NXDOMAIN:
-        print '\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n'
+        print('\nError: \nDomain Not Valid, Check You Have Entered It Correctly\n')
         sys.exit()
     except dns.exception.Timeout:
-        print '\nThe connection hit a timeout. Are you connected to the internet?\n'
+        print('\nThe connection hit a timeout. Are you connected to the internet?\n')
         sys.exit()
     except Exception:
         info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)

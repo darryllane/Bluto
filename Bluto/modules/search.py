@@ -9,11 +9,11 @@ import re
 import requests
 import random
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 from termcolor import colored
 from bs4 import BeautifulSoup
-from bluto_logging import info, INFO_LOG_FILE
+from .bluto_logging import info, INFO_LOG_FILE
 
 requests.packages.urllib3.disable_warnings()
 
@@ -63,7 +63,7 @@ def action_google(domain, userCountry, userServer, q, user_agents, prox):
                                     url = div.find('cite').text
                                     email = str(match).replace("u'",'').replace('[','').replace(']','').replace("'",'')
                                     entries_tuples.append((email.lower(),str(url).replace("u'",'').replace("'","")))
-                    except Exception, e:
+                    except Exception as e:
                         pass
             time.sleep(3)
             for urls in entries_tuples:
@@ -154,21 +154,21 @@ def action_emailHunter(domain, api, user_agents, q, prox):
         elif response.status_code == 401:
             json_data = response.json()
             if json_data['message'] =='Too many calls for this period.':
-                print colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red')
-                print colored('\tAPI Key: {}\n'.format(api),'red')
+                print(colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red'))
+                print(colored('\tAPI Key: {}\n'.format(api),'red'))
                 q.put(None)
                 return None
             if json_data['message'] == 'Invalid or missing api key.':
-                print colored("\tError:\tIt seems the Hunter API key being used is no longer valid,\nit was probably deleted.", 'red')
-                print colored('\tAPI Key: {}\n'.format(api),'red')
-                print colored('\tWhy don\'t you grab yourself a new one (they are free)','green')
-                print colored('\thttps://hunter.io/api_keys','green')
+                print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid,\nit was probably deleted.", 'red'))
+                print(colored('\tAPI Key: {}\n'.format(api),'red'))
+                print(colored('\tWhy don\'t you grab yourself a new one (they are free)','green'))
+                print(colored('\thttps://hunter.io/api_keys','green'))
                 q.put(None)
                 return None
         else:
             raise ValueError('No Response From Hunter')
-    except UnboundLocalError,e:
-        print e
+    except UnboundLocalError as e:
+        print(e)
     except KeyError:
         pass
     except ValueError:
@@ -245,7 +245,7 @@ def doc_exalead(domain, user_agents, prox, q):
                 break
             for div in soup.findAll('li', {'class': 'media'}):
                 document = div.find('a', href=True)['href']
-                document = urllib2.unquote(document)
+                document = urllib.parse.unquote(document)
                 document_list.append(document)
 
         except Exception:
@@ -287,7 +287,7 @@ def doc_bing(domain, user_agents, prox, q):
             for div in divs:
                 h2 = div.find('h2')
                 document = h2.find('a', href=True)['href']
-                document = urllib2.unquote(document)
+                document = urllib.parse.unquote(document)
                 document_list.append(document)
         except requests.models.ChunkedEncodingError:
             continue
@@ -351,7 +351,7 @@ def action_linkedin(domain, userCountry, q, company, user_agents, prox):
 def action_netcraft(domain, myResolver):
     info('NetCraft Search Started')
     netcraft_list = []
-    print "\nPassive Gatherings From NetCraft\n"
+    print("\nPassive Gatherings From NetCraft\n")
     try:
         link = "http://searchdns.netcraft.com/?restriction=site+contains&host=*.{}&lookup=wait..&position=limited" .format (domain)
         response = requests.get(link)
@@ -369,7 +369,7 @@ def action_netcraft(domain, myResolver):
                 netcheck = myResolver.query(item + '.' + domain)
                 for data in netcheck:
                     netcraft_list.append(item + '.' + domain + ' ' + str(data))
-                    print colored(item + '.' + domain, 'red')
+                    print(colored(item + '.' + domain, 'red'))
             except dns.exception.Timeout:
                 pass
             except dns.resolver.NXDOMAIN:
@@ -377,7 +377,7 @@ def action_netcraft(domain, myResolver):
             except Exception:
                 info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
     else:
-        print '\tNo Results Found'
+        print('\tNo Results Found')
 
     info('NetCraft Completed')
     return netcraft_list

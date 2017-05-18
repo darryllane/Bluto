@@ -8,7 +8,7 @@ import socket
 import dns.resolver
 import random
 import string
-from bluto_logging import info, INFO_LOG_FILE
+from .bluto_logging import info, INFO_LOG_FILE
 from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 
@@ -29,7 +29,7 @@ def get_dns_details(domain, myResolver):
     zn_list =[]
     mx_list = []
     try:
-        print "\nName Server:\n"
+        print("\nName Server:\n")
         myAnswers = myResolver.query(domain, "NS")
         for data in myAnswers.rrset:
             data1 = str(data)
@@ -40,12 +40,12 @@ def get_dns_details(domain, myResolver):
             list(set(ns_list))
             ns_list.sort()
         for i in ns_list:
-            print colored(i, 'green')
+            print(colored(i, 'green'))
     except dns.resolver.NoNameservers:
         info('\tNo Name Servers\nConfirm The Domain Name Is Correct.' + INFO_LOG_FILE, exc_info=True)
         sys.exit()
     except dns.resolver.NoAnswer:
-        print "\tNo DNS Servers"
+        print("\tNo DNS Servers")
     except dns.resolver.NXDOMAIN:
         info("\tDomain Does Not Exist" + INFO_LOG_FILE, exc_info=True)
         sys.exit()
@@ -56,7 +56,7 @@ def get_dns_details(domain, myResolver):
         info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
     try:
-        print "\nMail Server:\n"
+        print("\nMail Server:\n")
         myAnswers = myResolver.query(domain, "MX")
         for data in myAnswers:
             data1 = str(data)
@@ -66,9 +66,9 @@ def get_dns_details(domain, myResolver):
             list(set(mx_list))
             mx_list.sort()
         for i in mx_list:
-            print colored(i, 'green')
+            print(colored(i, 'green'))
     except dns.resolver.NoAnswer:
-        print "\tNo Mail Servers"
+        print("\tNo Mail Servers")
     except Exception:
         info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
 
@@ -125,7 +125,7 @@ def action_brute_start(subs, myResolver):
     global myResolverG
     myResolverG = myResolver
     info('Bruting SubDomains')
-    print '\nBrute Forcing Sub-Domains\n'
+    print('\nBrute Forcing Sub-Domains\n')
     pool = ThreadPool(8)
     pool.map(action_brute, subs)
     pool.close()
@@ -169,7 +169,7 @@ def action_brute_wild(sub_list, domain, myResolver):
 def action_zone_transfer(zn_list, domain):
     info('Attempting Zone Transfers')
     global clean_dump
-    print "\nAttempting Zone Transfers"
+    print("\nAttempting Zone Transfers")
     zn_list.sort()
     vuln = True
     vulnerable_listT = []
@@ -178,7 +178,7 @@ def action_zone_transfer(zn_list, domain):
     for ns in zn_list:
         try:
             z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=3))
-            names = z.nodes.keys()
+            names = list(z.nodes.keys())
             names.sort()
             if vuln == True:
                 info('Vuln: {}'.format(ns))
@@ -197,21 +197,21 @@ def action_zone_transfer(zn_list, domain):
 
 
     if vulnerable_listF:
-        print "\nNot Vulnerable:\n"
+        print("\nNot Vulnerable:\n")
         for ns in vulnerable_listF:
-            print colored(ns, 'green')
+            print(colored(ns, 'green'))
 
     if vulnerable_listT:
         info('Vulnerable To Zone Transfers')
-        print "\nVulnerable:\n"
+        print("\nVulnerable:\n")
         for ns in vulnerable_listT:
-            print colored(ns,'red'), colored("\t" + "TCP/53", 'red')
+            print(colored(ns,'red'), colored("\t" + "TCP/53", 'red'))
 
 
         z = dns.zone.from_xfr(dns.query.xfr(vulnerable_listT[0], domain))
-        names = z.nodes.keys()
+        names = list(z.nodes.keys())
         names.sort()
-        print "\nRaw Zone Dump\n"
+        print("\nRaw Zone Dump\n")
         for n in names:
             data1 = "{}.{}" .format(n,domain)
             try:
@@ -227,7 +227,7 @@ def action_zone_transfer(zn_list, domain):
                 else:
                     info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
-            print z[n].to_text(n)
+            print(z[n].to_text(n))
 
     info('Completed Attempting Zone Transfers')
     clean_dump = sorted(set(dump_list))
