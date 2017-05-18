@@ -9,7 +9,7 @@ INFO_LOG_FILE = os.path.expanduser(LOG_DIR + 'bluto-info.log')
 
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
-    os.chmod(LOG_DIR, 0o700)
+    os.chmod(LOG_DIR, 0700)
     open(INFO_LOG_FILE,'a').close()
 
 # set up formatting

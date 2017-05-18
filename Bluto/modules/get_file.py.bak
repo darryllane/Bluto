@@ -5,7 +5,7 @@ import traceback
 import sys
 import random
 from termcolor import colored
-from .bluto_logging import info, INFO_LOG_FILE
+from bluto_logging import info, INFO_LOG_FILE
 
 def get_user_agents(useragent_f):
     info('Gathering UserAgents')

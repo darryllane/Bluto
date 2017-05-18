@@ -1,6 +1,6 @@
 import pdfminer
 import requests
-import urllib.request, urllib.error, urllib.parse
+import urllib2
 import oletools.thirdparty.olefile as olefile
 import os
 import traceback
@@ -9,7 +9,7 @@ import re
 import random
 import math
 import sys
-import queue
+import Queue
 import time
 import threading
 import cgi
@@ -17,10 +17,10 @@ from termcolor import colored
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from bs4 import BeautifulSoup
-from .bluto_logging import info, INFO_LOG_FILE
-from .get_file import get_user_agents
-from .search import doc_bing, doc_exalead
-from .general import get_size
+from bluto_logging import info, INFO_LOG_FILE
+from get_file import get_user_agents
+from search import doc_bing, doc_exalead
+from general import get_size
 
 
 
@@ -29,7 +29,7 @@ def action_download(doc_list, docs):
 	i = 0
 	download_list = []
 	initial_count = 0
-	print('Gathering Live Documents For Metadata Mining\n')
+	print 'Gathering Live Documents For Metadata Mining\n'
 	headers = {
 		'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.0; pl; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB7.1 ( .NET CLR 3.5.30729',
 		'Referer': 'https://www.google.co.uk/',
@@ -52,7 +52,7 @@ def action_download(doc_list, docs):
 						code.write(r.content)
 						code.close()
 						initial_count += 1
-						print(('\tDownload Count: {}\r'.format(str(initial_count))), end=' ')
+						print('\tDownload Count: {}\r'.format(str(initial_count))),
 						info(str(doc).replace('%20', ' '))
 						download_list.append(str(doc).replace('%20', ' '))
 
@@ -66,7 +66,7 @@ def action_download(doc_list, docs):
 						code.write(r.content)
 						code.close()
 						initial_count += 1
-						print(('\tDownload Count: {}\r'.format(str(initial_count))), end=' ')
+						print('\tDownload Count: {}\r'.format(str(initial_count))),
 						download_list.append(str(doc).replace('%20', ' '))
 						info(str(doc).replace('%20', ' '))
 					continue
@@ -96,14 +96,14 @@ def action_download(doc_list, docs):
 	if i < 1:
 		sys.exit()
 	data_size = get_size(docs)
-	print('\tData Downloaded: {}MB'.format(str(math.floor(data_size))))
+	print '\tData Downloaded: {}MB'.format(str(math.floor(data_size)))
 	info('Documents Downloaded: {}'.format(initial_count))
 	return download_list
 
 
 def doc_search(domain, USERAGENT_F, prox):
-	q1 = queue.Queue()
-	q2 = queue.Queue()
+	q1 = Queue.Queue()
+	q2 = Queue.Queue()
 	t1 = threading.Thread(target=doc_bing, args=(domain, USERAGENT_F, prox, q1))
 	t2 = threading.Thread(target=doc_exalead, args=(domain, USERAGENT_F, prox, q2))
 	t1.start()
