@@ -34,7 +34,7 @@ from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
-VERSION = "2.3.14"
+VERSION = "2.3.13"
 
 prox = False
 
@@ -84,13 +84,17 @@ if __name__ == "__main__":
         args = vars(parser.parse_args())
         if args['u']:
             info('Checking For Update')
-            check = updateCheck()
+            check, new_version = updateCheck()
             if check:
                 info('Update Availble')
-                print 'Update Available, would you like to attempt to update?'
-                answer = raw_input('Y|N')
-                if answer:
+                print colored('Update Available!', 'red'), colored('{}'.format(new_version), 'green')
+                print colored('Would you like to attempt to update?\n', 'green')
+                answer = raw_input('Y|N: ')
+                if answer in ('y', 'yes'):
                     update()
+                    print '\n'
+                else:
+                    print '\n'
             else:
                 print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
 
