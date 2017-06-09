@@ -83,23 +83,28 @@ if __name__ == "__main__":
         parser.add_argument('-api', help='Supply your free Email Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['u']:
-            while True:
-                info('Checking For Update')
-                check, new_version = updateCheck()
-                if check:
-                    info('Update Availble')
-                    print colored('Update Available!', 'red'), colored('{}'.format(new_version), 'green')
-                    print colored('Would you like to attempt to update?\n', 'green')
+
+            info('Checking For Update')
+            check, new_version = updateCheck()
+
+            if check:
+                info('Update Availble')
+                print colored('Update Available!', 'red'), colored('{}'.format(new_version), 'green')
+                print colored('Would you like to attempt to update?\n', 'green')
+                while True:
                     answer = raw_input('Y|N: ')
                     if answer in ('y', 'yes'):
                         update()
                         print '\n'
+                        break
                     elif answer in ('n', 'no'):
                         print '\n'
+                        break
                     else:
                         print '\nThe Options Are yes|no Or y|no, Not {}'.format(answer)
-                else:
-                    print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
+                        break
+            else:
+                print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
 
 
         if args['t']:
