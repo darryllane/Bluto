@@ -49,7 +49,7 @@ print """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
  B::::::::::::::::B l:::::l                     ttt:::t
  B::::::BBBBBB:::::Bl:::::l                     t:::::t
- BB:::::B     B:::::l:::::l{6}              t:::::t
+ BB:::::B     B:::::l:::::l{6}               t:::::t
    B::::B     B:::::Bl::::luuuuuu    uuuuuttttttt:::::ttttttt      ooooooooooo
    B::::B     B:::::Bl::::lu::::u    u::::t:::::::::::::::::t    oo:::::::::::oo
    B::::BBBBBB:::::B l::::lu::::u    u::::t:::::::::::::::::t   o:::::::::::::::o
@@ -83,20 +83,24 @@ if __name__ == "__main__":
         parser.add_argument('-api', help='Supply your free Email Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
         if args['u']:
-            info('Checking For Update')
-            check, new_version = updateCheck()
-            if check:
-                info('Update Availble')
-                print colored('Update Available!', 'red'), colored('{}'.format(new_version), 'green')
-                print colored('Would you like to attempt to update?\n', 'green')
-                answer = raw_input('Y|N: ')
-                if answer in ('y', 'yes'):
-                    update()
-                    print '\n'
+            while True:
+                info('Checking For Update')
+                check, new_version = updateCheck()
+                if check:
+                    info('Update Availble')
+                    print colored('Update Available!', 'red'), colored('{}'.format(new_version), 'green')
+                    print colored('Would you like to attempt to update?\n', 'green')
+                    answer = raw_input('Y|N: ')
+                    if answer in ('y', 'yes'):
+                        update()
+                        print '\n'
+                    elif answer in ('n', 'no'):
+                        print '\n'
+                    else:
+                        print '\nThe Options Are yes|no Or y|no, Not {}'.format(answer)
                 else:
-                    print '\n'
-            else:
-                print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
+                    print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
+
 
         if args['t']:
             timeout_value = args['t']

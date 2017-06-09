@@ -2,6 +2,8 @@
 from bluto_logging import info
 import subprocess
 import re
+from termcolor import colored
+import sys
 
 def updateCheck():
 	command_check = (["pip list -o"])
@@ -25,6 +27,8 @@ def update():
 	output_check = process_check.communicate()[0]
 	lines = output_check.splitlines()
 	for line in lines:
-		print line
+		if 'successfully installed' in line.lower():
+			print colored('Update Successfull!', 'green')
+			sys.exit()
 
 updateCheck()
