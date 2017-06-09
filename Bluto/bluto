@@ -34,7 +34,7 @@ from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
-VERSION = "2.4.0"
+VERSION = "2.4.1"
 
 prox = False
 
