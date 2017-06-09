@@ -34,12 +34,14 @@ from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
-VERSION = "2.4.2"
+VERSION = "2.4.3"
 
 prox = False
 
 for item in SITES:
+
     if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
+
         path = item
         info('Application Path Identified: ' + path)
     else:
@@ -102,7 +104,7 @@ if __name__ == "__main__":
                         break
                     else:
                         print '\nThe Options Are yes|no Or y|no, Not {}'.format(answer)
-                        break
+
             else:
                 print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
 

@@ -26,9 +26,11 @@ def update():
 	process_check = subprocess.Popen(command_check, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	output_check = process_check.communicate()[0]
 	lines = output_check.splitlines()
-	for line in lines:
-		if 'successfully installed' in line.lower():
-			print colored('Update Successfull!', 'green')
-			sys.exit()
+	info(lines)
+	print lines[:-1]
+	if 'Successfully installed' in lines[:-1]:
+		print colored('\nUpdate Successfull!', 'green')
+		sys.exit()
+	else:
+		print colored('\nUpdate Failed, Please Check The Logs For Details', 'red')
 
-updateCheck()
