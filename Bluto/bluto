@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import sys
@@ -32,8 +32,9 @@ from modules.general import action_country_id, action_whois, action_bluto_use, c
 from modules.output import action_output_vuln_zone, action_output_wild_false, action_output_wild_false_hunter, action_output_vuln_zone_hunter
 from modules.data_mine import doc_start
 from modules.bluto_logging import info
+from modules.update import update, updateCheck
 
-VERSION = "2.3.12"
+VERSION = "2.3.13"
 
 prox = False
 
@@ -48,7 +49,7 @@ print """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
  B::::::::::::::::B l:::::l                     ttt:::t
  B::::::BBBBBB:::::Bl:::::l                     t:::::t
- BB:::::B     B:::::l:::::l{6}               t:::::t
+ BB:::::B     B:::::l:::::l{6}              t:::::t
    B::::B     B:::::Bl::::luuuuuu    uuuuuttttttt:::::ttttttt      ooooooooooo
    B::::B     B:::::Bl::::lu::::u    u::::t:::::::::::::::::t    oo:::::::::::oo
    B::::BBBBBB:::::B l::::lu::::u    u::::t:::::::::::::::::t   o:::::::::::::::o
@@ -72,13 +73,27 @@ print """
 
 if __name__ == "__main__":
     info('\nBluto Started')
+
     try:
         parser = argparse.ArgumentParser(description='Use: -e for lots of spinach (much larger sublist) | Use: -api for emailhunter_support')
         parser.add_argument('-e', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
+        parser.add_argument('-u', help='Used to check for updates', required=False, action='store_true')
         parser.add_argument('-t', type=int, help='Used to set the timeout, in seconds', required=False)
         parser.add_argument('-d', help='Used for setting the target domain', required=False)
         parser.add_argument('-api', help='Supply your free Email Hunter API key to gather even more email addresses', required=False)
         args = vars(parser.parse_args())
+        if args['u']:
+            info('Checking For Update')
+            check = updateCheck()
+            if check:
+                info('Update Availble')
+                print 'Update Available, would you like to attempt to update?'
+                answer = raw_input('Y|N')
+                if answer:
+                    update()
+            else:
+                print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
+
         if args['t']:
             timeout_value = args['t']
             myResolver = set_resolver(timeout_value)
@@ -287,6 +302,6 @@ if __name__ == "__main__":
 
         info('Bluto Finished')
     except KeyboardInterrupt:
-        print '\n\nExiting..'
+        print '\n\nRage Exit!..'
         info('Keyboard Interrupt From User\n')
         sys.exit()

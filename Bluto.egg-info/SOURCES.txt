@@ -21,3 +21,4 @@ Bluto/modules/get_dns.py
 Bluto/modules/get_file.py
 Bluto/modules/output.py
 Bluto/modules/search.py
+Bluto/modules/update.py

@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: Bluto
-Version: 2.3.11
+Version: 2.3.12
 Summary: 
     DNS Recon | Brute Forcer | DNS Zone Transfer | DNS Wild Card Checks
     DNS Wild Card Brute Forcer | Email Enumeration | Staff Enumeration
@@ -73,6 +73,15 @@ Description: **BLUTO**
         
         `sudo pip install git+git://github.com/darryllane/Bluto --upgrade`
         
+        
+        **Install From Dev Branch**
+        
+        (1) To install from the latest development branch (maybe unstable);
+        
+        `sudo pip uninstall bluto`
+        
+        `sudo pip install git+git://github.com/darryllane/Bluto@dev`
+        
         Change/Feature Requests
         ====
         * ~~MetaData Scraping From Document Hunt On Target Domain~~
@@ -106,5 +115,22 @@ Description: **BLUTO**
           * Modulated Code Base.
           * Local Error Logging.
         
+        
+        **Help Section**
+        
+        This section contains helpful snippets.
+        
+        Check version of openssl being used by python
+        
+        	python
+        	import ssl
+        	ssl.OPENSSL_VERSION`
+        
+        Output
+        
+        	>>> import ssl
+        	>>> ssl.OPENSSL_VERSION
+        	'OpenSSL 1.0.2j  26 Sep 2016'
+        	>>>
         
 Platform: UNKNOWN

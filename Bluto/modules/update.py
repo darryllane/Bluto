@@ -3,7 +3,7 @@ from bluto_logging import info
 import subprocess
 
 def updateCheck():
-	command_check = "pip list -o --format=freeze"
+	command_check = (["pip", "list", "-o", "--format=freeze"])
 	process_check = subprocess.Popen(command_check, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	output_check = process_check.communicate()[0]
 	line = output_check.splitlines()
@@ -18,12 +18,9 @@ def updateCheck():
 
 
 def update():
-	command_check = "pip install bluto --upgrade"
+	command_check = (["sudo -H pip install bluto --upgrade"])
 	process_check = subprocess.Popen(command_check, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	output_check = process_check.communicate()[0]
-	line = output_check.splitlines()
-	info(lines)
-
-
-updated = updateCheck()
-print updated
+	lines = output_check.splitlines()
+	for line in lines:
+		print line
