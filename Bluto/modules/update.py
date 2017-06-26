@@ -5,20 +5,35 @@ import re
 from termcolor import colored
 import sys
 
-def updateCheck():
+def updateCheck(VERSION):
 	command_check = (["pip list -o"])
 	process_check = subprocess.Popen(command_check, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	output_check = process_check.communicate()[0]
 	line = output_check.splitlines()
 	for i in line:
 		if 'bluto' in str(i).lower():
-			match = re.match('Bluto\s\(.*\)\s\-\sLatest\:\s(.*?)\s\[sdist\]', i)
+			new_version = re.match('Bluto\s\(.*\)\s\-\sLatest\:\s(.*?)\s\[sdist\]', i).group(1)
 			found = True
-			return (found, match.group(1))
 		else:
 			found = False
 
-	return (found, 'NONE')
+	if found:
+		info('Update Availble')
+		print colored('\nUpdate Available!', 'red'), colored('{}'.format(new_version), 'green')
+		print colored('Would you like to attempt to update?\n', 'green')
+		while True:
+			answer = raw_input('Y|N: ').lower()
+			if answer in ('y', 'yes'):
+				update()
+				print '\n'
+				break
+			elif answer in ('n', 'no'):
+				print '\n'
+				break
+			else:
+				print '\nThe Options Are yes|no Or Y|N, Not {}'.format(answer)
+	else:
+		print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
 
 
 def update():
@@ -27,7 +42,6 @@ def update():
 	output_check = process_check.communicate()[0]
 	lines = output_check.splitlines()
 	info(lines)
-	print lines[:-1]
 	if 'Successfully installed' in lines[:-1]:
 		print colored('\nUpdate Successfull!', 'green')
 		sys.exit()

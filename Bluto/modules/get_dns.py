@@ -177,7 +177,7 @@ def action_zone_transfer(zn_list, domain):
     dump_list = []
     for ns in zn_list:
         try:
-            z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=3))
+            z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=3, lifetime=5))
             names = z.nodes.keys()
             names.sort()
             if vuln == True:
@@ -208,7 +208,7 @@ def action_zone_transfer(zn_list, domain):
             print colored(ns,'red'), colored("\t" + "TCP/53", 'red')
 
 
-        z = dns.zone.from_xfr(dns.query.xfr(vulnerable_listT[0], domain))
+        z = dns.zone.from_xfr(dns.query.xfr(vulnerable_listT[0], domain, timeout=3, lifetime=5))
         names = z.nodes.keys()
         names.sort()
         print "\nRaw Zone Dump\n"

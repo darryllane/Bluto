@@ -1,6 +1,31 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+Description:
+
+DNS Recon | Brute Forcer | DNS Zone Transfer | DNS Wild Card Checks | DNS Wild Card Brute Forcer
+Email Enumeration | Staff Enumeration | Compromised Account Enumeration | MetaData Harvesting
+
+Author:  Darryl Lane
+Twitter: @darryllane101
+
+Usage:
+    bluto [--domain=<domain>] [-e] [-u] [--timeout=<timeout>] [--api=<key>]
+    bluto -h | --help
+    bluto --version
+
+Options:
+    bluto -e           Large Subdomain list used for bruteforcing
+    bluto -u           Check for latest version of Bluto
+    bluto --timeout    Set DNS timeout in seconds
+    bluto --domain     Set target domain
+    bluto --api        Set Hunter API key
+    bluto --help       Help menu
+    bluto --version    Current Bluto version
+
+"""
+
 import sys
 import site
 import os
@@ -11,11 +36,13 @@ for item in SITES:
         path = item
         sys.path.append(path + '/Bluto/')
 
+
 FILENAME_1 = path + "/Bluto/doc/subdomains-top1mil-20000.txt"
 FILENAME_2 = path + "/Bluto/doc/sub_interest.txt"
 USERAGENT_F = path + "/Bluto/doc/user_agents.txt"
 COUNTRIES_FILE = path + "/Bluto/doc/countries.txt"
 INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
+
 
 import time
 import threading
@@ -24,6 +51,7 @@ import argparse
 import dns.resolver
 import dns.query
 import dns.zone
+from docopt import docopt
 from termcolor import colored
 from modules.get_dns import action_brute_start, action_wild_cards, action_zone_transfer, get_dns_details, action_brute_wild, set_resolver
 from modules.search import action_bing_true, action_google, action_linkedin, action_netcraft, action_emailHunter
@@ -34,24 +62,13 @@ from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
-VERSION = "2.4.4"
+version = '2.4.5'
 
-prox = False
-
-for item in SITES:
-
-    if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
-
-        path = item
-        info('Application Path Identified: ' + path)
-    else:
-        pass
-
-print """
+title = """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
  B::::::::::::::::B l:::::l                     ttt:::t
  B::::::BBBBBB:::::Bl:::::l                     t:::::t
- BB:::::B     B:::::l:::::l{6}               t:::::t
+ BB:::::B     B:::::l:::::l{0}               t:::::t
    B::::B     B:::::Bl::::luuuuuu    uuuuuttttttt:::::ttttttt      ooooooooooo
    B::::B     B:::::Bl::::lu::::u    u::::t:::::::::::::::::t    oo:::::::::::oo
    B::::BBBBBB:::::B l::::lu::::u    u::::t:::::::::::::::::t   o:::::::::::::::o
@@ -60,57 +77,43 @@ print """
    B::::B     B:::::Bl::::lu::::u    u::::u     t:::::t         o::::o     o::::o
    B::::B     B:::::Bl::::lu::::u    u::::u     t:::::t         o::::o     o::::o
    B::::B     B:::::Bl::::lu:::::uuuu:::::u     t:::::t    ttttto::::o     o::::o
- BB:::::BBBBBB::::::l::::::u:::::::::::::::uu   t::::::tttt:::::o:::::ooooo:::::o
- B:::::::::::::::::Bl::::::lu:::::::::::::::u   tt::::::::::::::o:::::::::::::::o
- B::::::::::::::::B l::::::l uu::::::::uu:::u     tt:::::::::::ttoo:::::::::::oo
- BBBBBBBBBBBBBBBBB  llllllll   uuuuuuuu  uuuu       ttttttttttt    ooooooooooo
+BB:::::BBBBBB::::::l::::::u:::::::::::::::uu   t::::::tttt:::::o:::::ooooo:::::o
+B:::::::::::::::::Bl::::::lu:::::::::::::::u   tt::::::::::::::o:::::::::::::::o
+B::::::::::::::::B l::::::l uu::::::::uu:::u     tt:::::::::::ttoo:::::::::::oo
+BBBBBBBBBBBBBBBBB  llllllll   uuuuuuuu  uuuu       ttttttttttt    ooooooooooo
+""".format(colored("v" + version, 'red'))
 
-  {2} | {3} | {4} | {9}
+desc = """  {2} | {3} | {4} | {9}
         {8} | {7} | {10}
                {11}  |  {12}
 
                  {0}  |  {1}
                      {5}
-""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + VERSION, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'), colored("MetaData Mining", 'green'))
+""" . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + version, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'), colored("MetaData Mining", 'green'))
+
+prox = False
+
+for item in SITES:
+    if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
+        path = item
+        info('Application Path Identified: ' + path)
+    else:
+        pass
 
 if __name__ == "__main__":
     info('\nBluto Started')
-
+    args = docopt(__doc__, version=version)
+    print title
+    print desc
+#Check Arguments
     try:
-        parser = argparse.ArgumentParser(description='Use: -e for lots of spinach (much larger sublist) | Use: -api for emailhunter_support')
-        parser.add_argument('-e', help='Used for brute forcing with a very large list of SubDomains', required=False, action='store_true')
-        parser.add_argument('-u', help='Used to check for updates', required=False, action='store_true')
-        parser.add_argument('-t', type=int, help='Used to set the timeout, in seconds', required=False)
-        parser.add_argument('-d', help='Used for setting the target domain', required=False)
-        parser.add_argument('-api', help='Supply your free Email Hunter API key to gather even more email addresses', required=False)
-        args = vars(parser.parse_args())
-        if args['u']:
 
+        if args['-u']:
             info('Checking For Update')
-            check, new_version = updateCheck()
+            updateCheck(version)
 
-            if check:
-                info('Update Availble')
-                print colored('Update Available!', 'red'), colored('{}'.format(new_version), 'green')
-                print colored('Would you like to attempt to update?\n', 'green')
-                while True:
-                    answer = raw_input('Y|N: ')
-                    if answer in ('y', 'yes'):
-                        update()
-                        print '\n'
-                        break
-                    elif answer in ('n', 'no'):
-                        print '\n'
-                        break
-                    else:
-                        print '\nThe Options Are yes|no Or y|no, Not {}'.format(answer)
-
-            else:
-                print colored('You are running the latest version:','green'), colored('{}\n'.format(VERSION),'blue')
-
-
-        if args['t']:
-            timeout_value = args['t']
+        if args['--timeout']:
+            timeout_value = args['--timeout']
             myResolver = set_resolver(timeout_value)
         else:
             myResolver = dns.resolver.Resolver()
@@ -118,51 +121,55 @@ if __name__ == "__main__":
             myResolver.lifetime = 10
             myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
 
-        if args['e']:
+        if args['-e']:
             info('-e Argument Used')
             FILENAME_1 = path + "/Bluto/doc/lots-of-spinach.txt"
-        if args['api']:
-            api = args['api']
+
+        if args['--api']:
+            api = args['--api']
             info('-api Argument Used with api: ' + str(api))
         else:
             api = False
 
-        if args['d']:
-            domain = args['d']
+        if args['--domain']:
+            domain = args['--domain']
         else:
             domain = raw_input("Target Domain: ")
+
         user_agents = get_user_agents(USERAGENT_F)
         info('Domain Identified: ' + str(domain))
         domain_r = domain.split('.')
         report_location = os.path.expanduser('~/Bluto/Bluto-Evidence-{}.html'.format(domain_r[0]))
-    #Check if domain valid
+#Check if domain valid
         check_dom(domain, myResolver)
-    #WhoisGet
+#WhoisGet
         company = action_whois(domain)
-
-    #Detail Call
+#Detail Call
         sub_intrest = get_sub_interest(FILENAME_2, domain)
         zn_list = get_dns_details(domain, myResolver)
-    #NetCraft Call
+#NetCraft Call
         netcraft_list = action_netcraft(domain, myResolver)
-    #ZoneTrans Call
+#ZoneTrans Call
         vulnerable_results = action_zone_transfer(zn_list, domain)
         if vulnerable_results == ([], []):
             print "\nNone of the Name Servers are vulnerable to Zone Transfers"
-    #Bruting
+#Testing For Wild Cards
             print '\nTesting For Wild Cards'
             value = action_wild_cards(domain, myResolver)
+#Wild Cards True
             if value == True:
                 print colored('\n\tWild Cards Are In Place', 'green')
                 print colored("\n\tOh no! You ain't eatin' no spinach in this picture", 'blue')
                 print colored("\n\nThis Will Take A While Longer, On Average +- 20min", 'grey')
                 check_count = get_line_count(FILENAME_1)
+            #Grabbing Subs
                 subs = get_subs(FILENAME_1, domain)
                 print '\nGathering Data From Google, Bing And LinkedIn'
+            #Checking Request Country
                 userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
                 start_time_total = time.time()
-
+            #Executing Jobs
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
@@ -205,21 +212,24 @@ if __name__ == "__main__":
                 domains.sort()
                 if "temp-enter" in domains: domains.remove("temp-enter")
                 brute_results_dict = dict((x.split(' ') for x in domains))
-    #Outputing data
+            #Outputing data
                 if api:
                     emailHunter_results = q4.get()
                     action_output_wild_false_hunter(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, emailHunter_results, args, report_location, company, data_mine)
                 else:
                     action_output_wild_false(brute_results_dict, sub_intrest, google_true_results, bing_true_results, linkedin_results, check_count, domain, time_spent_email, time_spent_brute, time_spent_total, report_location, company, data_mine)
+#WildCards False
             else:
                 print colored('\n\tWild Cards Are Not In Place', 'red')
                 check_count = get_line_count(FILENAME_1)
+            #Grabbing Subs
                 subs = get_subs(FILENAME_1, domain)
                 print '\nGathering Data From Google, Bing And LinkedIn'
+            #Checking Request Country
                 userCountry, userServer = action_country_id(COUNTRIES_FILE, prox)
                 action_bluto_use(userCountry)
                 start_time_total = time.time()
-
+            #Executing Jobs
                 q1 = Queue.Queue()
                 q2 = Queue.Queue()
                 q3 = Queue.Queue()
@@ -317,6 +327,6 @@ if __name__ == "__main__":
 
         info('Bluto Finished')
     except KeyboardInterrupt:
-        print '\n\nRage Exit!..'
+        print '\n\nRage Quit!..'
         info('Keyboard Interrupt From User\n')
         sys.exit()

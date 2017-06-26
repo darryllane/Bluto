@@ -88,10 +88,11 @@ def action_download(doc_list, docs):
 			pass
 		except KeyError:
 			pass
+		except UnboundLocalError:
+			pass
 		except Exception:
 			info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
 			info(str(doc).replace('%20', ' '))
-			info(r.headers)
 			pass
 	if i < 1:
 		sys.exit()

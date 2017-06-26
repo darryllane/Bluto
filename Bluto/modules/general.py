@@ -32,7 +32,6 @@ def get_size(dir_location):
 
 
 def action_whois(domain):
-
     try:
         whois_things = pythonwhois.get_whois(domain)
         try:
@@ -77,7 +76,6 @@ def action_whois(domain):
                     info('User Supplied Company ' + company)
                     company = temp_company
                     break
-
 
     except pythonwhois.shared.WhoisException:
         pass
@@ -135,7 +133,7 @@ def action_country_id(countries_file, prox):
     while True:
         try:
             if prox == True:
-                proxy = {'http' : 'http://127.0.0.1:8080'}
+                proxy = {'https' : 'http://127.0.0.1:8080'}
                 r = requests.get(r'https://freegeoip.net/json/', proxies=proxy, verify=False)
                 ip = r.json()['ip']
                 originCountry = r.json()['country_name']

@@ -125,7 +125,7 @@ def action_pwned(emails):
 
 #Takes domain[str], api[list], user_agents[list] #Returns email,url [list[tuples]] Queue[object], prox[str]
 def action_emailHunter(domain, api, user_agents, q, prox):
-    info('Email Hunter Search Started')
+    info('Hunter Search Started')
     emails = []
     uas = user_agents
     ua = random.choice(uas)
@@ -178,7 +178,7 @@ def action_emailHunter(domain, api, user_agents, q, prox):
         traceback.print_exc()
         info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
 
-    info('Email Hunter Search Completed')
+    info('Hunter Search Completed')
     q.put(sorted(emails))
 
 
