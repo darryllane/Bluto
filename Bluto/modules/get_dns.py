@@ -81,7 +81,7 @@ def action_wild_cards(domain, myResolver):
     try:
         one = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
         myAnswers = myResolver.query(str(one) + '.' + str(domain))
-
+        print myAnswers.rrset
     except dns.resolver.NoNameservers:
         pass
 

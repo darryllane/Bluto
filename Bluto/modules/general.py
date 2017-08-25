@@ -91,7 +91,7 @@ def action_whois(domain):
         else:
             company = temp_company
     except Exception:
-        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
     if 'company' not in locals():
         print 'There is no Whois data for this domain.\n\nPlease supply a company name.'
         while True:
@@ -217,7 +217,7 @@ def action_bluto_use(countryID):
         payload = {'country': countryID, 'Date': now}
         requests.post(link, data=payload)
     except Exception:
-        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
         pass
 
 
@@ -237,4 +237,4 @@ def check_dom(domain, myResolver):
         print '\nThe connection hit a timeout. Are you connected to the internet?\n'
         sys.exit()
     except Exception:
-        info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
+        info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE)
