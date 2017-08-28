@@ -45,7 +45,6 @@ def non_intrusive(subdomain, my_resolver):
 	except dns.exception.SyntaxError:
 		pass
 	except dns.exception.Timeout:
-		print 'Timeout: {}'.format(subdomain)
 		pass
 	except dns.resolver.Timeout:
 		pass
