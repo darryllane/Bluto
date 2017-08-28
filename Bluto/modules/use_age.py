@@ -1,16 +1,5 @@
 import json
 
-def des():
-	value = """
-
-Description:
-
-    Filler
-
-    Author:  Darryl Lane
-    Twitter: @darryllane101
-"""
-	return value
 
 def soa_build():
 	value = """

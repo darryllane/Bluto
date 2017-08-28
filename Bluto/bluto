@@ -19,7 +19,7 @@ from modules import execute
 from modules import descriptor_
 from modules.use_age import debug_out
 
-parser = argparse.ArgumentParser(prog='Bluto', formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(prog,max_help_position=50), usage=descriptor_.des())
+parser = argparse.ArgumentParser(prog='Bluto', formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(prog,max_help_position=500), usage=descriptor_.des())
 
 requiredNamed = parser.add_argument_group('Required Arguments')
 requiredNamed.add_argument('-d', '--domain', help='Target Domain', required=True)
