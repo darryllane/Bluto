@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+
+import sys
+import site
+import os
+
+SITES = site.getsitepackages()
+for item in SITES:
+	if os.path.exists(item + "/Bluto/modules/__init__.py"):
+		path = item
+		sys.path.append(path + '/Bluto/')
+
 import argparse
 import traceback
 from termcolor import colored
