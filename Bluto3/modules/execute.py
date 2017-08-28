@@ -23,9 +23,62 @@ from in_out import gather
 from logger_ import info
 import descriptor_
 import _wildSanitise
+from use_age import debug_out
 
 global results
 results = []
+
+
+def non_intrusive(subdomain, my_resolver):
+	try:
+		myAnswers = my_resolver.query(subdomain, raise_on_no_answer=False)
+
+		for data in myAnswers:
+			results.append(subdomain.lower() + '\t' + str(data))
+
+	except dns.resolver.NoNameservers:
+		pass
+	except dns.resolver.NXDOMAIN:
+		pass
+	except dns.resolver.NoAnswer:
+		pass
+	except dns.exception.SyntaxError:
+		pass
+	except dns.exception.Timeout:
+		print 'Timeout: {}'.format(subdomain)
+		pass
+	except dns.resolver.Timeout:
+		pass
+	except Exception:
+		print traceback.print_exc()
+		print('An Unhandled Exception Has Occured, Please Check The Log For Details')
+
+
+def intrusive(subdomain, my_resolver):
+	try:
+		sub, domain = subdomain.split('.', 1)
+		soa_answer = my_resolver.query(domain, 'SOA')
+		master_answer = my_resolver.query(soa_answer[0].mname, 'A')
+		soa_address = str(master_answer.response.answer[0]).split(' ')[4]
+		default = dns.resolver.get_default_resolver()
+		default.nameservers = [soa_address]
+
+		nameserver = default.nameservers[0]
+		query = dns.message.make_query(subdomain, dns.rdatatype.A)
+		response_q = dns.query.udp(query, nameserver, timeout=5)
+		rcode = response_q.rcode()
+		if rcode == dns.rcode.NOERROR:
+			addr = my_resolver.query(subdomain)
+			address = str(addr.rrset[0])
+			results.append(subdomain.lower() + '\t' + address)
+	except dns.resolver.Timeout:
+		pass
+	except dns.resolver.NXDOMAIN:
+		pass
+	except dns.resolver.NoAnswer:
+		pass
+	except Exception:
+		print traceback.print_exc()
 
 
 def zone_trans(args):
@@ -154,36 +207,17 @@ def wild_check(args):
 		return {'wild': True}
 
 def start_brute(subdomain):
-	printed = []
+
 	global job_args
 	global brute_q
 	my_resolver = resolve._set(job_args)
-	domain = job_args.domain
 	time.sleep(0.1)
-	try:
-		myAnswers = my_resolver.query(subdomain, raise_on_no_answer=False)
+	if job_args.intrusive:
+		intrusive(subdomain, my_resolver)
+	else:
+		non_intrusive(subdomain, my_resolver)
 
-		for data in myAnswers:
-			results.append(subdomain.lower() + '\t' + str(data))
-
-	except dns.resolver.NoNameservers:
-		pass
-	except dns.resolver.NXDOMAIN:
-		pass
-	except dns.resolver.NoAnswer:
-		pass
-	except dns.exception.SyntaxError:
-		pass
-	except dns.exception.Timeout:
-		info('Timeout: {}'.format(subdomain))
-		pass
-	except dns.resolver.Timeout:
-		pass
-	except Exception:
-		print traceback.print_exc()
-		print('An Unhandled Exception Has Occured, Please Check The Log For Details')
-
-	return subdomain
+	return
 
 
 def _brute(job_arg_in):
@@ -195,7 +229,9 @@ def _brute(job_arg_in):
 	domain = job_arg_in.domain
 	topValue = job_arg_in.top
 	d = zone_trans(job_args)
-
+	if d is None:
+		print 'ZoneTransfer Checks Failed, Try again'
+		sys.exit()
 	z_data = json.dumps(d)
 	z_data = json.loads(z_data)
 	vuln = z_data["vuln"]
@@ -206,7 +242,10 @@ def _brute(job_arg_in):
 			subdomains = data_.top_list(fileObj, job_args)
 			joined_subs = [sub + '.' + domain for sub in subdomains]
 			if job_args.debug:
-				print subdomains
+				print colored('Debug Enabled:','red', 'on_yellow')
+				print colored('SubDomains Output', 'red', 'on_yellow')
+				debug_out(subdomains)
+
 		else:
 			filename = '/Users/laned/Python/Projects/Bluto3/docs/subdomains-top1mil-20000.txt'
 			subdomains = data_.get_subs(filename, domain)
@@ -215,12 +254,14 @@ def _brute(job_arg_in):
 		start_time_total = time.time()
 		wild = wild_check(job_args)
 		print '\nBrute-Forcing Top {} Subdomains:\n'.format(len(subdomains))
+		if job_args.intrusive:
+			print colored('Intrusive Mode Enabled!', 'yellow')
 		pool = ThreadPool(processes=100)
 		max_ = len(joined_subs)
 		with tqdm(total=max_) as pbar:
 			for i, _ in tqdm(enumerate(pool.imap_unordered(start_brute, joined_subs))):
 				pbar.update()
-		pbar.close()
+
 		if str(wild) == "{'wild': True}":
 			results = _wildSanitise.main(results, job_args)
 		time_spent_total = time.time() - start_time_total

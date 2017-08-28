@@ -29,19 +29,22 @@ def _set(args):
 
 
 #Gathers Record Types NS, MX
-def dns_records(domain, myResolver):
+def dns_records(args):
 	info('Gathering DNS Details')
+	my_resolver = _set(args)
+	domain = args.domain
 	ns_list = []
 	zn_list =[]
 	mx_list = []
 	try:
 		print "\nName Server:\n"
-		myAnswers = myResolver.query(domain, "NS")
+		myAnswers = my_resolver.query(domain, "NS")
 		for data in myAnswers.rrset:
-			data = (str(data).rstrip('.'))
-			addr = socket.gethostbyname(data)
-			ns_list.append(data + '\t' + addr)
-			zn_list.append(data)
+			hostname = str(data.target).strip('.')
+			answers = my_resolver.query(hostname)
+			for rdata in answers:
+				ns_list.append(hostname + '\t' + rdata.address)
+			zn_list.append(hostname)
 			list(set(ns_list))
 			ns_list.sort()
 		for i in ns_list:
@@ -59,16 +62,17 @@ def dns_records(domain, myResolver):
 		print('\tTimeouted\nConfirm The Domain Name Is Correct.')
 		sys.exit()
 	except Exception:
-		info(traceback.print_exc())
+		print traceback.print_exc()
 		print('An Unhandled Exception Has Occured, Please Check The Log For Details\n')
 
 	try:
 		print "\nMail Server:\n"
-		myAnswers = myResolver.query(domain, "MX")
-		for data in myAnswers:
-			data = (str(data).split(' ',1)[1].rstrip('.'))
-			addr = socket.gethostbyname(data)
-			mx_list.append(data + '\t' + addr)
+		myAnswers = my_resolver.query(domain, "MX")
+		for data in myAnswers.rrset.items:
+			hostname = str(data).split(' ')[1].strip('.')
+			answers = my_resolver.query(hostname)
+			for rdata in answers:
+				mx_list.append(hostname + '\t' + rdata.address)
 		list(set(mx_list))
 		mx_list.sort()
 		for i in mx_list:
@@ -87,9 +91,11 @@ def dns_records(domain, myResolver):
 
 
 #Checks Valid Domain Entry
-def domain_check(domain, myResolver):
+def domain_check(args):
 	try:
-		myAnswers = myResolver.query(domain, "NS")
+		domain = args.domain
+		my_resolver = _set(args)
+		myAnswers = my_resolver.query(domain, "NS")
 		dom = str(myAnswers.canonical_name).strip('.')
 		if dom:
 			pass
@@ -108,8 +114,6 @@ def domain_check(domain, myResolver):
 
 
 def main(args):
-	domain = args.domain
-	my_resolver = _set(args)
-	domain_check(domain, my_resolver)
-	dns_records(domain, my_resolver)
+	domain_check(args)
+	dns_records(args)
 
