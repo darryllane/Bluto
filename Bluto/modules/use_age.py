@@ -5,9 +5,7 @@ def des():
 
 Description:
 
-    DNS Recon | Brute Forcer | DNS Zone Transfer | DNS Wild Card Checks | DNS Wild Card Brute Forcer
-    Email Enumeration | Staff Enumeration | Compromised Account Enumeration | MetaData Harvesting
-	Web Inspection
+    Filler
 
     Author:  Darryl Lane
     Twitter: @darryllane101
