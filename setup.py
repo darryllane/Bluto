@@ -16,7 +16,7 @@ setup(
     long_description=open('README.md').read(),
     scripts=['Bluto/bluto'],
     install_requires=[
-    	"docopt"
+    	"docopt",
         "dnspython",
         "termcolor",
         "BeautifulSoup4",
