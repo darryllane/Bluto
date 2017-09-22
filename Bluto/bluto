@@ -62,7 +62,7 @@ from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
-version = '2.4.5'
+version = '2.4.6'
 
 title = """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
