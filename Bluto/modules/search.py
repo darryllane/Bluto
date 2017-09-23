@@ -166,7 +166,8 @@ def action_emailHunter(domain, api, user_agents, q, prox):
                 q.put(None)
                 return None
         else:
-            raise ValueError('No Response From Hunter')
+            info('No Response From Hunter')
+            q.put(None)
     except UnboundLocalError,e:
         print e
     except KeyError:

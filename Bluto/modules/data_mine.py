@@ -95,7 +95,7 @@ def action_download(doc_list, docs):
 			info(str(doc).replace('%20', ' '))
 			pass
 	if i < 1:
-		sys.exit()
+		return download_list
 	data_size = get_size(docs)
 	print '\tData Downloaded: {}MB'.format(str(math.floor(data_size)))
 	info('Documents Downloaded: {}'.format(initial_count))
@@ -267,3 +267,5 @@ def doc_start(domain, USERAGENT_F, prox, q):
 		software_list = []
 		info('The Hunt Ended')
 		q.put((user_names, software_list, download_count, download_list))
+	elif (user_names_t and software_list) is None:
+		q.put(None)

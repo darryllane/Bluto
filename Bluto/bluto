@@ -256,10 +256,13 @@ if __name__ == "__main__":
                 start_download_time = time.time()
                 t5.start()
                 t5.join()
+
                 time_spent_download = time.time() - start_download_time
                 google_true_results = q1.get()
                 bing_true_results = q2.get()
                 linkedin_results = q3.get()
+                if q5.empty():
+                    q5.put(None)
                 data_mine = q5.get()
                 start_time_brute = time.time()
                 targets = action_brute_start(subs, myResolver)
@@ -330,3 +333,5 @@ if __name__ == "__main__":
         print '\n\nRage Quit!..'
         info('Keyboard Interrupt From User\n')
         sys.exit()
+    except Exception,e:
+        print e
