@@ -50,7 +50,7 @@ Note: To test if pip is already installed execute.
 
 (1) Once `pip` has successfully downloaded and installed, we can install Bluto:
 
-`sudo pip install git+git://github.com/darryllane/Bluto`
+`sudo pip install bluto`
 
 (2) You should now be able to execute 'bluto' from any working directory in any terminal.
  
@@ -60,7 +60,7 @@ Note: To test if pip is already installed execute.
 
 (1) The upgrade process is as simple as;
 
-`sudo pip install git+git://github.com/darryllane/Bluto --upgrade`
+`sudo pip install bluto --upgrade`
 
 
 **Install From Dev Branch**
