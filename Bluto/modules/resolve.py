@@ -10,13 +10,12 @@ import dns.resolver
 import random
 import string
 from termcolor import colored
-from logger_ import info
+from .logger_ import info
 
 
 #Settings DNS Timout Values
 def _set(args):
 	ns_list= []
-	info('Setting Up Resolver')
 	timeout_value = args.timeo
 	if not timeout_value:
 		timeout_value = 5
@@ -30,14 +29,14 @@ def _set(args):
 
 #Gathers Record Types NS, MX
 def dns_records(args):
-	info('Gathering DNS Details')
+	info('gathering dns records')
 	my_resolver = _set(args)
 	domain = args.domain
 	ns_list = []
 	zn_list =[]
 	mx_list = []
 	try:
-		print "\nName Server:\n"
+		print ("\nName Server:\n")
 		myAnswers = my_resolver.query(domain, "NS")
 		for data in myAnswers.rrset:
 			hostname = str(data.target).strip('.')
@@ -48,45 +47,47 @@ def dns_records(args):
 			list(set(ns_list))
 			ns_list.sort()
 		for i in ns_list:
-			print colored(i, 'green')
+			print (colored(i, 'green'))
 
 	except dns.resolver.NoNameservers:
-		print('\tNo Name Servers\nConfirm The Domain Name Is Correct.')
+		print('\nNo Name Servers\nConfirm The Domain Name Is Correct\n')
 		sys.exit()
 	except dns.resolver.NoAnswer:
-		print "\tNo DNS Servers"
+		print ("\tNo DNS Servers")
 	except dns.resolver.NXDOMAIN:
 		print("\tDomain Does Not Exist")
 		sys.exit()
 	except dns.resolver.Timeout:
-		print('\tTimeouted\nConfirm The Domain Name Is Correct.')
+		print('\nTimeout\nConfirm The Domain Name Is Correct\n')
 		sys.exit()
 	except Exception:
-		print traceback.print_exc()
+		print (traceback.print_exc())
 		print('An Unhandled Exception Has Occured, Please Check The Log For Details\n')
 
 	try:
-		print "\nMail Server:\n"
+		print ("\nMail Server:\n")
 		myAnswers = my_resolver.query(domain, "MX")
 		for data in myAnswers.rrset.items:
 			hostname = str(data).split(' ')[1].strip('.')
 			answers = my_resolver.query(hostname)
 			for rdata in answers:
 				mx_list.append(hostname + '\t' + rdata.address)
-		list(set(mx_list))
-		mx_list.sort()
-		for i in mx_list:
-			print colored(i, 'green')
+		if mx_list:
+			list(set(mx_list))
+			mx_list.sort()
+			for i in mx_list:
+				print (colored(i, 'green'))
+		else:
+			print (colored('\n\tNo Mail Servers', 'red'))
 	except dns.resolver.Timeout:
-		pass
+		print (colored('Timeout', 'red'))
 	except socket.gaierror:
 		pass
 	except dns.resolver.NoAnswer:
-		print "\tNo Mail Servers"
+		print ("\tNo Mail Servers")
 	except Exception:
+		info('An Unhandled Exception Has Occured, Please Check The Log For Details')
 		info(traceback.print_exc())
-		info('An Unhandled Exception Has Occured, Please Check The Log For Details\n')
-	info('\nCompleted Gathering DNS Details')
 	return zn_list
 
 
@@ -100,18 +101,17 @@ def domain_check(args):
 		if dom:
 			pass
 	except dns.resolver.NoNameservers:
-		print '\nError: Domain Not Valid\n\nHave you typed the domain name correctly?\nYou Entered: {}'.format(domain)
+		print ('\nError: Domain Not Valid\n\nHave you typed the domain name correctly?\nYou Entered: {}'.format(domain))
 		sys.exit()
 	except dns.resolver.NXDOMAIN:
-		print '\nError: Domain Not Valid\n\nHave you typed the domain name correctly?\nYou Entered: {}'.format(domain)
+		print ('\nError: Domain Not Valid\n\nHave you typed the domain name correctly?\nYou Entered: {}'.format(domain))
 		sys.exit()
 	except dns.exception.Timeout:
-		print '\nError: Timeout\n\nAre you connected to the internet?\nHave you typed the domain name correctly?'
+		print ('\nError: Timeout\n\nAre you connected to the internet?\nHave you typed the domain name correctly?')
 		sys.exit()
 	except Exception:
+		info('An Unhandled Exception Has Occured, Please Check The Log For Details')
 		info(traceback.print_exc())
-		info('An Unhandled Exception Has Occured, Please Check The Log For Details\n')
-
 
 def main(args):
 	domain_check(args)

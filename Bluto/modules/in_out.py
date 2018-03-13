@@ -6,6 +6,7 @@ import os
 import collections
 import re
 import operator
+from .logger_ import info
 
 class gather:
 	def __init__(self, filename=None, search_results=None, time_spent=None, clean_dump=None, sub_intrest=None, domain=None, report_location=None, company=None, check_count=None, args=None):
@@ -25,26 +26,37 @@ class gather:
 		try:
 			lines = [line.rstrip('\n') for line in open(filename)]
 			line_count = sum(1 for line in open(filename))
-		except IOError, e:
-			print e
+		except IOError as e:
+			print('File not found, exiting')
+			info('file not found: {}'.format(filename))
+			info(traceback.print_exc())
+			sys.exit()
 		except Exception:
-			print traceback.print_exc()
 			print('An Unhandled Exception Has Occured, Please Check The Log For Details')
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details')
+			info(traceback.print_exc())
 			sys.exit()
 		return (lines, line_count)
 
 	def get_subs(self, filename, domain):
-		print('Gathering SubDomains')
+		info('gathering subdomains')
 		full_list = []
 		try:
 			subs = [line.rstrip('\n') for line in open(filename)]
 			for sub in subs:
 				full_list.append(str(sub.lower() + "." + domain))
-		except Exception:
-			print('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
+		except IOError as e:
+			print('File not found, exiting')
+			info('file not found: {}'.format(filename))
+			info(traceback.print_exc())
 			sys.exit()
+		except Exception:
+			print('An Unhandled Exception Has Occured, Please Check The Log For Details')
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details')
+			info(traceback.print_exc())
+			sys.exit()		
 
-		print('Completed Gathering SubDomains')
+		info('completed gathering subdomains')
 		return full_list
 
 	def top_list(self, filename, args):
@@ -58,8 +70,17 @@ class gather:
 		try:
 			for row in sorted_data:
 				top_list.append(row[0])
-		except IOError:
-			print 'FileError'
+		except IOError as e:
+			print('File not found, exiting')
+			info('file not found: {}'.format(filename))
+			info(traceback.print_exc())
+			sys.exit()
+		except Exception:
+			print('An Unhandled Exception Has Occured, Please Check The Log For Details')
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details')
+			info(traceback.print_exc())
+			sys.exit()		
+			
 		return top_list
 
 
