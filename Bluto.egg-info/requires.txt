@@ -1,3 +1,4 @@
+docopt
 dnspython
 termcolor
 BeautifulSoup4

@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: Bluto
-Version: 2.4.4
+Version: 2.4.7
 Summary: 
     DNS Recon | Brute Forcer | DNS Zone Transfer | DNS Wild Card Checks
     DNS Wild Card Brute Forcer | Email Enumeration | Staff Enumeration
@@ -61,7 +61,7 @@ Description: **BLUTO**
         
         (1) Once `pip` has successfully downloaded and installed, we can install Bluto:
         
-        `sudo pip install git+git://github.com/darryllane/Bluto`
+        `sudo pip install bluto`
         
         (2) You should now be able to execute 'bluto' from any working directory in any terminal.
          
@@ -71,7 +71,7 @@ Description: **BLUTO**
         
         (1) The upgrade process is as simple as;
         
-        `sudo pip install git+git://github.com/darryllane/Bluto --upgrade`
+        `sudo pip install bluto --upgrade`
         
         
         **Install From Dev Branch**
@@ -91,6 +91,9 @@ Description: **BLUTO**
         
         Changelog
         ====
+        * Version __2.4.7__ (__20/07/2018__):
+          * GeoIP lookup refactor
+          
         * Version __2.3.10__ (__13/01/2017__):
           * BugFixes
           
