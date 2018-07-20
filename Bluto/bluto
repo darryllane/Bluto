@@ -28,6 +28,13 @@ Options:
 
 import sys
 import site
+
+SITES = site.getsitepackages()
+for item in SITES:
+    if os.path.exists(item + "/Bluto/modules/__init__.py"):
+        path = item
+        sys.path.append(path + '/Bluto/')
+
 import os
 import time
 import threading
@@ -48,12 +55,6 @@ from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
 
-SITES = site.getsitepackages()
-for item in SITES:
-    if os.path.exists(item + "/Bluto/modules/__init__.py"):
-        path = item
-        sys.path.append(path + '/Bluto/')
-
 path = os.path.dirname(os.path.realpath(__file__))
 
 FILENAME_1 = path + "/doc/subdomains-top1mil-20000.txt"
@@ -62,7 +63,7 @@ USERAGENT_F = path + "/doc/user_agents.txt"
 COUNTRIES_FILE = path + "/doc/countries.txt"
 INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
 
-version = '2.4.8'
+version = '2.4.9'
 
 title = """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
