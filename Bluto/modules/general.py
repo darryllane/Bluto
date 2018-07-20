@@ -134,12 +134,12 @@ def action_country_id(countries_file, prox):
         try:
             if prox == True:
                 proxy = {'https' : 'http://127.0.0.1:8080'}
-                r = requests.get(r'https://freegeoip.net/json/', proxies=proxy, verify=False)
+                r = requests.get(r'http://api.ipstack.com/check?access_key=dd763372274e9ae8aed34a55a7a4b36a', proxies=proxy, verify=False)
                 ip = r.json()['ip']
                 originCountry = r.json()['country_name']
 
             else:
-                r = requests.get(r'http://freegeoip.net/json/', verify=False)
+                r = requests.get(r'http://api.ipstack.com/check?access_key=dd763372274e9ae8aed34a55a7a4b36a', verify=False)
                 ip = r.json()['ip']
                 originCountry = r.json()['country_name']
 

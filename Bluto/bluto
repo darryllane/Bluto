@@ -29,21 +29,6 @@ Options:
 import sys
 import site
 import os
-
-SITES = site.getsitepackages()
-for item in SITES:
-    if os.path.exists(item + "/Bluto/modules/__init__.py"):
-        path = item
-        sys.path.append(path + '/Bluto/')
-
-
-FILENAME_1 = path + "/Bluto/doc/subdomains-top1mil-20000.txt"
-FILENAME_2 = path + "/Bluto/doc/sub_interest.txt"
-USERAGENT_F = path + "/Bluto/doc/user_agents.txt"
-COUNTRIES_FILE = path + "/Bluto/doc/countries.txt"
-INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
-
-
 import time
 import threading
 import Queue
@@ -61,6 +46,15 @@ from modules.output import action_output_vuln_zone, action_output_wild_false, ac
 from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
+
+
+path = os.path.dirname(os.path.realpath(__file__))
+
+FILENAME_1 = path + "/doc/subdomains-top1mil-20000.txt"
+FILENAME_2 = path + "/doc/sub_interest.txt"
+USERAGENT_F = path + "/doc/user_agents.txt"
+COUNTRIES_FILE = path + "/doc/countries.txt"
+INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
 
 version = '2.4.6'
 
@@ -91,14 +85,7 @@ desc = """  {2} | {3} | {4} | {9}
                      {5}
 """ . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + version, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'), colored("MetaData Mining", 'green'))
 
-prox = False
-
-for item in SITES:
-    if os.path.exists(item + "/Bluto/doc/subdomains-top1mil-20000.txt"):
-        path = item
-        info('Application Path Identified: ' + path)
-    else:
-        pass
+prox = True
 
 if __name__ == "__main__":
     info('\nBluto Started')
