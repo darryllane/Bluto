@@ -54,16 +54,13 @@ from modules.data_mine import doc_start
 from modules.bluto_logging import info
 from modules.update import update, updateCheck
 
-
-path = os.path.dirname(os.path.realpath(__file__))
-
-FILENAME_1 = path + "/doc/subdomains-top1mil-20000.txt"
-FILENAME_2 = path + "/doc/sub_interest.txt"
-USERAGENT_F = path + "/doc/user_agents.txt"
-COUNTRIES_FILE = path + "/doc/countries.txt"
+FILENAME_1 = path + "/Bluto/doc/subdomains-top1mil-20000.txt"
+FILENAME_2 = path + "/Bluto/doc/sub_interest.txt"
+USERAGENT_F = path + "/Bluto/doc/user_agents.txt"
+COUNTRIES_FILE = path + "/Bluto/doc/countries.txt"
 INFO_LOG_FILE = os.path.expanduser('~/Bluto/log/bluto-info.log')
 
-version = '2.4.10'
+version = '2.4.11'
 
 title = """
  BBBBBBBBBBBBBBBBB  lllllll                       tttt
