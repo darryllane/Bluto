@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Bluto',
-    version='2.4.7',
+    version='2.4.8',
     author='Darryl lane',
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
