@@ -80,6 +80,9 @@ Change/Feature Requests
 
 Changelog
 ====
+* Version __2.4.7__ (__20/07/2018__):
+  * GeoIP lookup refactor
+  
 * Version __2.3.10__ (__13/01/2017__):
   * BugFixes
   
