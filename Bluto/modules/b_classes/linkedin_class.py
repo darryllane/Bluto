@@ -10,10 +10,11 @@ import os
 import socket
 import traceback
 import sys
+import json
 import pythonwhois
 import multiprocessing as mp
 
-from ..logger_ import info
+from ..logger_ import info, error
 from tqdm import tqdm
 from pyvirtualdisplay import Display
 from termcolor import colored
@@ -62,7 +63,7 @@ class FindPeople(object):
 			output = mp.Queue()
 			self.output = output
 
-			username, password = args.linkA.split(args.delemiter)
+			username, password = args.la.split(args.deli)
 			domain = args.domain
 			cpage, page = page_limits.split(':')
 
@@ -102,9 +103,9 @@ class FindPeople(object):
 			info('failed to login')
 			return
 		except Exception:
-			print('An Unhandled Exception Has Occured, Please Check The Log For Details')
-			info('An Unhandled Exception Has Occured, Please Check The Log For Details')
-			info(traceback.print_exc())
+			print('An Unhandled Exception Has Occured, Please Check The \'Error log\' For Details')
+			info('An Unhandled Exception Has Occured, Please Check The \'Error log\' For Details')
+			error(traceback.print_exc())
 			return
 
 
@@ -161,7 +162,7 @@ class FindPeople(object):
 				company = temp_company
 				print('\nSearching LinkedIn companies for {}\n'.format(company.title()))
 				self.company_name = company
-				return
+				return company
 			elif confirmed.lower() in ('n', 'no'):
 				continue
 			else:
@@ -297,7 +298,7 @@ class FindPeople(object):
 					self.company_found = True
 					return
 
-				data = soup.find('div', {'class': 'search-results__cluster-content'})
+				data = soup.find('div', {'class': 'search-results ember-view'})
 
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
 
@@ -305,15 +306,15 @@ class FindPeople(object):
 					try:
 						company_item = each.find('div', {'class': 'search-result__info'})
 						if company_item.find('h3', {'class':'search-result__title'}):
-							company_name = company_item.find('h3', {'class':'search-result__title'}).text
+							company_name = company_item.find('h3', {'class':'search-result__title'}).text.replace('.', '').replace('\n', '').strip()
 							#print company_name
 						if company_item.find('p', {'class':'subline-level-1'}):
-							company_type = company_item.find('p', {'class':'subline-level-1'}).text
+							company_type = company_item.find('p', {'class':'subline-level-1'}).text.replace('.', '').replace('\n', '').strip()
 							#print company_type
 						else:
 							company_type = None
 						if company_item.find('p', {'class':'subline-level-2'}):
-							company_people = company_item.find('p', {'class':'subline-level-2'}).text
+							company_people = company_item.find('p', {'class':'subline-level-2'}).text.replace('.', '').replace('\n', '').strip()
 							#print company_people
 						else:
 							company_people = None
@@ -322,26 +323,27 @@ class FindPeople(object):
 							company_number = data['href'].replace('/company/', '').replace('/', '')
 						#print '\n'
 
-						if all((company_name, company_type, company_people, company_number)):
-							company_details.append((company_name, company_type, company_people, company_number))
-							if self.company_name.lower() in company_name.lower():
-								print('Is This the correct company?')
-								tmp = colored('{}\n', 'green').format(company_name)
-								confirmed = input('\n{}'.format(tmp) + '{}\n{}'.format(company_type, company_people) + '\n\n' + colored('(y|n)','yellow') )
-								if confirmed.lower() in ('y', 'yes'):
-									tmp = colored(company_name, 'green')
-									print('\nTarget Company Identified:\n')
-									print('\t' + company_name)
-									print('\t' + company_type)
-									print('\t' + company_people)
-									print('\nSearching LinkedIn for ' + tmp + ' staff members\n')
-									self.company_number = company_number
-									self.company_found = True
-									return
-								elif confirmed.lower() in ('n', 'no'):
-									continue
-								else:
-									self.negative(confirmed)
+						company_details.append((company_name, company_type, company_people, company_number))
+						if self.company_name.lower() in company_name.lower():
+							print('Is This the correct company?')
+							tmp = colored('{}\n', 'green').format(company_name)
+							if company_people == None:
+								company_people = ''
+							confirmed = input('\n{}'.format(tmp) + '{}\n{}'.format(company_type, company_people) + '\n\n' + colored('(y|n)','yellow') )
+							if confirmed.lower() in ('y', 'yes'):
+								tmp = colored(company_name, 'green')
+								print('\nTarget Company Identified:\n')
+								print('\t' + str(company_name))
+								print('\t' + str(company_type))
+								print('\t' + str(company_people))
+								print('\nSearching LinkedIn for ' + tmp + ' staff members\n')
+								self.company_number = company_number
+								self.company_found = True
+								return
+							elif confirmed.lower() in ('n', 'no'):
+								continue
+							else:
+								self.negative(confirmed)
 
 					except Exception as e_rror:
 						print('An Unhandled Exception Has Occured, Please Check The Log For Details')
@@ -371,10 +373,9 @@ class FindPeople(object):
 		people_details = []
 
 		for page in tqdm(range(1, self.staff_page)):
-			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany=\
-			[%22{}%22]&page={}'.format(self.company_number, page))
+			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, page))
 
-			time.sleep(2)
+			time.sleep(4)
 			html = self.browser.page_source
 			try:
 				if 'No results found' in self.browser.page_source:
@@ -386,7 +387,7 @@ class FindPeople(object):
 				return
 			soup = BeautifulSoup(html, "lxml")
 
-			data = soup.find('ul', {'class': 'results-list ember-view'})
+			data = soup.find('ul', {'class': 'search-results__list'})
 			#print data.contents
 			if data:
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
@@ -398,8 +399,13 @@ class FindPeople(object):
 						else:
 
 							if li_item.find('span', {'class', 'name actor-name'}):
+								
 								name = li_item.find('span', {'class', 'name actor-name'}).text.replace('\n', '').rstrip()
-								img_url = li_item.find('img', {'class', 'lazy-image'})['src']
+								img_url_tmp = li_item.find('div', {'class', 'presence-entity presence-entity--size-4 ember-view'})
+								if re.match('.*url\(\"(http[s|]\:\/\/.*?)\"\).*', str(img_url_tmp)):
+									img_url = re.match('.*url\(\"(http[s|]\:\/\/.*?)\"\).*', str(img_url_tmp)).group(1)
+								else:
+									img_url = 'None'
 								#print name
 								if name.lower() == 'LinkedIn Member'.lower():
 									i += 1
@@ -414,10 +420,10 @@ class FindPeople(object):
 									pass
 								else:
 									SEEN.append(name)
-									people_details.append(("name;" + name.strip(),
-										                      "role;" + job.strip(),
-										                      "location;" + location.strip(),
-										                      "image;" + img_url.strip().replace("image:", '')))
+									people_details.append(("name:" + name.strip(),
+										                      "role:" + job.strip(),
+										                      "location:" + location.strip(),
+										                      "image:" + img_url))
 
 
 								if li_item.find('div', {'class', 'search-result__profile-blur'}):
@@ -441,7 +447,11 @@ class FindPeople(object):
 						if 'location' in e_rror:
 							location = None
 						continue
+					except TypeError as e:
+						print(traceback.print_exc())
+						continue
 					except Exception:
+						print(traceback.print_exc())
 						info('An Unhandled Exception Has Occured, Please Check The Log For Details')
 						info(traceback.print_exc())
 					try:

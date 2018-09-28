@@ -5,12 +5,11 @@ import traceback
 import sys
 import os
 from termcolor import colored
-from modules.resolve import main as resolve_dns
-from modules import execute
-from modules.logger_ import info
+from modules.logger_ import info, error
 from modules import descriptor_
 from modules.use_age import debug_out
 from modules.b_classes.thread_class import MakeThread
+
 
 
 def value_check(args):
@@ -20,8 +19,8 @@ def value_check(args):
 	if args.version:
 		descriptor_.welcome(args)
 		sys.exit()
-	if args.linkA:
-		count = args.linkA.count(args.delemiter)
+	if args.la:
+		count = args.la.count(args.deli)
 		if count > 1:
 			print('You seem to have multiple delemiter characters in the argument value.\nPlease double check your entry or specificy a custom delimitter.')
 		elif count < 1:
@@ -29,10 +28,20 @@ def value_check(args):
 			parser.print_help()
 			sys.exit()
 	else:
-		args.linkP = True
+		args.lp = False
+	
+	if args.proxy:
+		if ':' in args.proxy:
+			pass
+		else:
+			print('You seem to be missing the delemiter \':\' character in your proxy.\n')
+			error('missing proxy delimitter')
+			parser.print_help()
+			sys.exit()
 
 
-parser = argparse.ArgumentParser(prog='Bluto', formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(prog,max_help_position=50), usage=descriptor_.des())
+
+parser = argparse.ArgumentParser(prog='Bluto', formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(prog,max_help_position=50))
 
 requiredNamed = parser.add_argument_group('Required Arguments')
 requiredNamed.add_argument('-d', '--domain', help='Target Domain', required=True)
@@ -40,22 +49,25 @@ requiredNamed.add_argument('-d', '--domain', help='Target Domain', required=True
 zn_group = parser.add_argument_group('DNS Arguments', 'DNS related checks ')
 zn_group.add_argument('-b', '--brute', help='Enable SubDomain bruteforcing', required=False, action='store_true')
 zn_group.add_argument('-z', '--zone', help='Enable ZoneTransfer Checks', required=False, action='store_true')
+zn_group.add_argument('-ts', '--top', help='Most popular subdomains eg. Top1000', required=False)
 
 linked_group = parser.add_argument_group('LinkedIn', 'LinkedIn search method and arguments')
-linked_group.add_argument('-la', '--linkA', help='Active login (most accurate results) example:\'username:password\'')
-linked_group.add_argument('-lp', '--linkP', help='Passively gather data from search engines',action='store_true', default=False)
-linked_group.add_argument('-del', '--delemiter', help='Custom delimter for LinkedInActive', default=':')
+linked_group.add_argument('-la', help='Active eg:\'username:password\'')
+linked_group.add_argument('-lp', help='Passive',action='store_true', default=False)
+linked_group.add_argument('-deli', help='Custom delimter for Active', default=':')
 
-parser.add_argument('-i', '--intrusive', help='Authoritive DNS query.', required=False, action='store_true')
+parser.add_argument('-i', '--intrusive', help='Authoritive DNS query', required=False, action='store_true')
 parser.add_argument('-e', '--email', help='Enable Email Enumeration', required=False, action='store_true')
 parser.add_argument('-a', '--api', help='Hunter API key', required=False)
 parser.add_argument('-t', '--timeo', help='Set timeout value | Default 5', required=False)
-parser.add_argument('-ts', '--top', help='Most popular subdomains eg. Top1000', required=False)
+parser.add_argument('-p', '--proxy', help='eg 127.0.0.0:8080', required=False)
+
 parser.add_argument('-dns', '--dns', help='Carry out DNS enumeration', required=False, action='store_true')
 
 parser.add_argument('--debug', help=argparse.SUPPRESS, required=False, action='store_true')
 parser.add_argument('--VERSION_CONST', help=argparse.SUPPRESS, required=False)
 parser.add_argument('--COMPANY_LOC', help=argparse.SUPPRESS, required=False)
+parser.add_argument('--ZONE_RESULT', help=argparse.SUPPRESS, required=False)
 parser.add_argument('-v', '--version', help='print version', required=False, action='store_true') 
 args = parser.parse_args()
 
@@ -65,48 +77,67 @@ if __name__ == "__main__":
 	value_check(args)
 	descriptor_.welcome(args)
 	func_list = []
+	func_order = []
+	
 	if args.debug:
 		info('debug enabled')
 		print (colored('Debug Enabled:','red', 'on_yellow'))
 		print (colored('Arg Output', 'red', 'on_yellow'))
 		debug_out(args.__dict__)
-	try:
-		if args.dns is False and args.brute is False and args.zone is False:
-			resolve_dns(args)
-			execute._brute(args)
-
-		else:
-			if args.dns:
-				info('dns enumeration started')
-				resolve_dns(args)
-			if args.brute is False and args.zone is True:
-				info('zone transfer check started')
-				execute.zone_trans(args)
-			if args.brute:
-				info('sub bruting started')
-				execute._brute(args)
-			if args.linkA:
-				info('active linkedin search started')
-				func_list.append(('linkedIn', args))
-			if (args.api) or (args.email):
-				info('email hunter started')
-				'placeholder'
-
-		if args.linkA:
-			func_list.append(('linkedIn', args))
-
+	try:		
+		if args.dns:
+			func_order.append('Dns')
+		if args.zone:
+			func_order.append('Zone')
+		if args.la:
+			func_order.append('LinkedIna')
+			
+		if func_order:
+			info('thread order pool populating')
+			jobs = MakeThread(func_order, args)
+			threads = jobs.order_exe()
+			for thread in threads:
+				if thread.name == 'Dns':
+					info('dns enumeration started')
+					thread.start()
+					thread.join()					
+				elif thread.name == 'Zone':
+					info('zone transfer check started')
+					thread.start()
+					thread.join()					
+				elif thread.name == 'LinkedIna':
+					info('active linkedin search started')
+					thread.start()
+					thread.join()					
+					
+		
+		if args.brute:
+			info('sub bruting started')
+			func_list.append('Brute')		
+		if args.lp:
+			info('passive linkedin search started')
+			func_list.append('linkedInp')						
+		if args.email:
+			info('email hunter started')
+			func_list.append('Email')
+		
+		
 		if func_list:
-			info('thread pool populating')
-			jobs = MakeThread(func_list)
-			threads = jobs.execute()
+			info('thread unordered pool populating')
+			jobs = MakeThread(func_list, args)
+			threads = jobs.unordered_exe()
 			for thread in threads:
 				thread.start()
-
 			for thread in threads:
 				thread.join()
+		
 		print('\n')
+				
 	except Exception:
-		print (traceback.print_exc())
+		print('An unhandled exception has occured, please check the \'Error log\' for details')
+		info('An unhandled exception has occured, please check the \'Error log\' for details')
+		error(traceback.print_exc())
 	except KeyboardInterrupt:
+		info('user abort via CTRL-C')
 		print ('\n\nRage Quit!!')
 

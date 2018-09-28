@@ -1,17 +1,21 @@
 import json
 import os
-from .logger_ import info
+import traceback
+from .logger_ import info, error
 
 def write_html(users, company_details, args):
-
-	LOG_ROOT = os.path.expanduser('~/Bluto/')
-	COMPANY_LOC = LOG_ROOT+'{}'.format(str(args.domain).split('.', 1)[0])
-	args.COMPANY_LOC = COMPANY_LOC
-	if not os.path.exists(COMPANY_LOC):
-		os.makedirs(COMPANY_LOC)
-		os.chmod(COMPANY_LOC, 0o700)
-	
-	users = json.loads(users)
+	try:
+		LOG_ROOT = os.path.expanduser('~/Bluto/')
+		COMPANY_LOC = LOG_ROOT+'{}'.format(str(args.domain).split('.', 1)[0])
+		args.COMPANY_LOC = COMPANY_LOC
+		if not os.path.exists(COMPANY_LOC):
+			os.makedirs(COMPANY_LOC)
+			os.chmod(COMPANY_LOC, 0o700)
+		
+	except Exception:
+		print('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		info('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		error(traceback.print_exc())
 
 	info('HTML report initialised')
 	head = '''
@@ -120,7 +124,9 @@ def write_html(users, company_details, args):
 			myFile.write(body_end)
 			myFile.close()
 			info('Completed HTML Report')
-	except IOError as e:
-		info('IOError', exc_info=True)
+	except IOError:
+		error('IOError', exc_info=True)
 	except Exception:
-		info('An Unhandled Exception Occured', exc_info=True)
+		print('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		info('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		error(traceback.print_exc())

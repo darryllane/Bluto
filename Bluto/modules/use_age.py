@@ -49,3 +49,14 @@ def debug_out(value):
 	if isinstance(value, list):
 		clean_dump = {'key': [item for item in value] }
 		print (json.dumps(clean_dump, indent=4, sort_keys=True))
+
+
+def bluto_use():
+	now = datetime.datetime.now()
+	try:
+		link = "http://darryllane.co.uk/bluto/log_use.php"
+		payload = {'country': countryID, 'Date': now}
+		requests.post(link, data=payload)
+	except Exception:
+		info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
+		pass

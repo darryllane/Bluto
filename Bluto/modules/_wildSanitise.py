@@ -2,7 +2,6 @@ import random
 import threading
 import string
 import dns.resolver
-from .resolve import _set, main, dns_records, domain_check
 import queue as Queue
 import traceback
 from multiprocessing.dummy import Pool as ThreadPool
@@ -37,8 +36,10 @@ def _ramdomGet(myResolver, domain):
 		pass
 	except dns.name.EmptyLabel:
 		pass
-	except Exception as e:
-		print (traceback.print_exc())
+	except Exception:
+		print('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		info('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		error(traceback.print_exc())
 	return data
 
 
@@ -58,22 +59,27 @@ def _wildClean(sub_list, rand_response):
 				pass
 			else:
 				target_results.append(host)
-		except Exception as e:
-			print (traceback.print_exc())
+		except Exception:
+			print('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+			info('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+			error(traceback.print_exc())
 	try:
 		while not q1.empty():
 			pool = ThreadPool(100)
 			pool.map(worker, q1.get())
 		pool.close()
 
-	except Exception as e:
-		print (traceback.print_exc())
+	except Exception:
+		print('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		info('An Unhandled Exception Has Occured, Please Check The \'Error\' For Details')
+		error(traceback.print_exc())
 
 	return target_results
 
 def main(sub_list, job_args):
+	
 	domain = job_args.domain
-	myResolver = _set(job_args)
+	myResolver = Dns._set(job_args)
 	rand_response = _ramdomGet(myResolver, domain)
 	target_results = _wildClean(sub_list, rand_response)
 	return target_results

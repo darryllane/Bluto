@@ -1,0 +1,16 @@
+beautifulsoup4==4.6.0
+bs4==0.0.1
+certifi==2018.4.16
+chardet==3.0.4
+dnspython==1.15.0
+EasyProcess==0.2.3
+idna==2.7
+lxml==4.2.3
+progressbar==2.5
+pythonwhois==2.4.3
+PyVirtualDisplay==0.2.1
+requests==2.19.1
+selenium==3.14.0
+termcolor==1.1.0
+tqdm==4.23.4
+urllib3==1.23
