@@ -235,6 +235,12 @@ class Dns:
 				match = re.match(pattern, str(soa_answer.rrset))
 				m_name, ttl, class_, ns, email, serial, refresh, retry, expiry, minim = match.groups()
 				soa_data = (m_name, ttl, class_, ns, str(email).replace('\\', ''), serial, refresh, retry, expiry, minim)
+				if self.args.soa:
+					print ('\nSOA Details:\n')
+					soa_json = soa_build(soa_data)
+					soa_json = json.loads(soa_json)
+					data = json.dumps(soa_json, indent=6, sort_keys=True)
+					print (colored(data, 'blue'))
 				z = dns.zone.from_xfr(dns.query.xfr(ns, domain, timeout=10, lifetime=10))
 				vuln = '{"vuln":true}'
 				info('vulnerable to zone transfers: {}'.format(soa_answer))

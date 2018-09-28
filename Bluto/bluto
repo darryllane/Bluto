@@ -63,7 +63,7 @@ parser.add_argument('-t', '--timeo', help='Set timeout value | Default 5', requi
 parser.add_argument('-p', '--proxy', help='eg 127.0.0.0:8080', required=False)
 
 parser.add_argument('-dns', '--dns', help='Carry out DNS enumeration', required=False, action='store_true')
-
+parser.add_argument('-soa', '--soa', help='Start of Authority record details', required=False, action='store_true')
 parser.add_argument('--debug', help=argparse.SUPPRESS, required=False, action='store_true')
 parser.add_argument('--VERSION_CONST', help=argparse.SUPPRESS, required=False)
 parser.add_argument('--COMPANY_LOC', help=argparse.SUPPRESS, required=False)
