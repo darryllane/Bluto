@@ -290,6 +290,8 @@ def doc_bing(domain, user_agents, prox, q):
                 document = h2.find('a', href=True)['href']
                 document = urllib2.unquote(document)
                 document_list.append(document)
+        except TypeError:
+            pass
         except requests.models.ChunkedEncodingError:
             continue
         except Exception:
