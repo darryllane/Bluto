@@ -17,7 +17,7 @@ def linkedIna(params):
 	args = params[0][0]
 	q1 = params[0][1]
 	people = []
-	obj = FindPeople(args, page_limits='5:10', company_details='', company='', company_number='')
+	obj = FindPeople(args, page_limits='10:20', company_details='', company='', company_number='')
 	obj.company()
 	obj.people()
 	results = obj.output.get()
