@@ -25,6 +25,7 @@ class Search(object):
         initiat
         """
         info('email module init')
+        self.EmailQue = Queue.Queue()
         self.uas = []
         self.args =  args[0][0]
         self.proxy = self.args.proxy
@@ -88,16 +89,12 @@ class Search(object):
             break
 
     def google(self):
-        """Return the balance remaining after withdrawing *amount*
-        dollars.<em>{}</em>.format(self.args.domain)
-        
-        GOT HERE JUST FILTERING GOOGLE RESULTS
-        
+        """
+        Carry out Google search scrape for email addresses
+        on target domain
         
         !!!!remeber to cross reference email addresses with linkedin users for match
-        
         """
-        
         
         try:
             for country, server in self.countries_dic.items():
@@ -176,15 +173,15 @@ class Search(object):
                 error(traceback.print_exc(), exc_info=True)                               
             
         
-        return(email_seen)
+        self.EmailQue.put(email_seen)
              
                         
     def bing(self):
-        """Return the balance remaining after depositing *amount*
-        dollars.
+        """
+        Carry out Bing search scrape for email addresses
+        on target domain
         
-        
-        
+        !!!!remeber to cross reference email addresses with linkedin users for match
         """
         
         email_seen = []
@@ -230,26 +227,18 @@ class Search(object):
                 error(traceback.print_exc())                     
                                
         
-        return(email_seen)
+        self.EmailQue.put(email_seen)
     
     
     
     def exlead(self):
-        """Return the balance remaining after depositing *amount*
-        dollars.
-        find all
-        <p class="for li in soup.findAll('li', {'class': 'b_algo'}):">
+        """
+        Carry out Exlead search scrape for email addresses
+        on target domain
         
-        email
-        <span class="ellipsis">
-        
-        url
-        <a class="ellipsis" href="
-        
-        http://www.exalead.com/search/web/results/?q="@saga.co.uk"&search_language=&elements_per_page=80&start_index=1
+        !!!!remeber to cross reference email addresses with linkedin users for match
         """
         
-
         email_seen = []
 
         headers = {"Connection" : "close",
@@ -296,12 +285,16 @@ class Search(object):
                 error(traceback.print_exc())              
                 
         
-        return(email_seen)
+        self.EmailQue.put(email_seen)
     
     
     def baidu(self):
-        """Return the balance remaining after depositing *amount*
-        dollars."""
+        """
+        Carry out Baidu search scrape for email addresses
+        on target domain
+        
+        !!!!remeber to cross reference email addresses with linkedin users for match
+        """
     
         email_seen = []
         headers = {"User-Agent" : random.choice(self.uas).decode('utf-8'),
@@ -356,5 +349,5 @@ class Search(object):
                 error(traceback.print_exc())             
         
         
-        return(email_seen)    
-    
+        self.EmailQue.put(email_seen)
+        

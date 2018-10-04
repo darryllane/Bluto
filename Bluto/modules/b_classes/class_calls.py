@@ -7,9 +7,8 @@ from termcolor import colored
 import threading
 import json
 import traceback
+from queue import Queue
 
-global threads
-threads = []
 
 def linkedIna(params):
 	print ('\nActive LinkedIn Check:\n')
@@ -70,31 +69,12 @@ def Email(args):
 		search = Search(args)
 		print ("\nGathering Email Addresses:\n")
 		
-	
-		def worker(engine):
-			
-			if engine == 'baidu':
-				baidu_stash = search.baidu()
-			elif engine == 'exlead':
-				exlead_stash = search.exlead()
-			elif engine == 'bing':
-				bing_stash = search.bing()
-			elif engine == 'google':
-				google_stash = search.google()
-						
-							
-		engines = ['baidu', 'google', 'bing', 'exlead']
+		search.baidu()
+		search.exlead()
+		search.bing()
+		search.google()
 		
-		for engine in engines:
-			thread = threading.Thread(target=worker, args=(engine,))
-			threads.append(thread)
-			thread.start()
-			thread.join()
-			
-		
-		
-			
-		email_list = bing_stash + baidu_stash + exlead_stash + google_stash
+		email_list = search.EmailQue.get()
 		email_json = merge_dicts(email_list) 
 		
 		print (colored(json.dumps(email_json, indent=6, sort_keys=True), 'blue'))
