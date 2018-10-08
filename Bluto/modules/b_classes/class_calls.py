@@ -7,7 +7,6 @@ from termcolor import colored
 import threading
 import json
 import traceback
-from queue import Queue
 
 
 def linkedIna(params):
@@ -17,6 +16,8 @@ def linkedIna(params):
 	q1 = params[0][1]
 	people = []
 	obj = FindPeople(args, page_limits='10:20', company_details='', company='', company_number='')
+	if args[0][0].verbose:
+		print ("Page Limits Company10:People20")	
 	obj.company()
 	obj.people()
 	results = obj.output.get()
@@ -40,15 +41,14 @@ def linkedIna(params):
 		
 
 def Email(args):
-	
+	threads = []
 	email_list = []
 	def merge_dicts(email_list):
-		seen = []
-		diction = {'email':[]}
 		"""
 		Given any number of dicts, shallow copy and merge into a new dict,
 		precedence goes to key value pairs in latter dicts.
 		"""
+		seen = []	
 		result = {'email':[]}
 		fields = ['url', 'address']
 		email_list = [dict(zip(fields, d)) for d in email_list]
@@ -67,12 +67,23 @@ def Email(args):
 	try:
 
 		search = Search(args)
-		print ("\nGathering Email Addresses:\n")
+		if args[0][0].verbose:
+			print ("\nGathering Email Addresses:\n")
 		
-		search.baidu()
-		search.exlead()
-		search.bing()
-		search.google()
+		t1 = threading.Thread(target=search.baidu,)
+		t2 = threading.Thread(target=search.exlead,)
+		t3 = threading.Thread(target=search.bing,)
+		t4 = threading.Thread(target=search.google,)
+		threads.append(t1)
+		threads.append(t2)
+		threads.append(t3)
+		threads.append(t4)
+		for t in threads:
+			t.start()
+		
+		for t in threads:
+			t.join()
+	
 		
 		email_list = search.EmailQue.get()
 		email_json = merge_dicts(email_list) 
@@ -80,10 +91,11 @@ def Email(args):
 		print (colored(json.dumps(email_json, indent=6, sort_keys=True), 'blue'))
 		
 	except Exception:
-		print(traceback.print_exc())
-		print('An unhandled exception has occured, please check the \'Error log\' for details')
+		if args[0][0].verbose:
+			print('An unhandled exception has occured, please check the \'Error log\' for details')
+			print(traceback.print_exc())
 		info('An unhandled exception has occured, please check the \'Error log\' for details')
-		error(traceback.print_exc())
+		error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)
 
 
 def dns_gather(args):

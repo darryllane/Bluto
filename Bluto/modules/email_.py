@@ -3,12 +3,12 @@ import re
 import json
 import os
 import random
+import time
 import traceback
 import threading
-from multiprocessing import Queue
 from bs4 import BeautifulSoup
 from .logger_ import info, error
-import queue as Queue
+from multiprocessing import Queue
 
 requests.packages.urllib3.disable_warnings()
 
@@ -25,7 +25,7 @@ class Search(object):
         initiat
         """
         info('email module init')
-        self.EmailQue = Queue.Queue()
+        self.EmailQue = Queue()
         self.uas = []
         self.args =  args[0][0]
         self.proxy = self.args.proxy
@@ -42,9 +42,11 @@ class Search(object):
     
             info('completed gathering user_agents')
         except Exception:
-            print('An unhandled exception has occured, please check the \'Error log\' for details')
+            if self.args.verbose:
+                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                    print(traceback.print_exc())
             info('An unhandled exception has occured, please check the \'Error log\' for details')
-            error(traceback.print_exc())
+            error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1) 
             
         try:
             with open(self.country_file) as fin:
@@ -55,9 +57,11 @@ class Search(object):
             self.countries_dic = dict((k.lower(), v.lower()) for k,v in self.tcountries_dic.items())
             
         except Exception:
-            print('An unhandled exception has occured, please check the \'Error log\' for details')
+            if self.args.verbose:
+                print('An unhandled exception has occured, please check the \'Error log\' for details')
+                print(traceback.print_exc())
             info('An unhandled exception has occured, please check the \'Error log\' for details')
-            error(traceback.print_exc())
+            error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)             
             
         
         while True:
@@ -79,9 +83,11 @@ class Search(object):
                 self.originCountry = 'United Kingdom'
                 continue
             except Exception:
-                print('\nAn unhandled exception has occured, please check the \'Error log\' for details')
+                if self.args.verbose:
+                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                    print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error(traceback.print_exc())
+                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1) 
                 print('The Google UK server has been selected')
                 self.originCountry = 'United Kingdom'
                 continue
@@ -130,6 +136,8 @@ class Search(object):
                     response = requests.get(link, headers=headers, params=payload, verify=False, allow_redirects=True)
                 
                 if response.status_code == 503:
+                    if self.args.verbose:
+                        print('Google is responding with a Captcha, other searches will continue')
                     info('Google is responding with a Captcha, other searches will continue')               
                     error('Google is responding with a Captcha, other searches will continue')
                     break        
@@ -163,16 +171,23 @@ class Search(object):
                             except UnboundLocalError:
                                 pass
                             except Exception:
-                                print('An unhandled exception has occured, please check the \'Error log\' for details')
+                                if self.args.verbose:
+                                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                                    print(traceback.print_exc())
                                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                                error(traceback.print_exc())
+                                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                                
         
             except Exception:
-                print('An unhandled exception has occured, please check the \'Error log\' for details')
+                if self.args.verbose:
+                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                    print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error(traceback.print_exc(), exc_info=True)                               
+                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                                              
             
-        
+        if self.args.verbose:
+            print('Google Out: {}'.format(email_seen))
+            print('Google Count: {}\n'.format(len(email_seen)))
+            
         self.EmailQue.put(email_seen)
              
                         
@@ -222,13 +237,17 @@ class Search(object):
                                 email_seen.append((url, email.lower()))
 
             except Exception:
-                print('An unhandled exception has occured, please check the \'Error log\' for details')
+                if self.args.verbose:
+                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                    print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error(traceback.print_exc())                     
+                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                                     
                                
-        
+        if self.args.verbose:
+            print('Bing Out: {}'.format(email_seen))
+            print('Bing Count: {}\n'.format(len(email_seen)))   
+            
         self.EmailQue.put(email_seen)
-    
     
     
     def exlead(self):
@@ -241,13 +260,10 @@ class Search(object):
         
         email_seen = []
 
-        headers = {"Connection" : "close",
-                   "User-Agent" : random.choice(self.uas).decode('utf-8'),
+        headers = {"User-Agent" : random.choice(self.uas).decode('utf-8'),
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                    'Accept-Language': 'en-US,en;q=0.5',
                    'Accept-Encoding': 'gzip, deflate'}
-        
-    
                             
         for start in range(0,1000,10):
             try:
@@ -260,8 +276,10 @@ class Search(object):
                     response = requests.get(link, headers=headers, verify=False)
                     
                 if 'We are sorry, but your request has been blocked' in response.text:
-                    info('Exlead is responding with a Captcha, other searches will continue')               
-                    error('Exlead is responding with a Captcha, other searches will continue')
+                    if self.args.verbose:
+                        print('Exlead request has been blocked\n')                    
+                    info('Exlead request has been blocked')               
+                    error('Exlead request has been blocked')
                     return
                 else:
                     response.raise_for_status()
@@ -278,13 +296,18 @@ class Search(object):
                                 pass
                             else:
                                 email_seen.append((url, email.lower()))
-                          
+    
             except Exception:
-                print('An unhandled exception has occured, please check the \'Error log\' for details')
+                if self.args.verbose:
+                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                    print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error(traceback.print_exc())              
+                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                              
                 
-        
+        if self.args.verbose:
+            print('Exlead Out: {}'.format(email_seen))
+            print('Exlead Count: {}\n'.format(len(email_seen)))
+            
         self.EmailQue.put(email_seen)
     
     
@@ -295,7 +318,7 @@ class Search(object):
         
         !!!!remeber to cross reference email addresses with linkedin users for match
         """
-    
+        
         email_seen = []
         headers = {"User-Agent" : random.choice(self.uas).decode('utf-8'),
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -313,10 +336,8 @@ class Search(object):
         
 
         
-        for start in range(0,1000,10):
-           
+        for start in range(0,1000,10): 
             try:
-                
                 saerchfor = '"@{}"'.format(self.args.domain)
             
                 link = 'https://www.baidu.com/s?wd={}&pn={}'.format(saerchfor, start)
@@ -341,13 +362,25 @@ class Search(object):
                                 if (url, email) in email_seen:
                                     pass
                                 else:
-                                    email_seen.append((url, email.lower()))
+                                    email_seen.append((url, email.lower()))  
                                     
+            except requests.exceptions.ConnectionError:
+                if self.args.verbose:
+                    print('DNS resolution failed for www.baidu.com')
+
+                info('DNS resolution failed for www.baidu.com')
+                error('DNS resolution failed for www.baidu.com')
+                self.EmailQue.put(email_seen)
+                return
             except Exception:
-                print('An unhandled exception has occured, please check the \'Error log\' for details')
+                if self.args.verbose:
+                    print('An unhandled exception has occured, please check the \'Error log\' for details')
+                    print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error(traceback.print_exc())             
+                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                             
         
-        
+        if self.args.verbose:
+            print('Baidu Out: {}'.format(email_seen))
+            print('Baidu Count: {}\n'.format(len(email_seen)))
         self.EmailQue.put(email_seen)
         

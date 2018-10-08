@@ -68,7 +68,8 @@ parser.add_argument('--debug', help=argparse.SUPPRESS, required=False, action='s
 parser.add_argument('--VERSION_CONST', help=argparse.SUPPRESS, required=False)
 parser.add_argument('--COMPANY_LOC', help=argparse.SUPPRESS, required=False)
 parser.add_argument('--ZONE_RESULT', help=argparse.SUPPRESS, required=False)
-parser.add_argument('-v', '--version', help='print version', required=False, action='store_true') 
+parser.add_argument('-v', '--version', help='print version', required=False, action='store_true')
+parser.add_argument('-V', '--verbose', help=argparse.SUPPRESS, required=False, action='store_true') 
 args = parser.parse_args()
 
 
