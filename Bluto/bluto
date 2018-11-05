@@ -89,7 +89,7 @@ desc = """  {2} | {3} | {4} | {9}
                      {5}
 """ . format (colored("Author: Darryl Lane", 'blue'), colored("Twitter: @darryllane101", 'blue'), colored("DNS Recon", 'green'), colored("SubDomain Brute Forcer", 'green'), colored("DNS Zone Transfers", 'green'), colored("https://github.com/darryllane/Bluto", 'green'), colored("v" + version, 'red'), colored("Email Enumeration", 'green'), colored("Staff Enumeration", 'green'), colored("DNS Wild Card Checks", 'green'), colored("DNS Wild Card Brute Forcer", 'green'), colored("Compromised Account Enumeration", 'green'), colored("MetaData Mining", 'green'))
 
-prox = True
+prox = False
 
 if __name__ == "__main__":
     info('\nBluto Started')
