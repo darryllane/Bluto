@@ -91,6 +91,7 @@ def action_output_vuln_zone(google_results, bing_results, linkedin_results, time
     else:
         print '\tNo Data To Be Found'
 
+    user_names = None
     if data_mine is not None:
         user_names = data_mine[0]
         software_list = data_mine[1]
