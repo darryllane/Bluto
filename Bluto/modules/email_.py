@@ -280,7 +280,7 @@ class Search(object):
                         print('Exlead request has been blocked\n')                    
                     info('Exlead request has been blocked')               
                     error('Exlead request has been blocked')
-                    return
+                    break
                 else:
                     response.raise_for_status()
                     soup = BeautifulSoup(response.content, "lxml")

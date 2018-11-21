@@ -3,7 +3,7 @@
 Class to discover and report staff members of a target organisation from LinkedIn
 
 """
-
+import platform
 import re
 import time
 import os
@@ -19,6 +19,7 @@ from tqdm import tqdm
 from pyvirtualdisplay import Display
 from termcolor import colored
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
 global SEEN
@@ -62,7 +63,7 @@ class FindPeople(object):
 		try:
 			output = mp.Queue()
 			self.output = output
-
+			self.operating_system = platform.system()	
 			username, password = args.la.split(args.deli)
 			domain = args.domain
 			cpage, page = page_limits.split(':')
@@ -76,11 +77,23 @@ class FindPeople(object):
 			self.company_name = company
 			self.staff_page = int(page)
 			self.company_number = company_number
-
+			dirname = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../doc/driver/'))
+			
+			opt = Options()
+			opt.add_argument("--disable-notifications")
+			opt.add_argument('--no-sandbox')
+			opt.add_argument('headless')
+			
 			display = Display(visible=0, size=(800, 600))
 			display.start()
-			executable = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../doc/driver/chromedriver'))
-			browser = webdriver.Chrome(executable_path=executable)
+			
+			if self.operating_system == 'Linux':
+				exec_path = dirname + '/chromedriverLINUX'
+			elif self.operating_system == 'Darwin':
+				exec_path = dirname + '/chromedriverMAC'			
+				
+			browser = webdriver.Chrome(options=opt, executable_path=exec_path)
+			
 			self.browser = browser
 			time.sleep(1)
 			self.browser.get('https://www.linkedin.com/uas/login')
@@ -90,10 +103,19 @@ class FindPeople(object):
 			username1.send_keys(self.username)
 			password1.send_keys(str(self.password))
 			time.sleep(0.5)
-			browser.find_element_by_id("btn-primary").click()
+			
+			if browser.find_element_by_class_name("btn__primary--large"):
+				browser.find_element_by_class_name("btn__primary--large").click()
+				
+			elif browser.find_element_by_id("btn-primary"):
+				browser.find_element_by_id("btn-primary").click()
+			
+			else:
+				print('')
 			time.sleep(1)
-
-			if 'alert error' in self.browser.page_source:
+			
+			
+			if 'alert error' in self.browser.page_source or 'that\'s not the right password' in self.browser.page_source:
 				raise NotLoggedIn('You have had an error logging in')
 
 			session_id = self.browser.session_id
@@ -101,7 +123,23 @@ class FindPeople(object):
 
 		except NotLoggedIn:
 			info('failed to login')
+			error('failed to login')
+			answer = ['yes', 'y', 'no', 'n']
+			while True:
+				response = input('\nLinkedIn Password is incorrect.\nWould you like to quit and re-enter the credentials?\n\n').lower()
+				if response in answer:
+					if response in ['y', 'yes']:
+						info('User quitting..')
+						print('\nUser quitting..')
+						os._exit(0)
+					else:
+						info('User continuing..')
+						print('\ncontinuing..')
+						break
+				else:
+					print('You need to enter 1 of the following: (y | yes | n | no)\nNot \'{}\''.format(response))
 			return
+	
 		except Exception:
 			print('An Unhandled Exception Has Occured, Please Check The \'Error log\' For Details')
 			info('An Unhandled Exception Has Occured, Please Check The \'Error log\' For Details')
