@@ -30,11 +30,9 @@ import sys
 import site
 import os
 
-SITES = site.getsitepackages()
-for item in SITES:
-    if os.path.exists(item + "/Bluto/modules/__init__.py"):
-        path = item
-        sys.path.append(path + '/Bluto/')
+if os.path.exists(os.path.dirname(os.__file__) + "/site-packages/Bluto/modules/__init__.py"):
+    path = os.path.dirname(os.__file__)+"/site-packages"
+    sys.path.append(path + '/Bluto/')
 
 import time
 import threading
