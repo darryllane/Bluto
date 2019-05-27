@@ -13,7 +13,7 @@ from modules.b_classes.thread_class import MakeThread
 
 
 def value_check(args):
-	version = '3.0.2'
+	version = '3.0.3'
 	args.VERSION_CONST = version
 		
 	if args.version:
