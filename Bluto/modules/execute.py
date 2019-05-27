@@ -447,11 +447,11 @@ class Dns:
 			return d
 	
 	
-	def bluto_use(countryID):
+	def bluto_use(self):
 		now = datetime.datetime.now()
 		try:
 			link = "https://darryllane.co.uk/bluto/log_use.php"
-			payload = {'country': countryID, 'Date': now}
+			payload = {'country': self.countryID, 'Date': now}
 			requests.post(link, data=payload)
 		except Exception:
 			info('An Unhandled Exception Has Occured, Please Check The Log For Details' + INFO_LOG_FILE)
