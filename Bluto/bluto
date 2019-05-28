@@ -1,5 +1,15 @@
 #!/usr/bin/env python3.7
 
+import sys
+import site
+import os
+
+SITES = site.getsitepackages()
+for item in SITES:
+	if os.path.exists(item + "/Bluto/modules/__init__.py"):
+		path = item
+sys.path.append(path + '/Bluto/')
+
 import argparse
 import traceback
 import sys
@@ -11,9 +21,8 @@ from modules.use_age import debug_out
 from modules.b_classes.thread_class import MakeThread
 
 
-
 def value_check(args):
-	version = '3.0.7'
+	version = '3.0.8'
 	args.VERSION_CONST = version
 		
 	if args.version:

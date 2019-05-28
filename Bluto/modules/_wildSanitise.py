@@ -2,7 +2,7 @@ import random
 import threading
 import string
 import dns.resolver
-import queue as Queue
+import queue as queue
 import traceback
 from multiprocessing.dummy import Pool as ThreadPool
 
