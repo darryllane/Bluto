@@ -1,19 +1,19 @@
-#!/usr/bin/python
+#!/usr/bin/env python3.7
 
 import argparse
 import traceback
 import sys
 import os
 from termcolor import colored
-from .modules.logger_ import info, error
-from .modules import descriptor_
-from .modules.use_age import debug_out
-from .modules.b_classes.thread_class import MakeThread
+from modules.logger_ import info, error
+from modules import descriptor_
+from modules.use_age import debug_out
+from modules.b_classes.thread_class import MakeThread
 
 
 
 def value_check(args):
-	version = '3.0.4'
+	version = '3.0.7'
 	args.VERSION_CONST = version
 		
 	if args.version:
