@@ -11,7 +11,7 @@ import socket
 import traceback
 import sys
 import json
-import pythonwhois
+
 import multiprocessing as mp
 
 from ..logger_ import info, error
@@ -78,20 +78,35 @@ class FindPeople(object):
 			self.staff_page = int(page)
 			self.company_number = company_number
 			dirname = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../doc/driver/'))
-			
 			opt = Options()
-			opt.add_argument("--disable-notifications")
-			opt.add_argument('--no-sandbox')
-			opt.add_argument('headless')
-			
-			display = Display(visible=0, size=(800, 600))
-			display.start()
 			
 			if self.operating_system == 'Linux':
+				if args.verbose:
+					info('verbose: on')				
+					display = Display(visible=1, size=(1280, 720))
+				else:
+					opt.add_argument('headless')
+					info('headless: on')
+					display = Display(visible=0, size=(1280, 720))
+					info('verbose: off')
 				exec_path = dirname + '/chromedriverLINUX'
+			
 			elif self.operating_system == 'Darwin':
-				exec_path = dirname + '/chromedriverMAC'			
+				if args.verbose:
+					info('verbose: on')				
+					display = Display(visible=1, size=(1280, 720))
+				else:
+					opt.add_argument('headless')
+					info('headless: on')
+					display = Display(visible=0, size=(1280, 720))
+					info('verbose: off')
+				exec_path = dirname + '/chromedriverMAC'
 				
+			opt.add_argument("--disable-notifications")
+			opt.add_argument('--no-sandbox')
+			
+			#display.start()
+		
 			browser = webdriver.Chrome(options=opt, executable_path=exec_path)
 			
 			self.browser = browser
@@ -272,50 +287,8 @@ class FindPeople(object):
 		Company identification function
 		"""
 
-		try:
-			whois_things = pythonwhois.get_whois(self.domain)
-			try:
-				company = whois_things['contacts']['registrant']['name']
-			except Exception:
-				print('\nThere seems to be no Registrar for this domain.')
-				company = self.domain
-
-			splitup = company.lower().split()
-			patern = re.compile('|'.join(splitup))
-
-			if patern.search(self.domain):
-				result = True
-				company = self.result_accept(company, result)
-			else:
-				result = False
-				company = self.result_accept(company, result)
-
-
-		except pythonwhois.shared.WhoisException:
-			print(traceback.print_exc())
-		except socket.error:
-			print(traceback.print_exc())
-		except KeyError:
-			print(traceback.print_exc())
-		except Exception as e_rror:
-			print(e_rror.args)
-			print(colored('\nWhoisError: You may be behind a proxy or firewall preventing whois lookups. \
-			            Please supply the registered company name, if left blank the domain name ' +
-			              '"' + self.domain + '"' + ' will be used for the Linkedin search. The results may \
-			                not be as accurate.', 'red'))
-
-			temp_company = input(colored('\nRegistered Company Name: ', 'green'))
-			if temp_company == '':
-				company = self.domain
-			else:
-				company = temp_company
-
-			print(traceback.print_exc())
-
-
-		if 'company' not in locals():
-			company = self.supply_company()
-			return company
+		self.company_name = self.supply_company()
+			
 
 		company_details = []
 
@@ -399,6 +372,22 @@ class FindPeople(object):
 			info(traceback.print_exc())
 
 
+	def result_pages(self):
+		numbers = []
+		self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, '1'))
+		html = self.browser.page_source
+		soup = BeautifulSoup(html, "lxml")
+		result_pages = soup.find('ul', {'class': 'artdeco-pagination__pages artdeco-pagination__pages--number'})
+		li_list = result_pages.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
+		for li in li_list:
+			if '.' in li.span.text:
+				pass
+			elif '\u2026' in li.span.text:
+				pass
+			else:
+				numbers.append(int(li.span.text))
+		return max(numbers)
+		
 	def people(self):
 
 		"""
@@ -409,12 +398,15 @@ class FindPeople(object):
 
 		i = 0
 		people_details = []
-
+		if self.staff_page == 20:
+			self.staff_page = self.result_pages()
+			
 		for page in tqdm(range(1, self.staff_page)):
 			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, page))
 
-			time.sleep(4)
+			time.sleep(2)
 			html = self.browser.page_source
+			
 			try:
 				if 'No results found' in self.browser.page_source:
 					raise NoMoreData("No more results found")
@@ -428,6 +420,7 @@ class FindPeople(object):
 			data = soup.find('ul', {'class': 'search-results__list'})
 			#print data.contents
 			if data:
+				
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
 
 				for li_item in li_list:
@@ -440,8 +433,9 @@ class FindPeople(object):
 								
 								name = li_item.find('span', {'class', 'name actor-name'}).text.replace('\n', '').rstrip()
 								img_url_tmp = li_item.find('div', {'class', 'presence-entity presence-entity--size-4 ember-view'})
-								if re.match('.*url\(\"(http[s|]\:\/\/.*?)\"\).*', str(img_url_tmp)):
-									img_url = re.match('.*url\(\"(http[s|]\:\/\/.*?)\"\).*', str(img_url_tmp)).group(1)
+								
+								if re.match('.*src\=\"(.*?)\".*', str(img_url_tmp)):
+									img_url = re.match('.*src\=\"(.*?)\".*', str(img_url_tmp)).group(1)
 								else:
 									img_url = 'None'
 								#print name
