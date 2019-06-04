@@ -367,8 +367,8 @@ class FindPeople(object):
 			
 			html = self.browser.page_source
 			soup = BeautifulSoup(html, "lxml")
-			result_pages = soup.find('ul', {'class': 'artdeco-pagination__pages artdeco-pagination__pages--number'})
-			li_list = result_pages.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
+			result_page = soup.find('ul', {'class': 'artdeco-pagination__pages artdeco-pagination__pages--number'})
+			li_list = result_page.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
 			for li in li_list:
 				if '.' in li.span.text:
 					pass
@@ -384,7 +384,7 @@ class FindPeople(object):
 			info('debug data return: 10')
 			return (10)
 		else:
-			max(numbers)
+			return max(numbers)
 		
 	def people(self):
 
