@@ -22,7 +22,7 @@ from modules.b_classes.thread_class import MakeThread
 
 
 def value_check(args):
-	version = '3.0.8'
+	version = '3.0.10'
 	args.VERSION_CONST = version
 		
 	if args.version:
@@ -118,8 +118,7 @@ if __name__ == "__main__":
 				elif thread.name == 'LinkedIna':
 					info('active linkedin search started')
 					thread.start()
-					thread.join()					
-					
+					thread.join()						
 		
 		if args.brute:
 			info('sub bruting started')

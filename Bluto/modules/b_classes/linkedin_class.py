@@ -80,6 +80,14 @@ class FindPeople(object):
 			dirname = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../doc/driver/'))
 			opt = Options()
 			
+			if args.proxy:
+				opt.add_argument('--proxy-server=https://{}'.format(args.proxy))
+				opt.add_argument('--proxy-server=http://{}'.format(args.proxy))
+				info('proxy enabled: {}'.format(args.proxy))
+			
+			opt.add_argument("--disable-notifications")
+			opt.add_argument('--no-sandbox')
+			
 			if self.operating_system == 'Linux':
 				if args.verbose:
 					info('verbose: on')				
@@ -90,22 +98,22 @@ class FindPeople(object):
 					display = Display(visible=0, size=(1280, 720))
 					info('verbose: off')
 				exec_path = dirname + '/chromedriverLINUX'
-			
+				display.start()
 			elif self.operating_system == 'Darwin':
 				if args.verbose:
-					info('verbose: on')				
-					display = Display(visible=1, size=(1280, 720))
+					if args.debug:
+						opt.add_argument('--remote-debugging-port=9222')
+						info('debug enabled: http://localhost:9222')
+					info('verbose: on')	
 				else:
-					opt.add_argument('headless')
-					info('headless: on')
-					display = Display(visible=0, size=(1280, 720))
+					#opt.add_argument('headless')
+					info('headless: not currently working in OSX')
+					if args.debug:
+						opt.add_argument('--remote-debugging-port=9222')
+						info('debug enabled: http://localhost:9222')
 					info('verbose: off')
 				exec_path = dirname + '/chromedriverMAC'
-				
-			opt.add_argument("--disable-notifications")
-			opt.add_argument('--no-sandbox')
 			
-			#display.start()
 		
 			browser = webdriver.Chrome(options=opt, executable_path=exec_path)
 			
@@ -126,7 +134,9 @@ class FindPeople(object):
 				browser.find_element_by_id("btn-primary").click()
 			
 			else:
-				print('')
+				error('no button')
+				raise NotLoggedIn('Error: No login button found')
+	
 			time.sleep(1)
 			
 			
@@ -136,11 +146,14 @@ class FindPeople(object):
 			session_id = self.browser.session_id
 			self.session_id = session_id
 
-		except NotLoggedIn:
+		except NotLoggedIn as e:
 			info('failed to login')
 			error('failed to login')
 			answer = ['yes', 'y', 'no', 'n']
 			while True:
+				if 'No login button found' in e:
+					print('Error: No login found')
+					sys.exit()
 				response = input('\nLinkedIn Password is incorrect.\nWould you like to quit and re-enter the credentials?\n\n').lower()
 				if response in answer:
 					if response in ['y', 'yes']:
@@ -239,47 +252,6 @@ class FindPeople(object):
 			sys.stdout.flush()
 
 
-	def result_accept(self, company, result):
-
-		"""
-		Confirmation of WHOIS response as company search string
-		"""
-
-		if result:
-			try:
-				print('\nThe Whois Results Look Promising!')
-				while True:
-					tmp = colored('{}\n', 'green').format(company)
-
-					confirmed = input('\nIs The Search Term sufficient? ' +
-					                  tmp + colored('(y|n)', 'yellow') + ': ')
-
-					if confirmed.lower() in ('y', 'yes'):
-						print('\nSearching LinkedIn Companies for {}\n'.format(company))
-						self.company_name = company
-						return
-					elif confirmed.lower() in ('n', 'no'):
-						self.company_name = self.supply_company()
-						return
-					else:
-						self.negative(confirmed)
-
-			except Exception:
-				print('An Unhandled Exception Has Occured, Please Check The Log For Details')
-				info('An Unhandled Exception Has Occured, Please Check The Log For Details')
-				info(traceback.print_exc())
-
-		else:
-			try:
-				print(colored("\nThe Whois Results Don't Look Very Promissing: '{}'", "red").format(company))
-				self.supply_company()
-				return
-
-			except Exception:
-				print('An Unhandled Exception Has Occured, Please Check The Log For Details')
-				info('An Unhandled Exception Has Occured, Please Check The Log For Details')
-				info(traceback.print_exc())
-
 
 	def company(self):
 
@@ -374,19 +346,40 @@ class FindPeople(object):
 
 	def result_pages(self):
 		numbers = []
-		self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, '1'))
-		html = self.browser.page_source
-		soup = BeautifulSoup(html, "lxml")
-		result_pages = soup.find('ul', {'class': 'artdeco-pagination__pages artdeco-pagination__pages--number'})
-		li_list = result_pages.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
-		for li in li_list:
-			if '.' in li.span.text:
-				pass
-			elif '\u2026' in li.span.text:
-				pass
-			else:
-				numbers.append(int(li.span.text))
-		return max(numbers)
+		try:
+			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, '1'))
+			
+			last_height = self.browser.execute_script("return document.body.scrollHeight")
+			
+			while True:
+				# Scroll down to bottom
+				self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+			
+				# Wait to load page
+				time.sleep(1)
+			
+				# Calculate new scroll height and compare with last scroll height
+				new_height = self.browser.execute_script("return document.body.scrollHeight")
+				if new_height == last_height:
+					break
+				last_height = new_height			
+			
+			html = self.browser.page_source
+			soup = BeautifulSoup(html, "lxml")
+			result_pages = soup.find('ul', {'class': 'artdeco-pagination__pages artdeco-pagination__pages--number'})
+			li_list = result_pages.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
+			for li in li_list:
+				if '.' in li.span.text:
+					pass
+				elif '\u2026' in li.span.text:
+					pass
+				else:
+					numbers.append(int(li.span.text))
+		except Exception as e:
+			print(e.args)
+			return 10
+		#return max(numbers)
+		return (10)
 		
 	def people(self):
 
@@ -501,5 +494,7 @@ class FindPeople(object):
 			else:
 				time.sleep(2)
 				continue
-
+			
+		print('{} staff members found\n'.format(len(SEEN)))
 		self.output.put(people_details)
+		self.browser.close()

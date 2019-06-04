@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Bluto',
-    version='3.0.8b',
+    version='3.0.10b',
     author='Darryl lane',
     author_email='DarrylLane101@gmail.com',
     url='https://github.com/darryllane/Bluto',
@@ -24,7 +24,6 @@ setup(
 		"idna",
 		"lxml",
 		"progressbar",
-		"pythonwhois",
 		"PyVirtualDisplay",
 		"requests",
 		"selenium",

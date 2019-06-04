@@ -21,7 +21,6 @@ def linkedIna(params):
 	obj.company()
 	obj.people()
 	results = obj.output.get()
-
 	if results:
 		for tup in results:
 			tempDict = {}
@@ -30,6 +29,9 @@ def linkedIna(params):
 				tempDict.update({elem[0]:elem[1]})
 			people.append(tempDict)
 		people = {'person':people}
+		
+		# ADD EMAIL GENERATION FROM RESULTS
+		print(people)
 		write_html(people, 'company name', args)
 		print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
 		data = json.dumps(people, indent=6, sort_keys=True)
