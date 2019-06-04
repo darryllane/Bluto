@@ -31,7 +31,7 @@ def linkedIna(params):
 		people = {'person':people}
 		
 		# ADD EMAIL GENERATION FROM RESULTS
-		print(people)
+		
 		write_html(people, 'company name', args)
 		print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
 		data = json.dumps(people, indent=6, sort_keys=True)

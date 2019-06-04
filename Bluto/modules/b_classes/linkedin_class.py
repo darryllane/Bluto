@@ -67,7 +67,8 @@ class FindPeople(object):
 			username, password = args.la.split(args.deli)
 			domain = args.domain
 			cpage, page = page_limits.split(':')
-
+			
+			self.args = args
 			self.username = username
 			self.password = password
 			self.domain = domain
@@ -376,10 +377,14 @@ class FindPeople(object):
 				else:
 					numbers.append(int(li.span.text))
 		except Exception as e:
-			print(e.args)
-			return 10
-		#return max(numbers)
-		return (10)
+			error(e.args)
+			return 20
+		
+		if self.args.debug:
+			info('debug data return: 10')
+			return (10)
+		else:
+			max(numbers)
 		
 	def people(self):
 
