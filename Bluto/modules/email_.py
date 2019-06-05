@@ -94,6 +94,7 @@ class Search(object):
                 
             break
 
+
     def google(self):
         """
         Carry out Google search scrape for email addresses
@@ -384,3 +385,58 @@ class Search(object):
             print('Baidu Count: {}\n'.format(len(email_seen)))
         self.EmailQue.put(email_seen)
         
+        
+    def hunter_io(self):
+        info('Hunter Search Started')
+        emails = []
+        link = 'https://api.emailhunter.co/v1/search?domain={0}&api_key={1}'.format(self.args.domain, self.args.api)
+    
+        if self.args.proxy == True:
+            proxy = {'http' : 'http://127.0.0.1:8080'}
+        else:
+            pass
+        try:
+            headers = {"User-Agent" : random.choice(self.uas).decode('utf-8'),
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate'}            
+            if self.args.proxy == True:
+                response = requests.get(link, headers=headers, proxies=proxy, verify=False)
+            else:
+                response = requests.get(link, headers=headers, verify=False)
+            if response.status_code == 200:
+                json_data = response.json()
+                for value in json_data['emails']:
+                    for domain in value['sources']:
+                        url = str(domain['uri']).replace("u'","")
+                        email =  str(value['value']).replace("u'","")
+                        emails.append((url, email))
+            elif response.status_code == 401:
+                json_data = response.json()
+                if json_data['message'] =='Too many calls for this period.':
+                    print(colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red'))
+                    print(colored('\tAPI Key: {}\n'.format(api),'red'))
+                    q.put(None)
+                    return None
+                if json_data['message'] == 'Invalid or missing api key.':
+                    print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid,\nit was probably deleted.", 'red'))
+                    print(colored('\tAPI Key: {}\n'.format(api),'red'))
+                    print(colored('\tWhy don\'t you grab yourself a new one (they are free)','green'))
+                    print(colored('\thttps://hunter.io/api_keys','green'))
+                    q.put(None)
+                    return None
+            else:
+                raise ValueError('No Response From Hunter')
+        except UnboundLocalError as e:
+            print(e)
+        except KeyError:
+            pass
+        except ValueError:
+            info(traceback.print_exc())
+            pass
+        except Exception:
+            traceback.print_exc()
+            info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
+    
+        info('Hunter Search Completed')
+        self.EmailQue.put(emails)
