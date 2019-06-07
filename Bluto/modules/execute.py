@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from ._wildSanitise import main as wild_main
 from .descriptor_ import soa_build
 from .in_out import Gather
@@ -220,6 +221,31 @@ class Dns:
 			error(traceback.print_exc())
 	
 	
+	def soa_only(args):
+		domain = args.domain
+		dump_list = []
+	
+		try:
+			soa_answer = dns.resolver.query(domain, 'SOA')
+			info('soa enumerated')
+			master_answer = dns.resolver.query(soa_answer[0].mname, 'A')
+			if soa_answer.rrset is not None:
+	
+				pattern= r'(%s)\.\s(\d{1,})\s(\w+)\sSOA\s(.*?)\.\s(.*?)\.\s(\d{1,})\s(\d{1,})\s(\d{1,})\s(\d{1,})\s(\d{1,})' % domain
+				match = re.match(pattern, str(soa_answer.rrset))
+				m_name, ttl, class_, ns, email, serial, refresh, retry, expiry, minim = match.groups()
+				soa_data = (m_name, ttl, class_, ns, str(email).replace('\\', ''), serial, refresh, retry, expiry, minim)				
+				print ('\nSOA Details:\n')
+				soa_json = soa_build(soa_data)
+				soa_json = json.loads(soa_json)
+				data = json.dumps(soa_json, indent=6, sort_keys=True)
+				print (colored(data, 'blue'))
+		except Exception:
+			print(traceback.print_exc())
+			info('An unhandled exception has occured, please check the \'Error log\' for details')
+			error('An Unhandled Exception Has Occured, Please Check The Log For Details', exc_info=True)  			
+		
+		
 	def zone(self):
 		print ('\nZoneTranfer Check:\n')
 		domain = self.args.domain
@@ -297,7 +323,7 @@ class Dns:
 			d = self.NoZones()
 			return d
 		except Exception:
-			info('An nnhandled exception has occured, please check the \'Error log\' for details')
+			info('An unhandled exception has occured, please check the \'Error log\' for details')
 			error(traceback.print_exc())
 			d = NoZones()
 			return d
@@ -375,7 +401,8 @@ class Dns:
 		topValue = self.args.top
 		
 		fileObj = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../doc/Subdomains-Raw.txt'))
-		
+		if not self.args.ZONE_RESULT:
+			self.zone(self)
 		if self.args.ZONE_RESULT['vuln']:
 			d = self.zone()
 			z_data = json.dumps(d)

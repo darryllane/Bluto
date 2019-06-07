@@ -19,10 +19,11 @@ from modules.logger_ import info, error
 from modules import descriptor_
 from modules.use_age import debug_out
 from modules.b_classes.thread_class import MakeThread
+from modules import execute
 
 
 def value_check(args):
-	version = '3.0.14'
+	version = '3.0.15'
 	args.VERSION_CONST = version
 		
 	if args.version:
@@ -94,7 +95,11 @@ if __name__ == "__main__":
 		print (colored('Debug Enabled:','red', 'on_yellow'))
 		print (colored('Arg Output', 'red', 'on_yellow'))
 		debug_out(args.__dict__)
-	try:		
+	try:
+		if not any([args.email, args.dns, args.zone, args.soa]):
+			parser.print_help()
+		if args.soa:
+			execute.Dns.soa_only(args)
 		if args.dns:
 			func_order.append('Dns')
 		if args.zone:

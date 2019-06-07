@@ -16,8 +16,7 @@ def linkedIna(params):
 	q1 = params[0][1]
 	people = []
 	obj = FindPeople(args, page_limits='10:20', company_details='', company='', company_number='')
-	if args.verbose:
-		print ("Page Limits Company10:People20")	
+	
 	obj.company()
 	obj.people()
 	results = obj.output.get()
@@ -37,9 +36,6 @@ def linkedIna(params):
 		data = json.dumps(people, indent=6, sort_keys=True)
 		print (colored(data, 'blue'))
 		q1.put(people)
-
-	else:
-		print('No Data')
 		
 
 def Email(args):
@@ -67,10 +63,9 @@ def Email(args):
 		return result
 	
 	try:
-
+		
 		search = Search(args)
-		if args[0][0].verbose:
-			print ("\nGathering Email Addresses:\n")
+		print ("\nGathering Email Addresses:\n")
 		
 		t1 = threading.Thread(target=search.baidu,)
 		t2 = threading.Thread(target=search.exlead,)
@@ -80,7 +75,8 @@ def Email(args):
 		if args[0][0].api:
 			t5 = threading.Thread(target=search.hunter_io)
 			threads.append(t5)
-		
+		else:
+			print(colored('\tDon\'t forget to grab your free API key from "Huter IO" (https://hunter.io/api_keys)\n\n\tYou are likley to find far more results....', 'green'))
 		threads.append(t1)
 		threads.append(t2)
 		threads.append(t3)

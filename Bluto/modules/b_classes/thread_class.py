@@ -64,10 +64,10 @@ class MakeThread():
 			
 				if self.func_name == 'Dns':
 					self.function = dns_gather
-				elif self.func_name == 'Zone':
-					self.function = zone_transfer
 				elif self.func_name == 'LinkedIna':
 					self.function = linkedIna
+				elif self.func_name == 'Zone':
+					self.function = zone_transfer				
 				
 				self.queue = Queue()
 				self.arg_list.append((self.func_args,self.queue))

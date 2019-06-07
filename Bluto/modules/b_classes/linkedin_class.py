@@ -43,6 +43,15 @@ class NotLoggedIn(Exception):
 
 	def __init__(self, *args, **kwargs):
 		Exception.__init__(self, *args, **kwargs)
+		
+		
+class NotInternetAccess(Exception):
+	"""
+		Error thrown if network error.
+	"""
+
+	def __init__(self, *args, **kwargs):
+		Exception.__init__(self, *args, **kwargs)
 
 class BreakOut(Exception):
 
@@ -122,11 +131,17 @@ class FindPeople(object):
 			time.sleep(1)
 			self.browser.get('https://www.linkedin.com/uas/login')
 			time.sleep(3)
+			
+			if 'No Internet' in browser.page_source:
+				error('internet down!')
+				raise NotInternetAccess('Error: No internet access')
+			
 			username1 = browser.find_element_by_name("session_key")
 			password1 = browser.find_element_by_name("session_password")
 			username1.send_keys(self.username)
 			password1.send_keys(str(self.password))
 			time.sleep(0.5)
+			
 			
 			if browser.find_element_by_class_name("btn__primary--large"):
 				browser.find_element_by_class_name("btn__primary--large").click()
@@ -146,7 +161,12 @@ class FindPeople(object):
 
 			session_id = self.browser.session_id
 			self.session_id = session_id
-
+		
+		except NotInternetAccess:
+			info('not internet access')
+			error('not internet access')
+			print(colored('You dont seem to have any network connectivity!', 'red'))
+			os._exit(1)
 		except NotLoggedIn as e:
 			info('failed to login')
 			error('failed to login')
@@ -273,6 +293,8 @@ class FindPeople(object):
 				time.sleep(3)
 				html = self.browser.page_source
 				soup = BeautifulSoup(html, "lxml")
+				
+				
 				try:
 					if 'No results found' in self.browser.page_source:
 						raise NoMoreData("No more results found")
@@ -283,7 +305,10 @@ class FindPeople(object):
 					return
 
 				data = soup.find('div', {'class': 'search-results ember-view'})
-
+				
+				if 'Make the most of your professional life' in html:
+					raise NotLoggedIn('login failure!')
+				
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
 
 				for each in li_list:
@@ -328,7 +353,8 @@ class FindPeople(object):
 								continue
 							else:
 								self.negative(confirmed)
-
+					except AttributeError:
+						print(traceback.print_exc())
 					except Exception as e_rror:
 						info('An unhandled exception has occured, please check the \'Error log\' for details')
 						error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
@@ -376,7 +402,8 @@ class FindPeople(object):
 					numbers.append(int(li.span.text))
 		except AttributeError:
 			if 'upgrade to Premium to continue searching' in html:
-				raise NoMoreData('your linkedin account has reached its search limit')
+				info('your linkedin account has reached its search limit')
+				return 'limit reach'
 		except Exception:
 			info('An unhandled exception has occured, please check the \'Error log\' for details')
 			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
@@ -386,7 +413,10 @@ class FindPeople(object):
 			info('debug data return: 10')
 			return (10)
 		else:
-			return max(numbers)
+			if numbers:
+				return max(numbers)
+			else:
+				return 'none'
 		
 	def people(self):
 
@@ -399,13 +429,30 @@ class FindPeople(object):
 		i = 0
 		people_details = []
 		if self.staff_page == 20:
-			self.staff_page = self.result_pages()
+			data = self.result_pages()
+			if isinstance(data, int):
+				self.staff_page = data
+			else:
+				print(colored('\nUser account reached search limit!', 'red'))
+				error('User account reached search limit!')
+				info('User account reached search limit!')
+				self.output.put(people_details)
+				self.browser.close()				
+				return
 			
 		for page in tqdm(range(1, self.staff_page)):
 			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, page))
 
 			time.sleep(2)
 			html = self.browser.page_source
+			
+			if 'upgrade to Premium to continue searching' in html:
+				print(colored('User account reached search limit!', 'red'))
+				error('User account reached search limit!')
+				info('User account reached search limit!')
+				self.output.put(people_details)
+				self.browser.close()				
+				return		
 			
 			try:
 				if 'No results found' in self.browser.page_source:
