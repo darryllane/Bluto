@@ -14,7 +14,7 @@ import json
 
 import multiprocessing as mp
 
-from ..logger_ import info, error
+from ..logger_ import error, info, INFO_LOG_FILE, ERROR_LOG_FILE
 from tqdm import tqdm
 from pyvirtualdisplay import Display
 from termcolor import colored
@@ -223,7 +223,7 @@ class FindPeople(object):
 		while True:
 			if i > 0:
 				os.system('clear')
-			temp_company = input('\nPlease Supply The Company Name\n\nThis Will Be Used To Query LinkedIn: ')
+			temp_company = input('Please Supply The Company Name\n\nThis Will Be Used To Query LinkedIn: ')
 			confirmed = input(colored('\nConfirm search for: "{}"? '.format(temp_company), 'yellow'))
 			if confirmed.lower() in ('y', 'yes'):
 				company = temp_company
@@ -313,14 +313,14 @@ class FindPeople(object):
 							tmp = colored('{}\n', 'green').format(company_name)
 							if company_people == None:
 								company_people = ''
-							confirmed = input('\n{}'.format(tmp) + '{}\n{}'.format(company_type, company_people) + '\n\n' + colored('(y|n)','yellow') )
+							confirmed = input('\n{}'.format(tmp) + '{}\n{}'.format(company_type, company_people) + '\n' + colored('(y|n)','yellow') )
 							if confirmed.lower() in ('y', 'yes'):
 								tmp = colored(company_name, 'green')
 								print('\nTarget Company Identified:\n')
 								print('\t' + str(company_name))
 								print('\t' + str(company_type))
 								print('\t' + str(company_people))
-								print('\nSearching LinkedIn for ' + tmp + ' staff members\n')
+								print('Searching LinkedIn for ' + tmp + ' staff members\n')
 								self.company_number = company_number
 								self.company_found = True
 								return
@@ -330,9 +330,8 @@ class FindPeople(object):
 								self.negative(confirmed)
 
 					except Exception as e_rror:
-						print('An Unhandled Exception Has Occured, Please Check The Log For Details')
-						info('An Unhandled Exception Has Occured, Please Check The Log For Details')
-						info(traceback.print_exc())
+						info('An unhandled exception has occured, please check the \'Error log\' for details')
+						error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
 			self.company_details = company_details
 			company_number = self.not_exact()
@@ -340,9 +339,8 @@ class FindPeople(object):
 			return
 
 		except Exception:
-			print('An Unhandled Exception Has Occured, Please Check The Log For Details')
-			info('An Unhandled Exception Has Occured, Please Check The Log For Details')
-			info(traceback.print_exc())
+			info('An unhandled exception has occured, please check the \'Error log\' for details')
+			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
 
 	def result_pages(self):
@@ -376,8 +374,12 @@ class FindPeople(object):
 					pass
 				else:
 					numbers.append(int(li.span.text))
-		except Exception as e:
-			error(e.args)
+		except AttributeError:
+			if 'upgrade to Premium to continue searching' in html:
+				raise NoMoreData('your linkedin account has reached its search limit')
+		except Exception:
+			info('An unhandled exception has occured, please check the \'Error log\' for details')
+			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 			return 20
 		
 		if self.args.debug:
@@ -467,8 +469,8 @@ class FindPeople(object):
 						if 'src' in e_rror.args:
 							pass
 						else:
-							info('An Unexpected Exception Has Occured, Please Check The Log For Details')
-							info(traceback.print_exc())
+							info('An unhandled exception has occured, please check the \'Error log\' for details')
+							error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)							
 					except UnboundLocalError as e_rror:
 						if 'name' in e_rror:
 							name = None
@@ -477,13 +479,11 @@ class FindPeople(object):
 						if 'location' in e_rror:
 							location = None
 						continue
-					except TypeError as e:
-						print(traceback.print_exc())
+					except TypeError:
 						continue
 					except Exception:
-						print(traceback.print_exc())
-						info('An Unhandled Exception Has Occured, Please Check The Log For Details')
-						info(traceback.print_exc())
+						info('An unhandled exception has occured, please check the \'Error log\' for details')
+						error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 					try:
 						if i > 3:
 							raise NoMoreData("No more results found")

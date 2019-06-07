@@ -32,7 +32,7 @@ def linkedIna(params):
 		
 		# ADD EMAIL GENERATION FROM RESULTS
 		
-		write_html(people, args.company_name, args)
+		write_html(people, obj.company_name, args)
 		print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
 		data = json.dumps(people, indent=6, sort_keys=True)
 		print (colored(data, 'blue'))
@@ -76,12 +76,16 @@ def Email(args):
 		t2 = threading.Thread(target=search.exlead,)
 		t3 = threading.Thread(target=search.bing,)
 		t4 = threading.Thread(target=search.google,)
-		t5 = threading.Thread(target=search.hunter_io)
+		
+		if args[0][0].api:
+			t5 = threading.Thread(target=search.hunter_io)
+			threads.append(t5)
+		
 		threads.append(t1)
 		threads.append(t2)
 		threads.append(t3)
 		threads.append(t4)
-		threads.append(t5)
+		
 		for t in threads:
 			t.start()
 		

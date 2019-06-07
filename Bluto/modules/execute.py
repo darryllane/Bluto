@@ -376,23 +376,20 @@ class Dns:
 		
 		fileObj = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../doc/Subdomains-Raw.txt'))
 		
-		if self.args.zone:
-			if not self.args.ZONE_RESULT['vuln']:
-				pass
-			else:
-				d = self.zone()
-				z_data = json.dumps(d)
-				z_data = json.loads(z_data)
-				vuln = z_data["vuln"]
-				if d is None:
-					print ('ZoneTransfer Checks Failed, Try again')
-					sys.exit()					
-	
-					print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
-					data = json.dumps(d, indent=6, sort_keys=True)
-					print (colored(data, 'blue'))
-					return d
-		else:		
+		if self.args.ZONE_RESULT['vuln']:
+			d = self.zone()
+			z_data = json.dumps(d)
+			z_data = json.loads(z_data)
+			vuln = z_data["vuln"]
+			if d is None:
+				print ('ZoneTransfer Checks Failed, Try again')
+				sys.exit()					
+
+				print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
+				data = json.dumps(d, indent=6, sort_keys=True)
+				print (colored(data, 'blue'))
+				return d
+		else:				
 			if self.args.top:
 	
 				subdomains = data_.top_list(fileObj, self.args)

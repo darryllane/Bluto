@@ -6,8 +6,9 @@ import random
 import time
 import traceback
 import threading
+from termcolor import colored
 from bs4 import BeautifulSoup
-from .logger_ import info, error
+from .logger_ import error, info, INFO_LOG_FILE, ERROR_LOG_FILE
 from multiprocessing import Queue
 
 requests.packages.urllib3.disable_warnings()
@@ -46,7 +47,7 @@ class Search(object):
                     print('An unhandled exception has occured, please check the \'Error log\' for details')
                     print(traceback.print_exc())
             info('An unhandled exception has occured, please check the \'Error log\' for details')
-            error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1) 
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
             
         try:
             with open(self.country_file) as fin:
@@ -61,7 +62,7 @@ class Search(object):
                 print('An unhandled exception has occured, please check the \'Error log\' for details')
                 print(traceback.print_exc())
             info('An unhandled exception has occured, please check the \'Error log\' for details')
-            error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)             
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)       
             
         
         while True:
@@ -87,7 +88,7 @@ class Search(object):
                     print('An unhandled exception has occured, please check the \'Error log\' for details')
                     print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1) 
+                error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)    
                 print('The Google UK server has been selected')
                 self.originCountry = 'United Kingdom'
                 continue
@@ -111,9 +112,8 @@ class Search(object):
                         print('\n\tSearching From: {0}\n\tGoogle Server: {1}\n'.format(self.originCountry.title(), self.userServer))
                     
         except Exception:
-            print('An unhandled exception has occured, please check the \'Error log\' for details')
             info('An unhandled exception has occured, please check the \'Error log\' for details')
-            error(traceback.print_exc())        
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)                       
                 
         email_seen = []
         
@@ -176,14 +176,14 @@ class Search(object):
                                     print('An unhandled exception has occured, please check the \'Error log\' for details')
                                     print(traceback.print_exc())
                                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                                
+                                error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)                                   
         
             except Exception:
                 if self.args.verbose:
                     print('An unhandled exception has occured, please check the \'Error log\' for details')
                     print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                                              
+                error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)                                              
             
         if self.args.verbose:
             print('Google Out: {}'.format(email_seen))
@@ -242,7 +242,7 @@ class Search(object):
                     print('An unhandled exception has occured, please check the \'Error log\' for details')
                     print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                                     
+                error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)                            
                                
         if self.args.verbose:
             print('Bing Out: {}'.format(email_seen))
@@ -374,11 +374,8 @@ class Search(object):
                 self.EmailQue.put(email_seen)
                 return
             except Exception:
-                if self.args.verbose:
-                    print('An unhandled exception has occured, please check the \'Error log\' for details')
-                    print(traceback.print_exc())
                 info('An unhandled exception has occured, please check the \'Error log\' for details')
-                error('An unhandled exception has occured, please check the \'Error log\' for details', exc_info=1)                             
+                error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)                        
         
         if self.args.verbose:
             print('Baidu Out: {}'.format(email_seen))
@@ -415,28 +412,27 @@ class Search(object):
                 json_data = response.json()
                 if json_data['message'] =='Too many calls for this period.':
                     print(colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red'))
-                    print(colored('\tAPI Key: {}\n'.format(api),'red'))
+                    print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
                     q.put(None)
                     return None
                 if json_data['message'] == 'Invalid or missing api key.':
-                    print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid,\nit was probably deleted.", 'red'))
-                    print(colored('\tAPI Key: {}\n'.format(api),'red'))
+                    print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid", 'red'))
+                    print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
                     print(colored('\tWhy don\'t you grab yourself a new one (they are free)','green'))
                     print(colored('\thttps://hunter.io/api_keys','green'))
                     q.put(None)
                     return None
             else:
-                raise ValueError('No Response From Hunter')
-        except UnboundLocalError as e:
-            print(e)
+                raise Valueerror('No Response From Hunter')
+        except UnboundLocalError:
+            error('An UnboundLocalError Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
         except KeyError:
             pass
         except ValueError:
-            info(traceback.print_exc())
             pass
         except Exception:
-            traceback.print_exc()
-            info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
+            info('An unhandled exception has occured, please check the \'Error log\' for details')
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)   
     
         info('Hunter Search Completed')
         self.EmailQue.put(emails)

@@ -1,5 +1,6 @@
 import threading
 from multiprocessing import Queue
+from ..logger_ import error, info, INFO_LOG_FILE, ERROR_LOG_FILE
 from .class_calls import linkedIna, Email, dns_gather, zone_transfer, enumerate_subdomains
 
 
@@ -55,24 +56,27 @@ class MakeThread():
 	
 	def order_exe(self):
 		
-		threads = []
-		for func in self.func_list:
-			self.arg_list = []
-			self.func_name = func
-		
-			if self.func_name == 'Dns':
-				self.function = dns_gather
-			elif self.func_name == 'Zone':
-				self.function = zone_transfer
-			elif self.func_name == 'LinkedIna':
-				self.function = linkedIna
+		try:
+			threads = []
+			for func in self.func_list:
+				self.arg_list = []
+				self.func_name = func
 			
-			self.queue = Queue()
-			self.arg_list.append((self.func_args,self.queue))
-		
-			self.thread = threading.Thread(target=self.function, args=(self.arg_list,), name=self.func_name)
-			threads.append(self.thread)
-		
+				if self.func_name == 'Dns':
+					self.function = dns_gather
+				elif self.func_name == 'Zone':
+					self.function = zone_transfer
+				elif self.func_name == 'LinkedIna':
+					self.function = linkedIna
+				
+				self.queue = Queue()
+				self.arg_list.append((self.func_args,self.queue))
+			
+				self.thread = threading.Thread(target=self.function, args=(self.arg_list,), name=self.func_name)
+				threads.append(self.thread)
+		except Exception:
+			info('An unhandled exception has occured, please check the \'Error log\' for details')
+			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)			
 		return threads
 		
 		
