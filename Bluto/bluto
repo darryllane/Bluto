@@ -23,7 +23,7 @@ from modules import execute
 
 
 def value_check(args):
-	version = '3.0.15'
+	version = '3.0.16b'
 	args.VERSION_CONST = version
 		
 	if args.version:
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 		print (colored('Arg Output', 'red', 'on_yellow'))
 		debug_out(args.__dict__)
 	try:
-		if not any([args.email, args.dns, args.zone, args.soa]):
+		if not any([args.email, args.dns, args.zone, args.soa, args.brute]):
 			parser.print_help()
 		if args.soa:
 			execute.Dns.soa_only(args)
