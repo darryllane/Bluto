@@ -96,7 +96,7 @@ if __name__ == "__main__":
 		print (colored('Arg Output', 'red', 'on_yellow'))
 		debug_out(args.__dict__)
 	try:
-		if not any([args.email, args.dns, args.zone, args.soa, args.brute]):
+		if not any([args.email, args.dns, args.zone, args.soa, args.brute, args.la]):
 			parser.print_help()
 		if args.soa:
 			execute.Dns.soa_only(args)

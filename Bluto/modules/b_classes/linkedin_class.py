@@ -11,7 +11,7 @@ import socket
 import traceback
 import sys
 import json
-
+import requests
 import multiprocessing as mp
 
 from ..logger_ import error, info, INFO_LOG_FILE, ERROR_LOG_FILE
@@ -101,11 +101,11 @@ class FindPeople(object):
 			if self.operating_system == 'Linux':
 				if args.verbose:
 					info('verbose: on')				
-					display = Display(visible=1, size=(1280, 720))
+					display = Display(visible=1, size=(1280, 1280))
 				else:
 					opt.add_argument('headless')
 					info('headless: on')
-					display = Display(visible=0, size=(1280, 720))
+					display = Display(visible=0, size=(1280, 1280))
 					info('verbose: off')
 				exec_path = dirname + '/chromedriverLINUX'
 				display.start()
@@ -195,7 +195,16 @@ class FindPeople(object):
 			error(traceback.print_exc())
 			return
 
-
+		
+	def scroll_page(self):
+		count = 1
+		while count:
+			scheight = .1
+			while scheight < 20.0:
+				self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight/{});".format(scheight))
+				scheight += .02
+			count -= 1
+			
 	def not_exact(self):
 
 		"""
@@ -314,20 +323,21 @@ class FindPeople(object):
 				for each in li_list:
 					try:
 						company_item = each.find('div', {'class': 'search-result__info'})
-						if company_item.find('h3', {'class':'search-result__title'}):
+						if 'search-result__title' in str(company_item):
 							company_name = company_item.find('h3', {'class':'search-result__title'}).text.replace('.', '').replace('\n', '').strip()
 							#print company_name
-						if company_item.find('p', {'class':'subline-level-1'}):
+						if 'subline-level-1' in str(company_item):
 							company_type = company_item.find('p', {'class':'subline-level-1'}).text.replace('.', '').replace('\n', '').strip()
 							#print company_type
 						else:
 							company_type = None
-						if company_item.find('p', {'class':'subline-level-2'}):
+						if 'subline-level-2' in str(company_item):
 							company_people = company_item.find('p', {'class':'subline-level-2'}).text.replace('.', '').replace('\n', '').strip()
 							#print company_people
 						else:
 							company_people = None
-						if company_item.find('a', {'data-control-name': 'search_srp_result'}):
+							
+						if 'search_srp_result' in str(company_item):
 							data = company_item.find('a', href=True)
 							company_number = data['href'].replace('/company/', '').replace('/', '')
 						#print '\n'
@@ -372,22 +382,9 @@ class FindPeople(object):
 	def result_pages(self):
 		numbers = []
 		try:
-			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, '1'))
+			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&origin=FACETED_SEARCH&page={}'.format(self.company_number, '1'))
 			
-			last_height = self.browser.execute_script("return document.body.scrollHeight")
-			
-			while True:
-				# Scroll down to bottom
-				self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-			
-				# Wait to load page
-				time.sleep(1)
-			
-				# Calculate new scroll height and compare with last scroll height
-				new_height = self.browser.execute_script("return document.body.scrollHeight")
-				if new_height == last_height:
-					break
-				last_height = new_height			
+			self.scroll_page()
 			
 			html = self.browser.page_source
 			soup = BeautifulSoup(html, "lxml")
@@ -401,7 +398,10 @@ class FindPeople(object):
 				else:
 					numbers.append(int(li.span.text))
 		except AttributeError:
-			if 'upgrade to Premium to continue searching' in html:
+			if not result_page:
+				info('your linkedin account has reached its search limit')
+				return 2
+			elif 'upgrade to Premium to continue searching' in html:
 				info('your linkedin account has reached its search limit')
 				return 'limit reach'
 		except Exception:
@@ -416,7 +416,60 @@ class FindPeople(object):
 			if numbers:
 				return max(numbers)
 			else:
-				return 'none'
+				return 20
+	
+	
+	def email_pattern(self):
+		info('Pattern Search Started')
+		link = 'https://api.hunter.io/v2/domain-search?domain={0}&api_key={1}'.format(self.args.domain, self.args.api)
+		if self.args.proxy == True:
+			proxy = {'http' : 'http://127.0.0.1:8080'}
+		else:
+			pass
+		try:
+			headers = {"User-Agent" : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+			           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			    'Accept-Language': 'en-US,en;q=0.5',
+			    'Accept-Encoding': 'gzip, deflate'}            
+			if self.args.proxy == True:
+				response = requests.get(link, headers=headers, proxies=proxy, verify=False)
+			else:
+				response = requests.get(link, headers=headers, verify=False)
+			if response.status_code == 200:
+				json_data = response.json()
+			
+				if json_data['data']['pattern']:
+					info('Pattern Search Started')
+					self.pattern = json_data['data']['pattern']
+
+			elif response.status_code == 401:
+				json_data = response.json()
+			
+				if json_data['message'] =='Too many calls for this period.':
+					print(colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red'))
+					print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
+					q.put(None)
+					return None
+				if json_data['message'] == 'Invalid or missing api key.':
+					print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid", 'red'))
+					print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
+					print(colored('\tWhy don\'t you grab yourself a new one (they are free)','green'))
+					print(colored('\thttps://hunter.io/api_keys','green'))
+					q.put(None)
+					return None
+				else:
+					raise Valueerror('No Response From Hunter')
+
+		except UnboundLocalError:
+			error('An UnboundLocalError Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+		except KeyError:
+			pass
+		except ValueError:
+			pass
+		except Exception:
+			info('An unhandled exception has occured, please check the \'Error log\' for details')
+			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)   	
+	
 		
 	def people(self):
 
@@ -433,7 +486,7 @@ class FindPeople(object):
 			if isinstance(data, int):
 				self.staff_page = data
 			else:
-				print(colored('\nUser account reached search limit!', 'red'))
+				print(colored('\n\nUser account reached search limit!', 'red'))
 				error('User account reached search limit!')
 				info('User account reached search limit!')
 				self.output.put(people_details)
@@ -444,15 +497,7 @@ class FindPeople(object):
 			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, page))
 
 			time.sleep(2)
-			html = self.browser.page_source
-			
-			if 'upgrade to Premium to continue searching' in html:
-				print(colored('User account reached search limit!', 'red'))
-				error('User account reached search limit!')
-				info('User account reached search limit!')
-				self.output.put(people_details)
-				self.browser.close()				
-				return		
+			html = self.browser.page_source	
 			
 			try:
 				if 'No results found' in self.browser.page_source:
@@ -499,6 +544,9 @@ class FindPeople(object):
 									pass
 								else:
 									SEEN.append(name)
+									if self.args.api:
+										self.email_pattern()
+										print(self.pattern)
 									people_details.append(("name:" + name.strip(),
 										                      "role:" + job.strip(),
 										                      "location:" + location.strip(),
@@ -543,9 +591,18 @@ class FindPeople(object):
 							print(colored('\n\nYou’ve reached the commercial use limit on this linkedIn account!', 'red'))
 						self.output.put(people_details)
 						return
+					
 			else:
 				time.sleep(2)
 				continue
+			
+			if 'upgrade to Premium to continue searching' in html:
+				print(colored('\n\nUser account reached search limit!', 'red'))
+				error('User account reached search limit!')
+				info('User account reached search limit!')
+				self.output.put(people_details)
+				self.browser.close()				
+				return	
 			
 		print('{} staff members found\n'.format(len(SEEN)))
 		self.output.put(people_details)

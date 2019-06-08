@@ -381,13 +381,12 @@ class Search(object):
             print('Baidu Out: {}'.format(email_seen))
             print('Baidu Count: {}\n'.format(len(email_seen)))
         self.EmailQue.put(email_seen)
-        
-        
+                        
+                    
     def hunter_io(self):
         info('Hunter Search Started')
         emails = []
-        link = 'https://api.emailhunter.co/v1/search?domain={0}&api_key={1}'.format(self.args.domain, self.args.api)
-    
+        link = 'https://api.hunter.io/v2/domain-search?domain=={0}&api_key={1}'.format(self.args.domain, self.args.api)
         if self.args.proxy == True:
             proxy = {'http' : 'http://127.0.0.1:8080'}
         else:
@@ -403,6 +402,9 @@ class Search(object):
                 response = requests.get(link, headers=headers, verify=False)
             if response.status_code == 200:
                 json_data = response.json()
+                if json_data['pattern']:
+                    info('Pattern Search Started')
+                    self.pattern = json_data['pattern']
                 for value in json_data['emails']:
                     for domain in value['sources']:
                         url = str(domain['uri']).replace("u'","")
