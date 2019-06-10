@@ -23,7 +23,7 @@ from modules import execute
 
 
 def value_check(args):
-	version = '3.0.16b'
+	version = '3.0.17b'
 	args.VERSION_CONST = version
 		
 	if args.version:
