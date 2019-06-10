@@ -107,13 +107,13 @@ def write_html(users, company_details, args):
 				for user in value:
 					name = user['name']
 					job = user['role']
-					
+					confirmed = user['confirmed']
 					url = user['image']
 					if url == 'None':
 						url = blank_user()
 						
 					address = user['location']
-					email = 'FILLER'
+					email = user['email']
 
 					myFile.write('<div class="row">')
 					myFile.write('<div class="column">')
@@ -124,6 +124,7 @@ def write_html(users, company_details, args):
 					myFile.write('<p class="title">{job}</p>'.format(job=job))
 					myFile.write('<p>{address}</p>'.format(address=address))
 					myFile.write('<p>{email}</p>'.format(email=email))
+					myFile.write('<p>{confirmed}</p>'.format(confirmed=confirmed))
 					myFile.write('<p><button class="button">Details</button></p>')
 					myFile.write('</div>')
 					myFile.write('</div>')

@@ -265,7 +265,45 @@ class FindPeople(object):
 				self.negative(confirmed)
 				i += 1
 
+	def confirm_email(self, email):
+		info('Compromised Account Enumeration Search Started')
+		pwend_data = []
+		seen = set()
+		
+		link = 'https://haveibeenpwned.com/api/v2/breachedaccount/{}'.format(email)
+		try:
+			headers = {"Connection" : "close",
+		               "User-Agent" : "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
+		               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+		               'Accept-Language': 'en-US,en;q=0.5',
+		               'Accept-Encoding': 'gzip, deflate'}
 
+			response = requests.get(link, headers=headers, verify=False)
+			json_data = response.json()
+			if json_data:
+				if email in seen:
+					pass
+				else:
+					for item in json_data:
+						seen.add(email)
+						email_address = email
+						breach_domain = str(item['Domain']).replace("u'","")
+						breach_data = str(item['DataClasses']).replace("u'","'").replace('"','').replace('[','').replace(']','')
+						breach_date = str(item['BreachDate']).replace("u'","")
+						breach_added = str(item['AddedDate']).replace("u'","").replace('T',' ').replace('Z','')
+						breach_description = str(item['Description']).replace("u'","")
+						pwend_data.append((email_address, breach_domain, breach_data, breach_date, breach_added, breach_description))
+
+		except ValueError:
+			pass
+		except Exception:
+			info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
+	
+		info('Compromised Account Enumeration Search Completed')
+		return pwend_data	
+
+
+	
 	def negative(self, confirmed):
 
 		"""
@@ -321,53 +359,57 @@ class FindPeople(object):
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
 
 				for each in li_list:
-					try:
-						company_item = each.find('div', {'class': 'search-result__info'})
-						if 'search-result__title' in str(company_item):
-							company_name = company_item.find('h3', {'class':'search-result__title'}).text.replace('.', '').replace('\n', '').strip()
-							#print company_name
-						if 'subline-level-1' in str(company_item):
-							company_type = company_item.find('p', {'class':'subline-level-1'}).text.replace('.', '').replace('\n', '').strip()
-							#print company_type
-						else:
-							company_type = None
-						if 'subline-level-2' in str(company_item):
-							company_people = company_item.find('p', {'class':'subline-level-2'}).text.replace('.', '').replace('\n', '').strip()
-							#print company_people
-						else:
-							company_people = None
-							
-						if 'search_srp_result' in str(company_item):
-							data = company_item.find('a', href=True)
-							company_number = data['href'].replace('/company/', '').replace('/', '')
-						#print '\n'
+					if not ' Upgrade to Premium today' in str(each):
+						try:
+						
+							company_item = each.find('div', {'class': 'search-result__info'})
 
-						company_details.append((company_name, company_type, company_people, company_number))
-						if self.company_name.lower() in company_name.lower():
-							print('Is This the correct company?')
-							tmp = colored('{}\n', 'green').format(company_name)
-							if company_people == None:
-								company_people = ''
-							confirmed = input('\n{}'.format(tmp) + '{}\n{}'.format(company_type, company_people) + '\n' + colored('(y|n)','yellow') )
-							if confirmed.lower() in ('y', 'yes'):
-								tmp = colored(company_name, 'green')
-								print('\nTarget Company Identified:\n')
-								print('\t' + str(company_name))
-								print('\t' + str(company_type))
-								print('\t' + str(company_people))
-								print('Searching LinkedIn for ' + tmp + ' staff members\n')
-								self.company_number = company_number
-								self.company_found = True
-								return
-							elif confirmed.lower() in ('n', 'no'):
-								continue
+							if 'search-result__title' in str(company_item):
+								if company_item.find('h3', {'class':'search-result__title'}):
+									company_name = company_item.find('h3', {'class':'search-result__title'}).text.replace('.', '').replace('\n', '').strip()								
+								#print company_name
+							if 'subline-level-1' in str(company_item):
+								company_type = company_item.find('p', {'class':'subline-level-1'}).text.replace('.', '').replace('\n', '').strip()
+								#print company_type
 							else:
-								self.negative(confirmed)
-					except AttributeError:
-						print(traceback.print_exc())
-					except Exception as e_rror:
-						info('An unhandled exception has occured, please check the \'Error log\' for details')
-						error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+								company_type = None
+							if 'subline-level-2' in str(company_item):
+								company_people = company_item.find('p', {'class':'subline-level-2'}).text.replace('.', '').replace('\n', '').strip()
+								#print company_people
+							else:
+								company_people = None
+								
+							if 'search_srp_result' in str(company_item):
+								data = company_item.find('a', href=True)
+								company_number = data['href'].replace('/company/', '').replace('/', '')
+							#print '\n'
+	
+							company_details.append((company_name, company_type, company_people, company_number))
+							if self.company_name.lower() in company_name.lower():
+								print('Is This the correct company?')
+								tmp = colored('{}\n', 'green').format(company_name)
+								if company_people == None:
+									company_people = ''
+								confirmed = input('\n{}'.format(tmp) + '{}\n{}'.format(company_type, company_people) + '\n' + colored('(y|n)','yellow') )
+								if confirmed.lower() in ('y', 'yes'):
+									tmp = colored(company_name, 'green')
+									print('\nTarget Company Identified:\n')
+									print('\t' + str(company_name))
+									print('\t' + str(company_type))
+									print('\t' + str(company_people))
+									print('Searching LinkedIn for ' + tmp + ' staff members\n')
+									self.company_number = company_number
+									self.company_found = True
+									return
+								elif confirmed.lower() in ('n', 'no'):
+									continue
+								else:
+									self.negative(confirmed)
+						except AttributeError:
+							print(traceback.print_exc())
+						except Exception as e_rror:
+							info('An unhandled exception has occured, please check the \'Error log\' for details')
+							error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 
 			self.company_details = company_details
 			company_number = self.not_exact()
@@ -470,6 +512,23 @@ class FindPeople(object):
 			info('An unhandled exception has occured, please check the \'Error log\' for details')
 			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)   	
 	
+	
+	def email_matching(self, name):
+		if '{first}.{last}' in self.pattern:
+			if ' ' in name:
+				name = re.sub('\(.*?\)', '', name)
+				split = name.lower().rstrip().strip().split(' ')
+				if len(split) == 2:
+					firstname, lastname = split
+					email_address = firstname + '.' + lastname + '@' + self.domain
+				else:
+					email_address = None
+			else:
+				email_address = None
+		else:
+			email_address = None	
+		
+		return email_address
 		
 	def people(self):
 
@@ -511,6 +570,10 @@ class FindPeople(object):
 
 			data = soup.find('ul', {'class': 'search-results__list'})
 			#print data.contents
+			
+			if self.args.api:
+				self.email_pattern()
+				
 			if data:
 				
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
@@ -544,13 +607,24 @@ class FindPeople(object):
 									pass
 								else:
 									SEEN.append(name)
-									if self.args.api:
-										self.email_pattern()
-										print(self.pattern)
+									if self.pattern:
+										email_address = self.email_matching(name)
+									else:
+										email_address = None
+									
+									if email_address:
+										pwn_data = self.confirm_email(email_address)
+									if pwn_data:
+										print('Confirmed: {}'.format(email_address))
+										confirmed = True
+									else:
+										confirmed = False
 									people_details.append(("name:" + name.strip(),
 										                      "role:" + job.strip(),
 										                      "location:" + location.strip(),
-										                      "image:" + img_url))
+										                      "image:" + img_url,
+									                          "email:" + email_address.lower(),
+									                          "confirmed:" + confirmed))
 
 
 								if li_item.find('div', {'class', 'search-result__profile-blur'}):
@@ -567,11 +641,11 @@ class FindPeople(object):
 							info('An unhandled exception has occured, please check the \'Error log\' for details')
 							error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)							
 					except UnboundLocalError as e_rror:
-						if 'name' in e_rror:
+						if 'name' in e_rror.args:
 							name = None
-						if 'job' in e_rror:
+						if 'job' in e_rror.args:
 							job = None
-						if 'location' in e_rror:
+						if 'location' in e_rror.args:
 							location = None
 						continue
 					except TypeError:
