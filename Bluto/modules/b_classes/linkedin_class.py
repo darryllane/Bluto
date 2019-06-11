@@ -615,7 +615,8 @@ class FindPeople(object):
 									if email_address:
 										pwn_data = self.confirm_email(email_address)
 									if pwn_data:
-										print('Confirmed: {}'.format(email_address))
+										if self.args.debug:
+											print('Confirmed: {}'.format(email_address))
 										confirmed = True
 									else:
 										confirmed = False
