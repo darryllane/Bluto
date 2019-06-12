@@ -19,24 +19,34 @@ def linkedIna(params):
 	
 	obj.company()
 	obj.people()
+	
 	results = obj.output.get()
-	if results:
-		for tup in results:
-			tempDict = {}
-			for elem in tup:
-				elem = elem.split(":", 1)
-				tempDict.update({elem[0]:elem[1]})
-			people.append(tempDict)
-		people = {'person':people}
-		
-		# ADD EMAIL GENERATION FROM RESULTS
+	try:
+		if results:
+			for tup in results:
+				tempDict = {}
+				for elem in tup:
+					elem = elem.split(":", 1)
+					tempDict.update({elem[0]:elem[1]})
+				people.append(tempDict)
+			people = {'person':people}
+			
+			# ADD EMAIL GENERATION FROM RESULTS
+			if args.debug:
+				print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
+				data = json.dumps(people, indent=6, sort_keys=True)
+				print (colored(data, 'blue'))
+				
+			write_html(people, obj.company_name, args)
+			
+			q1.put(people)
+			
+	except Exception as e_rror:
 		if args.debug:
-			print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
-			data = json.dumps(people, indent=6, sort_keys=True)
-			print (colored(data, 'blue'))		
-		write_html(people, obj.company_name, args)
-		
-		q1.put(people)
+			print(e_rror.args)
+			print(traceback.print_exc())
+		info('An unhandled exception has occured, please check the \'Error log\' for details')
+		error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)	
 		
 
 def Email(args):

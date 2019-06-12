@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/local/bin/python3
 
 import sys
 import site
@@ -23,7 +23,7 @@ from modules import execute
 
 
 def value_check(args):
-	version = '3.0.17b'
+	version = '3.0.18b'
 	args.VERSION_CONST = version
 		
 	if args.version:

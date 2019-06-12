@@ -124,7 +124,7 @@ def write_html(users, company_details, args):
 					myFile.write('<p class="title">{job}</p>'.format(job=job))
 					myFile.write('<p>{address}</p>'.format(address=address))
 					myFile.write('<p>{email}</p>'.format(email=email))
-					myFile.write('<p>{confirmed}</p>'.format(confirmed=confirmed))
+					myFile.write('<p>Confirmed: {confirmed}</p>'.format(confirmed=confirmed))
 					myFile.write('<p><button class="button">Details</button></p>')
 					myFile.write('</div>')
 					myFile.write('</div>')

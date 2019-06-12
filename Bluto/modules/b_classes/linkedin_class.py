@@ -130,7 +130,7 @@ class FindPeople(object):
 			self.browser = browser
 			time.sleep(1)
 			self.browser.get('https://www.linkedin.com/uas/login')
-			time.sleep(3)
+			time.sleep(2)
 			
 			if 'No Internet' in browser.page_source:
 				error('internet down!')
@@ -279,22 +279,26 @@ class FindPeople(object):
 		               'Accept-Encoding': 'gzip, deflate'}
 
 			response = requests.get(link, headers=headers, verify=False)
-			json_data = response.json()
-			if json_data:
-				if email in seen:
-					pass
-				else:
-					for item in json_data:
-						seen.add(email)
-						email_address = email
-						breach_domain = str(item['Domain']).replace("u'","")
-						breach_data = str(item['DataClasses']).replace("u'","'").replace('"','').replace('[','').replace(']','')
-						breach_date = str(item['BreachDate']).replace("u'","")
-						breach_added = str(item['AddedDate']).replace("u'","").replace('T',' ').replace('Z','')
-						breach_description = str(item['Description']).replace("u'","")
-						pwend_data.append((email_address, breach_domain, breach_data, breach_date, breach_added, breach_description))
+			if response.status_code == 429:
+				info('pwned failure: {}'.format(response.reason))
+			if response.status_code == 200:
+				json_data = response.json()
+				if json_data:
+					if email in seen:
+						pass
+					else:
+						for item in json_data:
+							seen.add(email)
+							email_address = email
+							breach_domain = str(item['Domain']).replace("u'","")
+							breach_data = str(item['DataClasses']).replace("u'","'").replace('"','').replace('[','').replace(']','')
+							breach_date = str(item['BreachDate']).replace("u'","")
+							breach_added = str(item['AddedDate']).replace("u'","").replace('T',' ').replace('Z','')
+							breach_description = str(item['Description']).replace("u'","")
+							pwend_data.append((email_address, breach_domain, breach_data, breach_date, breach_added, breach_description))
 
 		except ValueError:
+			print(traceback.print_exc())
 			pass
 		except Exception:
 			info('An Unhandled Exception Has Occured, Please Check The Log For Details\n' + INFO_LOG_FILE, exc_info=True)
@@ -424,41 +428,43 @@ class FindPeople(object):
 	def result_pages(self):
 		numbers = []
 		try:
-			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&origin=FACETED_SEARCH&page={}'.format(self.company_number, '1'))
+			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, '1'))
 			
 			self.scroll_page()
 			
+			self.browser.refresh
 			html = self.browser.page_source
+			
 			soup = BeautifulSoup(html, "lxml")
 			result_page = soup.find('ul', {'class': 'artdeco-pagination__pages artdeco-pagination__pages--number'})
-			li_list = result_page.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
-			for li in li_list:
-				if '.' in li.span.text:
-					pass
-				elif '\u2026' in li.span.text:
-					pass
-				else:
-					numbers.append(int(li.span.text))
-		except AttributeError:
-			if not result_page:
-				info('your linkedin account has reached its search limit')
-				return 2
-			elif 'upgrade to Premium to continue searching' in html:
-				info('your linkedin account has reached its search limit')
-				return 'limit reach'
+			if result_page:
+				li_list = result_page.findAll('li', {'class': 'artdeco-pagination__indicator artdeco-pagination__indicator--number'})
+				
+				for li in li_list:
+					
+					if '.' in li.span.text:
+						pass
+					elif '\u2026' in li.span.text:
+						pass
+					else:
+						numbers.append(int(li.span.text))
+			else:
+				return 20
+		except AttributeError as error_:
+			info('An "AttributeError" error has occured, please check the \'Error log\' for details: {}'.format(ERROR_LOG_FILE))
+			error('An "AttributeError" error has occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+			return 20
 		except Exception:
 			info('An unhandled exception has occured, please check the \'Error log\' for details')
 			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
 			return 20
 		
-		if self.args.debug:
-			info('debug data return: 10')
-			return (10)
+		if numbers:
+			return max(numbers)
 		else:
-			if numbers:
-				return max(numbers)
-			else:
-				return 20
+			info('no numbers found')
+			info('returning default: 20')
+			return 20
 	
 	
 	def email_pattern(self):
@@ -539,7 +545,9 @@ class FindPeople(object):
 		global SEEN
 
 		i = 0
+
 		people_details = []
+		confirmed_email = []
 		if self.staff_page == 20:
 			data = self.result_pages()
 			if isinstance(data, int):
@@ -553,6 +561,7 @@ class FindPeople(object):
 				return
 			
 		for page in tqdm(range(1, self.staff_page)):
+			
 			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, page))
 
 			time.sleep(2)
@@ -563,9 +572,14 @@ class FindPeople(object):
 					raise NoMoreData("No more results found")
 			except NoMoreData as e_rror:
 				print('No further results possible\n')
-				self.output.put(people_details)
 				print('{} staff members found\n'.format(len(SEEN)))
-				return
+				print('Confirmed accounts: {}'.format(len(confirmed_email)))
+				error('No further results possible')
+				info('No further results possible')
+				self.output.put(people_details)
+				self.browser.close()				
+				return					
+				
 			soup = BeautifulSoup(html, "lxml")
 
 			data = soup.find('ul', {'class': 'search-results__list'})
@@ -579,6 +593,7 @@ class FindPeople(object):
 				li_list = data.findAll('li', {'class': 'search-result search-result__occluded-item ember-view'})
 
 				for li_item in li_list:
+					pwn_data = []
 					try:
 						if li_item.find('img', {'class', 'lazy-image ghost-person loaded'}):
 							pass
@@ -615,25 +630,31 @@ class FindPeople(object):
 									if email_address:
 										pwn_data = self.confirm_email(email_address)
 									if pwn_data:
+										confirmed_email.append(email_address)
 										if self.args.debug:
-											print('Confirmed: {}'.format(email_address))
+											print('Confirmed: {}'.format(str(email_address).lower()))										
 										confirmed = True
 									else:
 										confirmed = False
+								
 									people_details.append(("name:" + name.strip(),
 										                      "role:" + job.strip(),
 										                      "location:" + location.strip(),
 										                      "image:" + img_url,
-									                          "email:" + email_address.lower(),
-									                          "confirmed:" + confirmed))
+									                          "email:" + str(email_address).lower(),
+									                          "confirmed: {}".format(confirmed),
+									                          'pwn_data:{}'.format(pwn_data)))
 
 
 								if li_item.find('div', {'class', 'search-result__profile-blur'}):
 									print(colored('\nYou\'ve Reached The Limit Imposed by LinkedIn', 'yellow'))
-									print('\nReturning Any Results Found\n')
+									print('{} staff members found\n'.format(len(SEEN)))
+									print('Confirmed accounts: {}'.format(len(confirmed_email)))
+									error('User account reached search limit!')
+									info('User account reached search limit!')
 									self.output.put(people_details)
-									print('{} staff members found'.format(len(SEEN)))
-									return
+									self.browser.close()				
+									return	
 
 					except KeyError as e_rror:
 						if 'src' in e_rror.args:
@@ -650,6 +671,7 @@ class FindPeople(object):
 							location = None
 						continue
 					except TypeError:
+						print(traceback.print_exc())
 						continue
 					except Exception:
 						info('An unhandled exception has occured, please check the \'Error log\' for details')
@@ -672,7 +694,9 @@ class FindPeople(object):
 				continue
 			
 			if 'upgrade to Premium to continue searching' in html:
-				print(colored('\n\nUser account reached search limit!', 'red'))
+				print(colored('\nYou\'ve Reached The Limit Imposed by LinkedIn', 'yellow'))
+				print('{} staff members found\n'.format(len(SEEN)))
+				print('Confirmed accounts: {}'.format(len(confirmed_email)))
 				error('User account reached search limit!')
 				info('User account reached search limit!')
 				self.output.put(people_details)
@@ -680,5 +704,6 @@ class FindPeople(object):
 				return	
 			
 		print('{} staff members found\n'.format(len(SEEN)))
+		print('Confirmed accounts: {}'.format(len(confirmed_email)))
 		self.output.put(people_details)
 		self.browser.close()
