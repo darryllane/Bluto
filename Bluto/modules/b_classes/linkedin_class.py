@@ -197,7 +197,7 @@ class FindPeople(object):
 
 		
 	def scroll_page(self):
-		count = 1
+		count = 2
 		while count:
 			scheight = .1
 			while scheight < 20.0:
@@ -431,7 +431,7 @@ class FindPeople(object):
 			self.browser.get('https://www.linkedin.com/search/results/people/?facetCurrentCompany={}&page={}'.format(self.company_number, '1'))
 			
 			self.scroll_page()
-			
+			time.sleep(2)
 			self.browser.refresh
 			html = self.browser.page_source
 			
@@ -449,22 +449,22 @@ class FindPeople(object):
 					else:
 						numbers.append(int(li.span.text))
 			else:
-				return 20
+				return 50
 		except AttributeError as error_:
 			info('An "AttributeError" error has occured, please check the \'Error log\' for details: {}'.format(ERROR_LOG_FILE))
 			error('An "AttributeError" error has occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
-			return 20
+			return 50
 		except Exception:
 			info('An unhandled exception has occured, please check the \'Error log\' for details')
 			error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
-			return 20
+			return 50
 		
 		if numbers:
 			return max(numbers)
 		else:
 			info('no numbers found')
 			info('returning default: 20')
-			return 20
+			return 50
 	
 	
 	def email_pattern(self):

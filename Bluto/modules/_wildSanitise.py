@@ -8,7 +8,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 
 def _ramdomGet(myResolver, domain):
-	q1 = Queue.Queue()
+	q1 = queue.Queue()
 	random_addrs = []
 	try:
 		def gather(q1, random_addrs, myResolver):
@@ -49,7 +49,7 @@ def _wildClean(sub_list, rand_response):
 
 	rand_response2 = rand_response
 	target_results = []
-	q1 = Queue.Queue()
+	q1 = queue.Queue()
 	q1.put(sub_list)
 
 	def worker(host):
@@ -76,10 +76,9 @@ def _wildClean(sub_list, rand_response):
 
 	return target_results
 
-def main(sub_list, job_args):
+def main(sub_list, job_args, myResolver):
 	
 	domain = job_args.domain
-	myResolver = Dns._set(job_args)
 	rand_response = _ramdomGet(myResolver, domain)
 	target_results = _wildClean(sub_list, rand_response)
 	return target_results

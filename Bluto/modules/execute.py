@@ -30,7 +30,7 @@ import traceback
 global results
 results = []
 
-class Dns:
+class Dns():
 	"""
 
 	DNS STUFF
@@ -298,7 +298,9 @@ class Dns:
 				print (colored('\nVulnerable To ZoneTransfers:\n\n{}'.format(ns), 'red'))
 				self.args.ZONE_RESULT = d
 				return d
-	
+		except dns.query.TransferError:
+			d = self.NoZones()
+			return d				
 		except dns.resolver.NoNameservers:
 			pass
 		except EOFError:
@@ -319,7 +321,7 @@ class Dns:
 		except Exception:
 			info('An unhandled exception has occured, please check the \'Error log\' for details')
 			error(traceback.print_exc())
-			d = NoZones()
+			d = self.NoZones()
 			return d
 			
 	
@@ -442,7 +444,7 @@ class Dns:
 					pbar.update()
 			
 			if str(wild) == "{'wild': True}":
-				results = wild_main(results, self.args)
+				results = wild_main(results, self.args, self.myResolver)
 			time_spent_total = time.time() - start_time_total
 			time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
 	
