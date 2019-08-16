@@ -1,7 +1,7 @@
 import pdfminer
 import requests
 import urllib2
-import oletools
+import olefile
 import os
 import traceback
 import time
