@@ -13,6 +13,7 @@ setup(
     DNS Recon | Brute Forcer | DNS Zone Transfer | DNS Wild Card Checks
     DNS Wild Card Brute Forcer | Email Enumeration | Staff Enumeration
     Compromised Account Checking''',
+    long_description_content_type='text/markdown',
     long_description=open('README.md').read(),
     scripts=['Bluto/bluto'],
     install_requires=[
