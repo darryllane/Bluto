@@ -1,9 +1,0 @@
-BeautifulSoup4
-dnspython
-docopt
-lxml
-oletools
-pdfminer
-pythonwhois
-requests[security]
-termcolor
