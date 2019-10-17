@@ -25,7 +25,7 @@ setup(
         "pythonwhois",
         "lxml",
         "oletools",
-        "pdfminer"
+        "pdfminer==20140328"
     ],
 )
 

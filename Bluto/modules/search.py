@@ -93,7 +93,7 @@ def action_pwned(emails):
         time.sleep(3)
         link = 'https://haveibeenpwned.com/api/v3/breachedaccount/{}?truncateResponse=false'.format(email)
         try:
-            headers = {"User-Agent" : "BlutoDNS v2.4.15",
+            headers = {"User-Agent" : "BlutoDNS v2.4.16",
                        'hibp-api-key': 'db192f959742455f98106687df692c68'}
 
             response = requests.get(link, headers=headers, verify=False)
