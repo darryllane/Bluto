@@ -6,7 +6,7 @@ from .in_out import Gather
 from .logger_ import info, error
 from itertools import chain
 from itertools import repeat
-from multiprocessing import Queue as Queue
+import multiprocessing as mp
 from multiprocessing.dummy import Pool as ThreadPool
 from termcolor import colored
 from tqdm import *
@@ -18,7 +18,6 @@ import dns.zone
 import json
 import os
 import progressbar
-import queue as Queue
 import random
 import re
 import socket
@@ -45,7 +44,7 @@ class Dns():
 		
 		"""
 		info('dns module init')
-		self.args = args[0][0]
+		self.args = args
 		
 
 		#Settings DNS Timout Values
@@ -54,7 +53,10 @@ class Dns():
 		self.myResolver = dns.resolver.Resolver()
 		self.myResolver.timeout = int(self.args.timeo)
 		self.myResolver.lifetime = int(self.args.timeo)
-		self.myResolver.nameservers = ['8.8.8.8', '8.8.4.4']				
+		self.myResolver.nameservers = ['8.8.8.8', '8.8.4.4']
+		self.dns_records_output = mp.Queue()
+		self.zone_records_output = mp.Queue()
+		self.brute_records_output = mp.Queue()
 		
 		
 	
@@ -64,6 +66,7 @@ class Dns():
 	def records(self):
 		info('gathering dns records')
 		domain = self.args.domain
+		d = {}
 		ns_list = []
 		zn_list =[]
 		mx_list = []
@@ -121,7 +124,12 @@ class Dns():
 			info('An Unhandled Exception Has Occured, Please Check The Log For Details')
 			info(traceback.print_exc())
 		
-		return zn_list
+		mail_servers = {"Mail Servers": dict(item.split("\t",1) for item in mx_list) }
+		dns_servers = {"DNS Servers": dict(item.split("\t",1) for item in ns_list) }
+		d.update(mail_servers)
+		d.update(dns_servers)
+	
+		self.dns_records_output.put(d) 
 
 
 	#Checks Valid Domain Entry
@@ -147,6 +155,8 @@ class Dns():
 			
 
 	def NoZones(self):
+		d = {}
+		z = {}
 		print (colored('Not Vulnerable To ZoneTransfers', 'green'))
 		vuln = '{"vuln":false}'
 		vuln = json.loads(vuln)
@@ -157,10 +167,11 @@ class Dns():
 		soa_json = '{"soa_json":false}'
 		soa_json = json.loads(soa_json)
 	
-		a = dict(vuln)
-		b = dict(dump_list)
-		c = dict(soa_json)
-		d = dict(a.items() | b.items() | c.items())
+		d.update(dict(vuln))
+		d.update(dict(dump_list))
+		d.update(dict(soa_json))
+		
+		self.zone_records_output.put(d)
 		self.args.ZONE_RESULT = d
 		return d	
 	
@@ -254,7 +265,7 @@ class Dns():
 		try:
 			soa_answer = dns.resolver.query(domain, 'SOA')
 			info('soa enumerated')
-			master_answer = dns.resolver.query(soa_answer[0].mname, 'A')
+			#master_answer = dns.resolver.query(soa_answer[0].mname, 'A')
 			if soa_answer.rrset is not None:
 	
 				pattern= r'(%s)\.\s(\d{1,})\s(\w+)\sSOA\s(.*?)\.\s(.*?)\.\s(\d{1,})\s(\d{1,})\s(\d{1,})\s(\d{1,})\s(\d{1,})' % domain
@@ -282,6 +293,7 @@ class Dns():
 					except Exception:
 						info('An nnhandled exception has occured, please check the \'Error log\' for details')
 						error(traceback.print_exc())
+			
 			if vuln == '{"vuln":true}':
 				d = {}
 				_dump = sorted(set(dump_list))
@@ -289,15 +301,19 @@ class Dns():
 				vuln = json.loads(vuln)
 				soa_json = soa_build(soa_data)
 				soa_json = json.loads(soa_json)
-				a = dict(vuln)
-				b = dict(clean_dump)
-				c = dict(soa_json)
-				d.update(a)
-				d.update(b)
-				d.update(c)
+				
+				d.update(dict(vuln))
+				d.update(dict(clean_dump))
+				d.update(dict(soa_json))
+			
+				self.zone_records_output.put(d)				
 				print (colored('\nVulnerable To ZoneTransfers:\n\n{}'.format(ns), 'red'))
 				self.args.ZONE_RESULT = d
 				return d
+			
+			else:
+				d = self.NoZones()
+				return d				
 		except dns.query.TransferError:
 			d = self.NoZones()
 			return d				
@@ -390,6 +406,7 @@ class Dns():
 	
 	
 	def _brute(self):
+		e = {}
 		global results
 		sub_joined = []
 		data_ = Gather()
@@ -400,18 +417,17 @@ class Dns():
 		if not self.args.ZONE_RESULT:
 			self.zone()
 		if self.args.ZONE_RESULT['vuln']:
+			
 			d = self.zone()
-			z_data = json.dumps(d)
-			z_data = json.loads(z_data)
-			vuln = z_data["vuln"]
 			if d is None:
 				print ('ZoneTransfer Checks Failed, Try again')
 				sys.exit()					
-
-				print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
-				data = json.dumps(d, indent=6, sort_keys=True)
-				print (colored(data, 'blue'))
-				return d
+			else:
+				d.update({'wild': False})
+				e.update(d)
+				e['zone'] = True
+				self.zone_records_output.put(e)				
+	
 		else:				
 			if self.args.top:
 	
@@ -445,6 +461,9 @@ class Dns():
 			
 			if str(wild) == "{'wild': True}":
 				results = wild_main(results, self.args, self.myResolver)
+				e.update({'wild': True})
+			else:
+				e.update({'wild': False})
 			time_spent_total = time.time() - start_time_total
 			time_spent_total_f = str(datetime.timedelta(seconds=(time_spent_total))).split('.')[0]
 	
@@ -455,16 +474,15 @@ class Dns():
 			a = '{{"brute":"{}"}}'.format(time_spent_total_f)
 			time_spent_total_f = self.json_loads_byteified(a)
 	
-			b = dict(time_spent_total_f)
-			c = dict(wild)
-	
-			d = dict(chain(results_f.items(), b.items(), c.items()))
-	
-			d = self.convert(d)
-			# FROM HERE OUTPUT IS RETURN TO MAIN THREAD
-			print (colored('\n\nOutput To HTML Module', 'magenta', attrs=['blink']))
-			data = json.dumps(d, indent=6, sort_keys=True)
-			print (colored(data, 'blue'))
+			
+			e.update(results_f)
+			e.update(dict(time_spent_total_f))
+			e.update(dict(wild))	 
+			e['zone'] = False
+			
+			e = self.convert(e)
+			self.brute_records_output.put(e)
+
 			
 			
 	

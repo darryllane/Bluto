@@ -1,7 +1,7 @@
 import threading
 from multiprocessing import Queue
 from ..logger_ import error, info, INFO_LOG_FILE, ERROR_LOG_FILE
-from .class_calls import linkedIna, Email, dns_gather, zone_transfer, enumerate_subdomains
+from .class_calls import linkedIna, linkedInp, Email, dns_gather, zone_transfer, enumerate_subdomains
 
 
 class MakeThread():
@@ -38,19 +38,17 @@ class MakeThread():
 			self.func_name = func
 			
 			
-			if self.func_name == 'LinkedInp':
-				pass
-			else:
-				if self.func_name == 'Email':
-					self.function = Email
-				elif self.func_name == 'Brute':
-					self.function = enumerate_subdomains
-				
-				self.queue = Queue()
-				self.arg_list.append((self.func_args,self.queue))
-				
-				self.thread = threading.Thread(target=self.function, args=(self.arg_list,), name=self.func_name)
-				threads.append(self.thread)
+			
+			if self.func_name == 'Email':
+				self.function = Email
+			elif self.func_name == 'Brute':
+				self.function = enumerate_subdomains
+			
+			self.queue = Queue()
+			self.arg_list.append((self.func_args,self.queue))
+			
+			self.thread = threading.Thread(target=self.function, args=(self.arg_list,), name=self.func_name)
+			threads.append(self.thread)
 
 		return threads
 	
@@ -66,6 +64,8 @@ class MakeThread():
 					self.function = dns_gather
 				elif self.func_name == 'LinkedIna':
 					self.function = linkedIna
+				elif self.func_name == 'LinkedInp':
+					self.function = linkedInp		
 				elif self.func_name == 'Zone':
 					self.function = zone_transfer				
 				

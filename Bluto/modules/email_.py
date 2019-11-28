@@ -28,11 +28,19 @@ class Search(object):
         info('email module init')
         self.EmailQue = Queue()
         self.uas = []
-        self.args =  args[0][0]
+        if isinstance(args, list):
+            self.args =  args[0][0]
+        else:
+            self.args =  args
         self.proxy = self.args.proxy
         self.user_file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../doc/user_agents.txt'))
         self.country_file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../doc/countries.txt'))
         self.tcountries_dic = {}
+        self.hunter_keys = ["59231dbd135ff77c81498fd793b7b5a69097e60b",
+                            "48afa43d4bf58f6c08b8e83aa07eaddf6d01e6f8",
+                            "a88d12ff7ab40ea1b32ea1de3594606da8320582",
+                            "92593a3f7a1feed6b82c45411dd27a95fa605bd0",
+                            "9f2ec135cb869d457a761003283fa52659881e8f"]
         try:
             info('gathering user_agents')
             with open(self.user_file, 'rb') as uaf:
@@ -42,6 +50,7 @@ class Search(object):
                         self.uas.append(ua)
     
             info('completed gathering user_agents')
+            self.hunter_io_pattern()
         except Exception:
             if self.args.verbose:
                     print('An unhandled exception has occured, please check the \'Error log\' for details')
@@ -385,8 +394,8 @@ class Search(object):
                     
     def hunter_io(self):
         info('Hunter Search Started')
-        emails = []
-        link = 'https://api.hunter.io/v2/domain-search?domain=={0}&api_key={1}'.format(self.args.domain, self.args.api)
+        email_seen = []
+        link = 'https://api.hunter.io/v2/domain-search?domain={0}&api_key={1}'.format(self.args.domain, random.choice(self.hunter_keys))
         if self.args.proxy == True:
             proxy = {'http' : 'http://127.0.0.1:8080'}
         else:
@@ -402,22 +411,22 @@ class Search(object):
                 response = requests.get(link, headers=headers, verify=False)
             if response.status_code == 200:
                 json_data = response.json()
-                if json_data['pattern']:
+                if json_data['data']['pattern']:
                     info('Pattern Search Started')
-                    self.pattern = json_data['pattern']
-                for value in json_data['emails']:
+                    self.pattern = json_data['data']['pattern']
+                for value in json_data['data']['emails']:
                     for domain in value['sources']:
-                        url = str(domain['uri']).replace("u'","")
-                        email =  str(value['value']).replace("u'","")
-                        emails.append((url, email))
+                        url = domain['uri']
+                        email =  value['value']
+                        email_seen.append((url, email))
             elif response.status_code == 401:
                 json_data = response.json()
-                if json_data['message'] =='Too many calls for this period.':
+                if json_data['data']['message'] =='Too many calls for this period.':
                     print(colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red'))
                     print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
                     q.put(None)
                     return None
-                if json_data['message'] == 'Invalid or missing api key.':
+                if json_data['data']['message'] == 'Invalid or missing api key.':
                     print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid", 'red'))
                     print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
                     print(colored('\tWhy don\'t you grab yourself a new one (they are free)','green'))
@@ -429,12 +438,81 @@ class Search(object):
         except UnboundLocalError:
             error('An UnboundLocalError Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
         except KeyError:
+            if self.args.verbose:
+                print(traceback.print_exc())
             pass
         except ValueError:
+            if self.args.verbose:
+                print(traceback.print_exc())            
             pass
         except Exception:
+            if self.args.verbose:
+                print(traceback.print_exc())
             info('An unhandled exception has occured, please check the \'Error log\' for details')
             error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)   
     
+        if self.args.verbose:
+            print('Hunter Out: {}'.format(email_seen))
+            print('Hunter Count: {}\n'.format(len(email_seen)))   
         info('Hunter Search Completed')
-        self.EmailQue.put(emails)
+        self.EmailQue.put(email_seen)
+        
+        
+    def hunter_io_pattern(self):
+        info('Hunter Pattern Started')
+        email_seen = []
+        
+        link = 'https://api.hunter.io/v2/domain-search?domain={0}&api_key={1}'.format(self.args.domain, random.choice(self.hunter_keys))
+        if self.args.proxy == True:
+            proxy = {'http' : 'http://127.0.0.1:8080'}
+        else:
+            pass
+        try:
+            headers = {"User-Agent" : random.choice(self.uas).decode('utf-8'),
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate'}            
+            if self.args.proxy == True:
+                response = requests.get(link, headers=headers, proxies=proxy, verify=False)
+            else:
+                response = requests.get(link, headers=headers, verify=False)
+            if response.status_code == 200:
+                json_data = response.json()
+                if json_data['data']['pattern']:
+                    info('Pattern Search Started')
+                    self.pattern = json_data['data']['pattern']
+
+            elif response.status_code == 401:
+                json_data = response.json()
+                if json_data['data']['message'] =='Too many calls for this period.':
+                    print(colored("\tError:\tIt seems the Hunter API key being used has reached\n\t\tit's limit for this month.", 'red'))
+                    print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
+                    return
+                if json_data['data']['message'] == 'Invalid or missing api key.':
+                    print(colored("\tError:\tIt seems the Hunter API key being used is no longer valid", 'red'))
+                    print(colored('\tAPI Key: {}\n'.format(self.args.api),'red'))
+                    print(colored('\tWhy don\'t you grab yourself a new one (they are free)','green'))
+                    print(colored('\thttps://hunter.io/api_keys','green'))
+                    return
+            else:
+                raise Valueerror('No Response From Hunter')
+        except UnboundLocalError:
+            error('An UnboundLocalError Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)
+        except KeyError:
+            if self.args.verbose:
+                print(traceback.print_exc())
+            pass
+        except ValueError:
+            if self.args.verbose:
+                print(traceback.print_exc())            
+            pass
+        except Exception:
+            if self.args.verbose:
+                print(traceback.print_exc())
+            info('An unhandled exception has occured, please check the \'Error log\' for details')
+            error('An Unhandled Exception Has Occured, Please Check The Log For Details' + ERROR_LOG_FILE, exc_info=True)   
+    
+        if self.args.verbose:
+            print('Pattern: {}'.format(self.pattern))
+        info('Hunter Search Completed')
+           

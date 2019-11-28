@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/en python3.7
 
 import sys
 import site
@@ -37,8 +37,6 @@ def value_check(args):
 			print('You seem to be missing the delemiter \'{}\' character in your password.\n'.format(args.delemiter))
 			parser.print_help()
 			sys.exit()
-	else:
-		args.lp = False
 	
 	if args.proxy:
 		if ':' in args.proxy:
@@ -70,7 +68,7 @@ parser.add_argument('-i', '--intrusive', help='Authoritive DNS query', required=
 parser.add_argument('-e', '--email', help='Enable Email Enumeration', required=False, action='store_true')
 parser.add_argument('-a', '--api', help='Hunter API key', required=False)
 parser.add_argument('-t', '--timeo', help='Set timeout value | Default 5', required=False)
-parser.add_argument('-p', '--proxy', help='eg 127.0.0.0:8080', required=False)
+parser.add_argument('-p', '--proxy', help='eg 127.0.0.1:8080', required=False)
 
 parser.add_argument('-dns', '--dns', help='Carry out DNS enumeration', required=False, action='store_true')
 parser.add_argument('-soa', '--soa', help='Start of Authority record details', required=False, action='store_true')
@@ -96,7 +94,7 @@ if __name__ == "__main__":
 		print (colored('Arg Output', 'red', 'on_yellow'))
 		debug_out(args.__dict__)
 	try:
-		if not any([args.email, args.dns, args.zone, args.soa, args.brute, args.la]):
+		if not any([args.email, args.dns, args.zone, args.soa, args.brute, args.la, args.lp]):
 			parser.print_help()
 		if args.soa:
 			execute.Dns.soa_only(args)
@@ -106,7 +104,25 @@ if __name__ == "__main__":
 			func_order.append('Zone')
 		if args.la:
 			func_order.append('LinkedIna')
-			
+		if args.lp:
+			func_order.append('LinkedInp')								
+		
+		if args.brute:
+			info('sub bruting started')
+			func_list.append('Brute')						
+		if args.email:
+			info('email hunter started')
+			func_list.append('Email')
+		
+		if func_list:
+			info('thread unordered pool populating')
+			jobs = MakeThread(func_list, args)
+			threads = jobs.unordered_exe()
+			for thread in threads:
+				thread.start()
+			for thread in threads:
+				thread.join()
+		
 		if func_order:
 			info('thread order pool populating')
 			jobs = MakeThread(func_order, args)
@@ -123,27 +139,11 @@ if __name__ == "__main__":
 				elif thread.name == 'LinkedIna':
 					info('active linkedin search started')
 					thread.start()
-					thread.join()						
-		
-		if args.brute:
-			info('sub bruting started')
-			func_list.append('Brute')		
-		if args.lp:
-			info('passive linkedin search started')
-			func_list.append('linkedInp')						
-		if args.email:
-			info('email hunter started')
-			func_list.append('Email')
-		
-		
-		if func_list:
-			info('thread unordered pool populating')
-			jobs = MakeThread(func_list, args)
-			threads = jobs.unordered_exe()
-			for thread in threads:
-				thread.start()
-			for thread in threads:
-				thread.join()
+					thread.join()
+				elif thread.name == 'LinkedInp':
+					info('passive linkedin search started')
+					thread.start()
+					thread.join()		
 		
 		print('\n')
 				
