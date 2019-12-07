@@ -436,7 +436,7 @@ class Dns():
 				if self.args.debug:
 					print (colored('Debug Enabled:','red', 'on_yellow'))
 					print (colored('SubDomains Output', 'red', 'on_yellow'))
-					debug_out(subdomains)
+					#debug_out(subdomains)
 	
 			else:
 				self.args.top = '1000'

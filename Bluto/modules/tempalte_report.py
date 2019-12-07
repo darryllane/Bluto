@@ -20,6 +20,10 @@ class StaffEnumeration():
 		COMPANY_LOC = LOG_ROOT+'{}'.format(str(self.args.domain).split('.', 1)[0])
 		self.COMPANY_LOC = COMPANY_LOC
 		
+		if not os.path.exists(self.COMPANY_LOC):
+			os.makedirs(self.COMPANY_LOC)
+			os.chmod(self.COMPANY_LOC, 0o700)			
+		
 		self.data = data
 		
 		start_html = self.start()
@@ -36,7 +40,7 @@ class StaffEnumeration():
 	
 		
 		
-		with open(self.COMPANY_LOC + '/profiles.html', 'w') as myFile:
+		with open(self.COMPANY_LOC + '/profiles.html', 'a') as myFile:
 
 			myFile.write(page)		
 			myFile.close()

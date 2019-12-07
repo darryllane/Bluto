@@ -245,7 +245,8 @@ class Search(object):
                                 pass
                             else:
                                 email_seen.append((url, email.lower()))
-
+            except ConnectionError:
+                pass
             except Exception:
                 if self.args.verbose:
                     print('An unhandled exception has occured, please check the \'Error log\' for details')

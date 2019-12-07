@@ -8,7 +8,7 @@ SITES = site.getsitepackages()
 for item in SITES:
 	if os.path.exists(item + "/Bluto/modules/__init__.py"):
 		path = item
-sys.path.append(path + '/Bluto/')
+#sys.path.append(path + '/Bluto/')
 
 import argparse
 import traceback
