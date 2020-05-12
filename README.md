@@ -124,3 +124,5 @@ Output
 	>>> ssl.OPENSSL_VERSION
 	'OpenSSL 1.0.2j  26 Sep 2016'
 	>>>
+
+Please be aware that the current version of Bluto does not support Python 3. It is a python 2.7.x application.
