@@ -17,7 +17,7 @@ The target domain is queried for MX and NS records. Sub-domains are passively ga
 
 Bluto now does email address enumeration based on the target domain, currently using Bing and Google search engines plus gathering data from the Email Hunter service and LinkedIn. https://haveibeenpwned.com/ is then used to identify if any email addresses have been compromised. Previously Bluto produced a 'Evidence Report' on the screen, this has now been moved off screen and into an HTML report.
 
-Search engine queries are configured in such a way to use a random `User Agent:` on each request and does a country look up to select the fastest Google server in relation to your egress address. Each request closes the connection in an attempt to further avoid captchas, however exsesive lookups will result in captchas (Bluto will warn you if any are identified). 
+Search engine queries are configured in such a way to use a random `User Agent:` on each request and does a country look up to select the fastest Google server in relation to your egress address. Each request closes the connection in an attempt to further avoid captchas, however excessive lookups will result in captchas (Bluto will warn you if any are identified). 
          
 Bluto requires various other dependencies. So to make things as easy as possible, `pip` is used for the installation. This does mean you will need to have pip installed prior to attempting the Bluto install.
 
