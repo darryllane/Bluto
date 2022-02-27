@@ -94,8 +94,8 @@ prox = False
 if __name__ == "__main__":
     info('\nBluto Started')
     args = docopt(__doc__, version=version)
-    print title
-    print desc
+    print(title)
+    print(desc)
 #Check Arguments
     try:
 
