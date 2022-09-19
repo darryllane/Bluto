@@ -29,7 +29,7 @@ def action_download(doc_list, docs):
 	i = 0
 	download_list = []
 	initial_count = 0
-	print 'Gathering Live Documents For Metadata Mining\n'
+	print('Gathering Live Documents For Metadata Mining\n')
 	headers = {
 		'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.0; pl; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB7.1 ( .NET CLR 3.5.30729',
 		'Referer': 'https://www.google.co.uk/',
@@ -97,7 +97,7 @@ def action_download(doc_list, docs):
 	if i < 1:
 		return download_list
 	data_size = get_size(docs)
-	print '\tData Downloaded: {}MB'.format(str(math.floor(data_size)))
+	print('\tData Downloaded: {}MB'.format(str(math.floor(data_size))))
 	info('Documents Downloaded: {}'.format(initial_count))
 	return download_list
 
